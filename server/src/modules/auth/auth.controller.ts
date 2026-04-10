@@ -1,8 +1,10 @@
 import {Request, Response} from 'express';
 import {User} from './auth.model';
+import bcrypt from 'bcryptjs';
 
 export const register = async (req: Request, res: Response) => {
     const {email, password} = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const existingUser = await User.findOne({email});
 
@@ -14,11 +16,14 @@ export const register = async (req: Request, res: Response) => {
 
     const user = await User.create({
         email,
-        password,
+        password: hashedPassword,
     });
 
     res.status(201).json({
         message: 'User created',
-        user,
+        user: {
+            id: user._id,
+            email: user.email,
+        },
     });
 };
