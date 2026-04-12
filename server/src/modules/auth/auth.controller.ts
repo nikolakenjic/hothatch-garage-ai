@@ -27,3 +27,31 @@ export const register = async (req: Request, res: Response) => {
         },
     });
 };
+
+export const login = async (req: Request, res: Response) => {
+    const {email, password} = req.body;
+
+    const user = await User.findOne({email});
+
+    if (!user) {
+        return res.status(400).json({
+            message: 'Invalid credentials',
+        });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+        return res.status(400).json({
+            message: 'Invalid credentials',
+        });
+    }
+
+    res.status(200).json({
+        message: 'Login successful',
+        user: {
+            _id: user._id,
+            email: user.email,
+        },
+    });
+};
