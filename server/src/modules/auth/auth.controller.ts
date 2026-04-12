@@ -1,6 +1,8 @@
 import {Request, Response} from 'express';
 import {User} from './auth.model';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import {env} from '../../config/env';
 
 export const register = async (req: Request, res: Response) => {
     const {email, password} = req.body;
@@ -39,6 +41,12 @@ export const login = async (req: Request, res: Response) => {
         });
     }
 
+    const token = jwt.sign(
+        {userId: user._id, email: user.email},
+        env.JWT_SECRET,
+        {expiresIn: '1d'},
+    );
+
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect) {
@@ -49,6 +57,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.status(200).json({
         message: 'Login successful',
+        token,
         user: {
             _id: user._id,
             email: user.email,
