@@ -30,3 +30,27 @@ export const getMyCars = async (req: Request, res: Response) => {
         cars,
     });
 };
+
+export const getCarById = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const userId = (req.user as any).userId;
+
+    const car = await Car.findById(id);
+
+    if (!car) {
+        return res.status(404).json({
+            message: 'Car not found',
+        });
+    }
+
+    if (car.user.toString() !== userId) {
+        return res.status(403).json({
+            message: 'Not authorized to access this car',
+        });
+    }
+
+    res.status(200).json({
+        message: 'Car fetched successfully',
+        car,
+    });
+};
