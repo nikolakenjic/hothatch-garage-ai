@@ -54,3 +54,60 @@ export const getCarById = async (req: Request, res: Response) => {
         car,
     });
 };
+
+export const updateCar = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const userId = (req.user as any).userId;
+
+    const car = await Car.findById(id);
+
+    if (!car) {
+        return res.status(404).json({
+            message: 'Car not found',
+        });
+    }
+
+    if (car.user.toString() !== userId) {
+        return res.status(403).json({
+            message: 'Not authorized to update this car',
+        });
+    }
+
+    const {brand, model, year} = req.body;
+
+    car.brand = brand || car.brand;
+    car.model = model || car.model;
+    car.year = year || car.year;
+
+    await car.save();
+
+    res.status(200).json({
+        message: 'Car updated successfully',
+        car,
+    });
+};
+
+export const deleteCar = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const userId = (req.user as any).userId;
+
+    const car = await Car.findById(id);
+
+    if (!car) {
+        return res.status(404).json({
+            message: 'Car not found',
+        });
+    }
+
+    if (car.user.toString() !== userId) {
+        return res.status(403).json({
+            message: 'Not authorized to delete this car',
+        });
+    }
+
+    await car.deleteOne();
+
+    res.status(200).json({
+        message: 'Car deleted successfully',
+    });
+};
