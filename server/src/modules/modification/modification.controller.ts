@@ -3,9 +3,10 @@ import {Car} from '../car/car.model';
 import {Modification} from './modification.model';
 
 export const createModification = async (req: Request, res: Response) => {
-    const carId = req.params.cardId as string;
+    const carId = req.params.carId as string;
     const {name, category, price} = req.body;
     const userId = (req.user as any).userId;
+    console.log(carId);
 
     const car = await Car.findById(carId);
 
