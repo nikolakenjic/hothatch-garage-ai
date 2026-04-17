@@ -61,6 +61,40 @@ export const getModificationsByCar = async (req: Request, res: Response) => {
     });
 };
 
+export const updateModification = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const userId = (req.user as any).userId;
+
+    const modification = await Modification.findById(id);
+
+    if (!modification) {
+        return res.status(404).json({
+            message: 'Modification not found',
+        });
+    }
+
+    const car = await Car.findById(modification.car);
+
+    if (!car || car.user.toString() !== userId) {
+        return res.status(403).json({
+            message: 'Not authorized to update this modification',
+        });
+    }
+
+    const {name, category, price} = req.body;
+
+    modification.name = name || modification.name;
+    modification.category = category || modification.category;
+    modification.price = price || modification.price;
+
+    await modification.save();
+
+    res.status(200).json({
+        message: 'Modification updated successfully',
+        modification,
+    });
+};
+
 export const deleteModification = async (req: Request, res: Response) => {
     const {id} = req.params;
     const userId = (req.user as any).userId;
