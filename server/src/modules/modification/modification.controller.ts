@@ -60,3 +60,30 @@ export const getModificationsByCar = async (req: Request, res: Response) => {
         modifications,
     });
 };
+
+export const deleteModification = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const userId = (req.user as any).userId;
+
+    const modification = await Modification.findById(id);
+
+    if (!modification) {
+        return res.status(404).json({
+            message: 'Modification not found',
+        });
+    }
+
+    const car = await Car.findById(modification.car);
+
+    if (!car || car.user.toString() !== userId) {
+        return res.status(403).json({
+            message: 'Not authorized to delete this modification',
+        });
+    }
+
+    await modification.deleteOne();
+
+    res.status(200).json({
+        message: 'Modification deleted successfully',
+    });
+};
