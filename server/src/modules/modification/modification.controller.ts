@@ -1,6 +1,7 @@
 import {Request, Response} from 'express';
 import {Car} from '../car/car.model';
 import {Modification} from './modification.model';
+import {getCarIfOwned} from '../car/car.service';
 
 export const createModification = async (req: Request, res: Response) => {
     const carId = req.params.carId as string;
@@ -38,19 +39,15 @@ export const getModificationsByCar = async (req: Request, res: Response) => {
     const carId = req.params.carId as string;
     const userId = (req.user as any).userId;
 
-    const car = await Car.findById(carId);
+    const result = await getCarIfOwned(carId, userId);
 
-    if (!car) {
-        return res.status(404).json({
-            message: 'Car not found',
+    if (result.error) {
+        return res.status(result.status).json({
+            message: result.error,
         });
     }
 
-    if (car.user.toString() !== userId) {
-        return res.status(403).json({
-            message: 'Not authorized to view modifications for this car',
-        });
-    }
+    const car = result.car;
 
     const modifications = await Modification.find({car: carId});
 
