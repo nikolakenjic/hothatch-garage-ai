@@ -1,10 +1,36 @@
 import {Request, Response} from 'express';
+import Groq from 'groq-sdk';
+import {env} from '../../config/env';
+
+const groq = new Groq({
+    apiKey: env.GROQ_API_KEY,
+});
 
 export const recommendCar = async (req: Request, res: Response) => {
     const {budget, fuel, use} = req.body;
 
-    // MOCK response (no AI yet)
-    const recommendation = `Based on your budget of ${budget}, I recommend a Volkswagen Golf GTD for ${use} use.`;
+    const prompt = `
+You are a car expert specialized in hot hatch cars.
+
+User preferences:
+- Budget: ${budget}
+- Fuel: ${fuel}
+- Use: ${use}
+
+Recommend ONE hot hatch car with short explanation.
+`;
+
+    const response = await groq.chat.completions.create({
+        model: 'llama3-8b-8192',
+        messages: [
+            {
+                role: 'user',
+                content: prompt,
+            },
+        ],
+    });
+
+    const recommendation = response.choices[0].message.content;
 
     res.status(200).json({
         message: 'Recommendation generated',
