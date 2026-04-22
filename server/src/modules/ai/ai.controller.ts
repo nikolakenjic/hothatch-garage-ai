@@ -17,11 +17,11 @@ User preferences:
 - Fuel: ${fuel}
 - Use: ${use}
 
-Recommend ONE hot hatch car with short explanation.
+Recommend ONE hot hatch car with a short explanation.
 `;
 
     const response = await groq.chat.completions.create({
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         messages: [
             {
                 role: 'user',
