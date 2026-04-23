@@ -42,7 +42,7 @@ Recommend ONE hot hatch car with a short explanation.
 };
 
 export const recommendUpgrade = async (req: Request, res: Response) => {
-    const {carId} = req.params;
+    const carId = req.params.carId as string;
     const userId = (req.user as any).userId;
 
     const car = await Car.findById(carId);
