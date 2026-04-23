@@ -3,6 +3,7 @@ import Groq from 'groq-sdk';
 import {env} from '../../config/env';
 import {Modification} from '../modification/modification.model';
 import {Car} from '../car/car.model';
+import {AIRecommendation} from './ai.model';
 
 const groq = new Groq({
     apiKey: env.GROQ_API_KEY,
@@ -88,8 +89,15 @@ Why: <short explanation>
 
     const recommendation = response.choices[0].message.content;
 
+    const savedRecommendation = await AIRecommendation.create({
+        user: userId,
+        car: carId,
+        type: 'upgrade',
+        content: recommendation || '',
+    });
+
     res.status(200).json({
         message: 'Upgrade recommendation generated',
-        recommendation,
+        recommendation: savedRecommendation,
     });
 };
