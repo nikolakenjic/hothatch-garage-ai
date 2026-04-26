@@ -101,3 +101,17 @@ Why: <short explanation>
         recommendation: savedRecommendation,
     });
 };
+
+export const getRecommendations = async (req: Request, res: Response) => {
+    const userId = (req.user as any).userId;
+
+    const recommendations = await AIRecommendation.find({user: userId}).sort({
+        createdAt: -1,
+    });
+
+    res.status(200).json({
+        message: 'Recommendations fetched successfully',
+        count: recommendations.length,
+        recommendations,
+    });
+};
