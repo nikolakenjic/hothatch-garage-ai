@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {
     getRecommendations,
+    getRecommendationsByCar,
     recommendCar,
     recommendUpgrade,
 } from './ai.controller';
@@ -11,5 +12,6 @@ const router = Router();
 router.post('/recommend', protect, recommendCar);
 router.post('/upgrade/:carId', protect, recommendUpgrade);
 router.get('/recommendations', protect, getRecommendations);
+router.get('/recommendations/car/:carId', protect, getRecommendationsByCar);
 
 export default router;

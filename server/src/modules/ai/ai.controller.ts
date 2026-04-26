@@ -115,3 +115,33 @@ export const getRecommendations = async (req: Request, res: Response) => {
         recommendations,
     });
 };
+
+export const getRecommendationsByCar = async (req: Request, res: Response) => {
+    const carId = req.params.carId as string;
+    const userId = (req.user as any).userId;
+
+    const car = await Car.findById(carId);
+
+    if (!car) {
+        return res.status(404).json({
+            message: 'Car not found',
+        });
+    }
+
+    if (car.user.toString() !== userId) {
+        return res.status(403).json({
+            message: 'Not authorized',
+        });
+    }
+
+    const recommendations = await AIRecommendation.find({
+        user: userId,
+        car: carId,
+    }).sort({createdAt: -1});
+
+    res.status(200).json({
+        message: 'Car recommendations fetched successfully',
+        count: recommendations.length,
+        recommendations,
+    });
+};
