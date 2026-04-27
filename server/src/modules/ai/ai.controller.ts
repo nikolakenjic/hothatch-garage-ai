@@ -4,6 +4,7 @@ import {env} from '../../config/env';
 import {Modification} from '../modification/modification.model';
 import {Car} from '../car/car.model';
 import {AIRecommendation} from './ai.model';
+import {generateUpgradeRecommendation} from './ai.service';
 
 const groq = new Groq({
     apiKey: env.GROQ_API_KEY,
@@ -57,37 +58,41 @@ export const recommendUpgrade = async (req: Request, res: Response) => {
 
     const modifications = await Modification.find({car: carId});
 
-    const modsList = modifications.map((m) => m.name).join(', ') || 'none';
+    // const modsList = modifications.map((m) => m.name).join(', ') || 'none';
 
-    const prompt = `
-You are a car tuning expert.
+    //     const prompt = `
+    // You are a car tuning expert.
 
-Car:
-- Brand: ${car.brand}
-- Model: ${car.model}
-- Year: ${car.year}
+    // Car:
+    // - Brand: ${car.brand}
+    // - Model: ${car.model}
+    // - Year: ${car.year}
 
-Current modifications:
-${modsList}
+    // Current modifications:
+    // ${modsList}
 
-Suggest ONE next best upgrade for this car.
-Respond in this format:
+    // Suggest ONE next best upgrade for this car.
+    // Respond in this format:
 
-Upgrade: <name>
-Why: <short explanation>
-`;
+    // Upgrade: <name>
+    // Why: <short explanation>
+    // `;
 
-    const response = await groq.chat.completions.create({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-            {
-                role: 'user',
-                content: prompt,
-            },
-        ],
-    });
+    // const response = await groq.chat.completions.create({
+    //     model: 'llama-3.1-8b-instant',
+    //     messages: [
+    //         {
+    //             role: 'user',
+    //             content: prompt,
+    //         },
+    //     ],
+    // });
 
-    const recommendation = response.choices[0].message.content;
+    // const recommendation = response.choices[0].message.content;
+    const recommendation = await generateUpgradeRecommendation(
+        car,
+        modifications,
+    );
 
     const savedRecommendation = await AIRecommendation.create({
         user: userId,
