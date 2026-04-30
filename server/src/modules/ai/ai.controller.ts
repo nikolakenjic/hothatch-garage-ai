@@ -1,4 +1,6 @@
 import {Request, Response} from 'express';
+import {catchAsync} from '../../utils/catchAsync';
+import {AppError} from '../../utils/AppError';
 import Groq from 'groq-sdk';
 import {env} from '../../config/env';
 import {Modification} from '../modification/modification.model';
@@ -10,7 +12,7 @@ const groq = new Groq({
     apiKey: env.GROQ_API_KEY,
 });
 
-export const recommendCar = async (req: Request, res: Response) => {
+export const recommendCar = catchAsync(async (req: Request, res: Response) => {
     const {budget, fuel, use} = req.body;
 
     const prompt = `
@@ -40,116 +42,93 @@ Recommend ONE hot hatch car with a short explanation.
         message: 'Recommendation generated',
         recommendation,
     });
-};
+});
 
-export const recommendUpgrade = async (req: Request, res: Response) => {
-    const carId = req.params.carId as string;
-    const userId = (req.user as any).userId;
+export const recommendUpgrade = catchAsync(
+    async (req: Request, res: Response) => {
+        const carId = req.params.carId as string;
+        const userId = (req.user as any).userId;
 
-    const car = await Car.findById(carId);
+        const car = await Car.findById(carId);
 
-    if (!car) {
-        return res.status(404).json({message: 'Car not found'});
-    }
+        if (!car) {
+            throw new AppError('Car not found', 404);
+        }
 
-    if (car.user.toString() !== userId) {
-        return res.status(403).json({message: 'Not authorized'});
-    }
+        if (car.user.toString() !== userId) {
+            throw new AppError('Not authorized', 403);
+        }
 
-    const modifications = await Modification.find({car: carId});
+        const modifications = await Modification.find({car: carId});
 
-    // const modsList = modifications.map((m) => m.name).join(', ') || 'none';
+        const recommendation = await generateUpgradeRecommendation(
+            car,
+            modifications,
+        );
 
-    //     const prompt = `
-    // You are a car tuning expert.
-
-    // Car:
-    // - Brand: ${car.brand}
-    // - Model: ${car.model}
-    // - Year: ${car.year}
-
-    // Current modifications:
-    // ${modsList}
-
-    // Suggest ONE next best upgrade for this car.
-    // Respond in this format:
-
-    // Upgrade: <name>
-    // Why: <short explanation>
-    // `;
-
-    // const response = await groq.chat.completions.create({
-    //     model: 'llama-3.1-8b-instant',
-    //     messages: [
-    //         {
-    //             role: 'user',
-    //             content: prompt,
-    //         },
-    //     ],
-    // });
-
-    // const recommendation = response.choices[0].message.content;
-    const recommendation = await generateUpgradeRecommendation(
-        car,
-        modifications,
-    );
-
-    const savedRecommendation = await AIRecommendation.create({
-        user: userId,
-        car: carId,
-        type: 'upgrade',
-        content: recommendation || '',
-    });
-
-    res.status(200).json({
-        message: 'Upgrade recommendation generated',
-        recommendation: {
-            id: savedRecommendation._id,
-            content: savedRecommendation.content,
-        },
-    });
-};
-
-export const getRecommendations = async (req: Request, res: Response) => {
-    const userId = (req.user as any).userId;
-
-    const recommendations = await AIRecommendation.find({user: userId}).sort({
-        createdAt: -1,
-    });
-
-    res.status(200).json({
-        message: 'Recommendations fetched successfully',
-        count: recommendations.length,
-        recommendations,
-    });
-};
-
-export const getRecommendationsByCar = async (req: Request, res: Response) => {
-    const carId = req.params.carId as string;
-    const userId = (req.user as any).userId;
-
-    const car = await Car.findById(carId);
-
-    if (!car) {
-        return res.status(404).json({
-            message: 'Car not found',
+        const savedRecommendation = await AIRecommendation.create({
+            user: userId,
+            car: carId,
+            type: 'upgrade',
+            content: recommendation || '',
         });
-    }
 
-    if (car.user.toString() !== userId) {
-        return res.status(403).json({
-            message: 'Not authorized',
+        res.status(200).json({
+            message: 'Upgrade recommendation generated',
+            recommendation: {
+                id: savedRecommendation._id,
+                content: savedRecommendation.content,
+            },
         });
-    }
+    },
+);
 
-    const recommendations = await AIRecommendation.find({
-        user: userId,
-        car: carId,
-    }).sort({createdAt: -1});
+export const getRecommendations = catchAsync(
+    async (req: Request, res: Response) => {
+        const userId = (req.user as any).userId;
 
-    res.status(200).json({
-        message: 'Car recommendations fetched successfully',
-        count: recommendations.length,
-        recommendations,
-    });
-};
+        const recommendations = await AIRecommendation.find({
+            user: userId,
+        }).sort({
+            createdAt: -1,
+        });
+
+        res.status(200).json({
+            message: 'Recommendations fetched successfully',
+            count: recommendations.length,
+            recommendations,
+        });
+    },
+);
+
+export const getRecommendationsByCar = catchAsync(
+    async (req: Request, res: Response) => {
+        const carId = req.params.carId as string;
+        const userId = (req.user as any).userId;
+
+        const car = await Car.findById(carId);
+
+        if (!car) {
+            return res.status(404).json({
+                message: 'Car not found',
+            });
+        }
+
+        if (car.user.toString() !== userId) {
+            return res.status(403).json({
+                message: 'Not authorized',
+            });
+        }
+
+        const recommendations = await AIRecommendation.find({
+            user: userId,
+            car: carId,
+        }).sort({createdAt: -1});
+
+        res.status(200).json({
+            message: 'Car recommendations fetched successfully',
+            count: recommendations.length,
+            recommendations,
+        });
+    },
+);
