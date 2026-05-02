@@ -7,10 +7,12 @@ import {
     updateCar,
 } from './car.controller';
 import {protect} from '../../middlewares/auth.middleware';
+import {validate} from '../../middlewares/validate';
+import {createCarSchema} from '../../validations/car.validation';
 
 const router = Router();
 
-router.post('/', protect, createCar);
+router.post('/', protect, validate(createCarSchema), createCar);
 router.get('/', protect, getMyCars);
 router.get('/:id', protect, getCarById);
 router.patch('/:id', protect, updateCar);
