@@ -9,16 +9,28 @@ import {
 import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
 import {
+    carIdParamsSchema,
     createCarSchema,
     updateCarSchema,
 } from '../../validations/car.validation';
 
 const router = Router();
 
-router.post('/', protect, validate(createCarSchema), createCar);
+router.post('/', protect, validate(createCarSchema, 'params'), createCar);
 router.get('/', protect, getMyCars);
 router.get('/:id', protect, getCarById);
-router.patch('/:id', protect, validate(updateCarSchema), updateCar);
-router.delete('/:id', protect, deleteCar);
+router.patch(
+    '/:id',
+    protect,
+    validate(carIdParamsSchema, 'params'),
+    validate(updateCarSchema),
+    updateCar,
+);
+router.delete(
+    '/:id',
+    protect,
+    validate(carIdParamsSchema, 'params'),
+    deleteCar,
+);
 
 export default router;
