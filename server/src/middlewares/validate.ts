@@ -1,11 +1,11 @@
 import {NextFunction, Request, Response} from 'express';
-import {ZodSchema} from 'zod';
+import {z} from 'zod';
 import {AppError} from '../utils/AppError';
 
 type ValidateTarget = 'body' | 'params';
 
 export const validate =
-    (schema: ZodSchema, target: ValidateTarget = 'body') =>
+    (schema: z.ZodType, target: ValidateTarget = 'body') =>
     (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req[target]);
 
