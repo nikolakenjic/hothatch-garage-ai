@@ -2,7 +2,6 @@ import {z} from 'zod';
 import {objectIdSchema} from './common.validation';
 
 export const createModificationSchema = z.object({
-    car: objectIdSchema,
     name: z.string().min(1, 'Name is required'),
     category: z.string().min(1, 'Category is required'),
     price: z.number().min(0, 'Price must be positive').optional(),
@@ -21,4 +20,8 @@ export const updateModificationSchema = z
 
 export const modificationIdParamsSchema = z.object({
     id: objectIdSchema,
+});
+
+export const carIdParamsSchema = z.object({
+    carId: objectIdSchema,
 });
