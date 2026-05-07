@@ -1,25 +1,11 @@
 import {Request, Response} from 'express';
 import {User} from './auth.model';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import {env} from '../../config/env';
+import {getMeService, loginService, registerService} from './auth.service';
 
 export const register = async (req: Request, res: Response) => {
     const {email, password} = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const existingUser = await User.findOne({email});
-
-    if (existingUser) {
-        return res.status(400).json({
-            message: 'User already exists',
-        });
-    }
-
-    const user = await User.create({
-        email,
-        password: hashedPassword,
-    });
+    const user = await registerService(email, password);
 
     res.status(201).json({
         message: 'User created',
@@ -33,27 +19,7 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
-    const user = await User.findOne({email});
-
-    if (!user) {
-        return res.status(400).json({
-            message: 'Invalid credentials',
-        });
-    }
-
-    const token = jwt.sign(
-        {userId: user._id, email: user.email},
-        env.JWT_SECRET,
-        {expiresIn: '1d'},
-    );
-
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordCorrect) {
-        return res.status(400).json({
-            message: 'Invalid credentials',
-        });
-    }
+    const {user, token} = await loginService(email, password);
 
     res.status(200).json({
         message: 'Login successful',
@@ -67,13 +33,8 @@ export const login = async (req: Request, res: Response) => {
 
 export const getMe = async (req: Request, res: Response) => {
     const userId = (req.user as any).userId;
-    const user = await User.findById(userId).select('-password');
 
-    if (!user) {
-        return res.status(404).json({
-            message: 'User not found',
-        });
-    }
+    const user = await getMeService(userId);
 
     res.status(200).json({
         message: 'Success',
