@@ -1,19 +1,17 @@
 import {Request, Response} from 'express';
 import {catchAsync} from '../../utils/catchAsync';
-import {AppError} from '../../utils/AppError';
-import {Car} from './car.model';
+import {
+    createCarService,
+    deleteCarService,
+    getCarIfOwned,
+    getMyCarsService,
+    updateCarService,
+} from './car.service';
 
 export const createCar = catchAsync(async (req: Request, res: Response) => {
-    const {brand, model, year} = req.body;
-
     const userId = (req.user as any).userId;
 
-    const car = await Car.create({
-        user: userId,
-        brand,
-        model,
-        year,
-    });
+    const car = await createCarService(userId, req.body);
 
     res.status(201).json({
         message: 'Car created successfully',
@@ -24,7 +22,7 @@ export const createCar = catchAsync(async (req: Request, res: Response) => {
 export const getMyCars = catchAsync(async (req: Request, res: Response) => {
     const userId = (req.user as any).userId;
 
-    const cars = await Car.find({user: userId});
+    const cars = await getMyCarsService(userId);
 
     res.status(200).json({
         message: 'Cars fetched successfully',
@@ -34,18 +32,10 @@ export const getMyCars = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getCarById = catchAsync(async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const carId = req.params.id as string;
     const userId = (req.user as any).userId;
 
-    const car = await Car.findById(id);
-
-    if (!car) {
-        throw new AppError('Car not found', 404);
-    }
-
-    if (car.user.toString() !== userId) {
-        throw new AppError('Not authorized to access this car', 403);
-    }
+    const car = await getCarIfOwned(carId, userId);
 
     res.status(200).json({
         message: 'Car fetched successfully',
@@ -54,26 +44,10 @@ export const getCarById = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const updateCar = catchAsync(async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const carId = req.params.id as string;
     const userId = (req.user as any).userId;
 
-    const car = await Car.findById(id);
-
-    if (!car) {
-        throw new AppError('Car not found', 404);
-    }
-
-    if (car.user.toString() !== userId) {
-        throw new AppError('Not authorized to update this car', 403);
-    }
-
-    const {brand, model, year} = req.body;
-
-    car.brand = brand ?? car.brand;
-    car.model = model ?? car.model;
-    car.year = year ?? car.year;
-
-    await car.save();
+    const car = await updateCarService(carId, userId, req.body);
 
     res.status(200).json({
         message: 'Car updated successfully',
@@ -82,20 +56,10 @@ export const updateCar = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const deleteCar = catchAsync(async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const carId = req.params.id as string;
     const userId = (req.user as any).userId;
 
-    const car = await Car.findById(id);
-
-    if (!car) {
-        throw new AppError('Car not found', 404);
-    }
-
-    if (car.user.toString() !== userId) {
-        throw new AppError('Not authorized to delete this car', 403);
-    }
-
-    await car.deleteOne();
+    await deleteCarService(carId, userId);
 
     res.status(200).json({
         message: 'Car deleted successfully',
