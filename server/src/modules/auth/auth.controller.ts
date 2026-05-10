@@ -1,13 +1,13 @@
 import {Request, Response} from 'express';
-import {User} from './auth.model';
 import {getMeService, loginService, registerService} from './auth.service';
+import {CREATED, OK} from '../../constants/http';
 
 export const register = async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
     const user = await registerService(email, password);
 
-    res.status(201).json({
+    res.status(CREATED).json({
         message: 'User created',
         user: {
             id: user._id,
@@ -21,7 +21,7 @@ export const login = async (req: Request, res: Response) => {
 
     const {user, token} = await loginService(email, password);
 
-    res.status(200).json({
+    res.status(OK).json({
         message: 'Login successful',
         token,
         user: {
@@ -36,7 +36,7 @@ export const getMe = async (req: Request, res: Response) => {
 
     const user = await getMeService(userId);
 
-    res.status(200).json({
+    res.status(OK).json({
         message: 'Success',
         user,
     });
