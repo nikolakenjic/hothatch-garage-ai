@@ -6,11 +6,12 @@ import {
     getRecommendationsService,
     recommendUpgradeService,
 } from './ai.service';
+import {OK} from '../../constants/http';
 
 export const recommendCar = catchAsync(async (req: Request, res: Response) => {
     const recommendation = await generateCarRecommendationService(req.body);
 
-    res.status(200).json({
+    res.status(OK).json({
         message: 'Recommendation generated',
         recommendation,
     });
@@ -23,7 +24,7 @@ export const recommendUpgrade = catchAsync(
 
         const recommendation = await recommendUpgradeService(carId, userId);
 
-        res.status(200).json({
+        res.status(OK).json({
             message: 'Upgrade recommendation generated',
             recommendation,
         });
@@ -36,7 +37,7 @@ export const getRecommendations = catchAsync(
 
         const recommendations = await getRecommendationsService(userId);
 
-        res.status(200).json({
+        res.status(OK).json({
             message: 'Recommendations fetched successfully',
             count: recommendations.length,
             recommendations,
@@ -54,7 +55,7 @@ export const getRecommendationsByCar = catchAsync(
             userId,
         );
 
-        res.status(200).json({
+        res.status(OK).json({
             message: 'Car recommendations fetched successfully',
             count: recommendations.length,
             recommendations,
