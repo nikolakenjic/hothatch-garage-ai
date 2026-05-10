@@ -1,42 +1,14 @@
 import {Request, Response} from 'express';
 import {catchAsync} from '../../utils/catchAsync';
-import {AppError} from '../../utils/AppError';
-import Groq from 'groq-sdk';
-import {env} from '../../config/env';
-import {Modification} from '../modification/modification.model';
-import {Car} from '../car/car.model';
-import {AIRecommendation} from './ai.model';
-import {generateUpgradeRecommendation} from './ai.service';
-
-const groq = new Groq({
-    apiKey: env.GROQ_API_KEY,
-});
+import {
+    generateCarRecommendationService,
+    getRecommendationsByCarService,
+    getRecommendationsService,
+    recommendUpgradeService,
+} from './ai.service';
 
 export const recommendCar = catchAsync(async (req: Request, res: Response) => {
-    const {budget, fuel, use} = req.body;
-
-    const prompt = `
-You are a car expert specialized in hot hatch cars.
-
-User preferences:
-- Budget: ${budget}
-- Fuel: ${fuel}
-- Use: ${use}
-
-Recommend ONE hot hatch car with a short explanation.
-`;
-
-    const response = await groq.chat.completions.create({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-            {
-                role: 'user',
-                content: prompt,
-            },
-        ],
-    });
-
-    const recommendation = response.choices[0].message.content;
+    const recommendation = await generateCarRecommendationService(req.body);
 
     res.status(200).json({
         message: 'Recommendation generated',
@@ -49,36 +21,11 @@ export const recommendUpgrade = catchAsync(
         const carId = req.params.carId as string;
         const userId = (req.user as any).userId;
 
-        const car = await Car.findById(carId);
-
-        if (!car) {
-            throw new AppError('Car not found', 404);
-        }
-
-        if (car.user.toString() !== userId) {
-            throw new AppError('Not authorized', 403);
-        }
-
-        const modifications = await Modification.find({car: carId});
-
-        const recommendation = await generateUpgradeRecommendation(
-            car,
-            modifications,
-        );
-
-        const savedRecommendation = await AIRecommendation.create({
-            user: userId,
-            car: carId,
-            type: 'upgrade',
-            content: recommendation || '',
-        });
+        const recommendation = await recommendUpgradeService(carId, userId);
 
         res.status(200).json({
             message: 'Upgrade recommendation generated',
-            recommendation: {
-                id: savedRecommendation._id,
-                content: savedRecommendation.content,
-            },
+            recommendation,
         });
     },
 );
@@ -87,11 +34,7 @@ export const getRecommendations = catchAsync(
     async (req: Request, res: Response) => {
         const userId = (req.user as any).userId;
 
-        const recommendations = await AIRecommendation.find({
-            user: userId,
-        }).sort({
-            createdAt: -1,
-        });
+        const recommendations = await getRecommendationsService(userId);
 
         res.status(200).json({
             message: 'Recommendations fetched successfully',
@@ -106,24 +49,10 @@ export const getRecommendationsByCar = catchAsync(
         const carId = req.params.carId as string;
         const userId = (req.user as any).userId;
 
-        const car = await Car.findById(carId);
-
-        if (!car) {
-            return res.status(404).json({
-                message: 'Car not found',
-            });
-        }
-
-        if (car.user.toString() !== userId) {
-            return res.status(403).json({
-                message: 'Not authorized',
-            });
-        }
-
-        const recommendations = await AIRecommendation.find({
-            user: userId,
-            car: carId,
-        }).sort({createdAt: -1});
+        const recommendations = await getRecommendationsByCarService(
+            carId,
+            userId,
+        );
 
         res.status(200).json({
             message: 'Car recommendations fetched successfully',
