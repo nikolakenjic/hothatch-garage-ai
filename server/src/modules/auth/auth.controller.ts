@@ -1,8 +1,9 @@
 import {Request, Response} from 'express';
 import {getMeService, loginService, registerService} from './auth.service';
 import {CREATED, OK} from '../../constants/http';
+import {catchAsync} from '../../utils/catchAsync';
 
-export const register = async (req: Request, res: Response) => {
+export const register = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
     const user = await registerService(email, password);
@@ -14,9 +15,9 @@ export const register = async (req: Request, res: Response) => {
             email: user.email,
         },
     });
-};
+});
 
-export const login = async (req: Request, res: Response) => {
+export const login = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
     const {user, token} = await loginService(email, password);
@@ -29,9 +30,9 @@ export const login = async (req: Request, res: Response) => {
             email: user.email,
         },
     });
-};
+});
 
-export const getMe = async (req: Request, res: Response) => {
+export const getMe = catchAsync(async (req: Request, res: Response) => {
     const userId = (req.user as any).userId;
 
     const user = await getMeService(userId);
@@ -40,4 +41,4 @@ export const getMe = async (req: Request, res: Response) => {
         message: 'Success',
         user,
     });
-};
+});
