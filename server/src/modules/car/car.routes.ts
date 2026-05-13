@@ -16,7 +16,7 @@ import {
 
 const router = Router();
 
-router.post('/', protect, validate(createCarSchema, 'params'), createCar);
+router.post('/', protect, validate(createCarSchema), createCar);
 router.get('/', protect, getMyCars);
 router.get('/:id', protect, getCarById);
 router.patch(

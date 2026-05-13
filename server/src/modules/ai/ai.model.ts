@@ -17,7 +17,7 @@ const aiRecommendationSchema = new Schema<IAIRecommendation>(
         car: {
             type: Schema.Types.ObjectId,
             ref: 'Car',
-            required: true,
+            required: false,
         },
         type: {
             type: String, // "upgrade" or "car"

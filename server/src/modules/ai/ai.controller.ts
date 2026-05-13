@@ -9,7 +9,11 @@ import {
 import {OK} from '../../constants/http';
 
 export const recommendCar = catchAsync(async (req: Request, res: Response) => {
-    const recommendation = await generateCarRecommendationService(req.body);
+    const userId = (req.user as any).userId;
+    const recommendation = await generateCarRecommendationService(
+        userId,
+        req.body,
+    );
 
     res.status(OK).json({
         message: 'Recommendation generated',

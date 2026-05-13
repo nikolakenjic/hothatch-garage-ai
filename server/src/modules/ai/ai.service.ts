@@ -15,6 +15,7 @@ type RecommendCarInput = {
 };
 
 export const generateCarRecommendationService = async (
+    userId: string,
     data: RecommendCarInput,
 ) => {
     const {budget, fuel, use} = data;
@@ -31,7 +32,7 @@ Recommend ONE hot hatch car with a short explanation.
 `;
 
     const response = await groq.chat.completions.create({
-        model: 'llama-3.1-8b-instant',
+        model: 'llama-3.3-70b-versatile',
         messages: [
             {
                 role: 'user',
@@ -40,7 +41,18 @@ Recommend ONE hot hatch car with a short explanation.
         ],
     });
 
-    return response.choices[0].message.content;
+    const content = response.choices[0].message.content || '';
+
+    const saved = await AIRecommendation.create({
+        user: userId,
+        type: 'car',
+        content,
+    });
+
+    return {
+        id: saved._id,
+        content: saved.content,
+    };
 };
 
 export const generateUpgradeRecommendation = async (
