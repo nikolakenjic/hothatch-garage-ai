@@ -8,9 +8,10 @@ import {
     updateCarService,
 } from './car.service';
 import {CREATED, OK} from '../../constants/http';
+import {getUserId} from '../../utils/getUser';
 
 export const createCar = catchAsync(async (req: Request, res: Response) => {
-    const userId = (req.user as any).userId;
+    const userId = getUserId(req);
 
     const car = await createCarService(userId, req.body);
 
@@ -21,7 +22,7 @@ export const createCar = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getMyCars = catchAsync(async (req: Request, res: Response) => {
-    const userId = (req.user as any).userId;
+    const userId = getUserId(req);
 
     const cars = await getMyCarsService(userId);
 
@@ -34,7 +35,7 @@ export const getMyCars = catchAsync(async (req: Request, res: Response) => {
 
 export const getCarById = catchAsync(async (req: Request, res: Response) => {
     const carId = req.params.id as string;
-    const userId = (req.user as any).userId;
+    const userId = getUserId(req);
 
     const car = await getCarIfOwned(carId, userId);
 
@@ -46,7 +47,7 @@ export const getCarById = catchAsync(async (req: Request, res: Response) => {
 
 export const updateCar = catchAsync(async (req: Request, res: Response) => {
     const carId = req.params.id as string;
-    const userId = (req.user as any).userId;
+    const userId = getUserId(req);
 
     const car = await updateCarService(carId, userId, req.body);
 
@@ -58,7 +59,7 @@ export const updateCar = catchAsync(async (req: Request, res: Response) => {
 
 export const deleteCar = catchAsync(async (req: Request, res: Response) => {
     const carId = req.params.id as string;
-    const userId = (req.user as any).userId;
+    const userId = getUserId(req);
 
     await deleteCarService(carId, userId);
 

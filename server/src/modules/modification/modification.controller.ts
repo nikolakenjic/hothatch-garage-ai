@@ -7,11 +7,12 @@ import {
     updateModificationService,
 } from './modification.service';
 import {CREATED, OK} from '../../constants/http';
+import {getUserId} from '../../utils/getUser';
 
 export const createModification = catchAsync(
     async (req: Request, res: Response) => {
         const carId = req.params.carId as string;
-        const userId = (req.user as any).userId;
+        const userId = getUserId(req);
 
         const modification = await createModificationService(
             carId,
@@ -29,7 +30,7 @@ export const createModification = catchAsync(
 export const getModificationsByCar = catchAsync(
     async (req: Request, res: Response) => {
         const carId = req.params.carId as string;
-        const userId = (req.user as any).userId;
+        const userId = getUserId(req);
 
         const modifications = await getModificationsByCarService(carId, userId);
 
@@ -44,7 +45,7 @@ export const getModificationsByCar = catchAsync(
 export const updateModification = catchAsync(
     async (req: Request, res: Response) => {
         const modificationId = req.params.id as string;
-        const userId = (req.user as any).userId;
+        const userId = getUserId(req);
 
         const modification = await updateModificationService(
             modificationId,
@@ -62,7 +63,7 @@ export const updateModification = catchAsync(
 export const deleteModification = catchAsync(
     async (req: Request, res: Response) => {
         const modificationId = req.params.id as string;
-        const userId = (req.user as any).userId;
+        const userId = getUserId(req);
 
         await deleteModificationService(modificationId, userId);
 
