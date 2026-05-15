@@ -1,6 +1,7 @@
 import {Request, Response} from 'express';
 import {catchAsync} from '../../utils/catchAsync';
 import {
+    buildPlanService,
     generateCarRecommendationService,
     getRecommendationsByCarService,
     getRecommendationsService,
@@ -67,3 +68,15 @@ export const getRecommendationsByCar = catchAsync(
         });
     },
 );
+
+export const buildPlan = catchAsync(async (req: Request, res: Response) => {
+    const carId = req.params.carId as string;
+    const userId = getUserId(req);
+
+    const recommendation = await buildPlanService(carId, userId, req.body);
+
+    res.status(OK).json({
+        message: 'Plan built successfully',
+        recommendation,
+    });
+});

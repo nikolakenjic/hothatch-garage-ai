@@ -134,3 +134,46 @@ export const getRecommendationsByCarService = async (
         car: carId,
     }).sort({createdAt: -1});
 };
+
+export const buildPlanService = async (
+    carId: string,
+    userId: string,
+    data: {budget: string; goal: string},
+) => {
+    const car = await getCarIfOwned(carId, userId);
+    const modifications = await Modification.find({car: carId});
+    const modsList = modifications.map((m) => m.name).join(', ') || 'none';
+
+    const prompt = `
+You are a hot hatch tuning expert.
+
+Car: ${car.brand} ${car.model} (${car.year})
+Current mods: ${modsList}
+Budget: ${data.budget}
+Goal: ${data.goal}
+
+Create a prioritized mod plan. For each mod include:
+1. Name
+2. Estimated cost
+3. Why it matters for the goal
+4. Order priority (do this first, second, etc.)
+
+Also add one warning if anything in the plan could be unsafe if done out of order.
+`;
+
+    const response = await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{role: 'user', content: prompt}],
+    });
+
+    const content = response.choices[0].message.content || '';
+
+    const saved = await AIRecommendation.create({
+        user: userId,
+        car: carId,
+        type: 'build-plan',
+        content,
+    });
+
+    return {id: saved._id, content: saved.content};
+};

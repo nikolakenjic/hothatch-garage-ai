@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import {
+    buildPlan,
     getRecommendations,
     getRecommendationsByCar,
     recommendCar,
@@ -7,7 +8,10 @@ import {
 } from './ai.controller';
 import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
-import {recommendCarSchema} from '../../validations/ai.validation';
+import {
+    buildPlanSchema,
+    recommendCarSchema,
+} from '../../validations/ai.validation';
 import {carIdParamsSchema} from '../../validations/car.validation';
 
 const router = Router();
@@ -25,6 +29,13 @@ router.get(
     protect,
     validate(carIdParamsSchema, 'params'),
     getRecommendationsByCar,
+);
+router.post(
+    '/build-plan/:carId',
+    protect,
+    validate(carIdParamsSchema, 'params'),
+    validate(buildPlanSchema),
+    buildPlan,
 );
 
 export default router;

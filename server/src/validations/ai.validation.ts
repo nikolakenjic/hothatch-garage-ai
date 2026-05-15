@@ -21,3 +21,10 @@ export const recommendCarSchema = z.object({
 export const carIdParamsSchema = z.object({
     carId: objectIdSchema,
 });
+
+export const buildPlanSchema = z.object({
+    budget: z
+        .string({error: 'Budget is required'})
+        .min(1, 'Budget is required'),
+    goal: z.string({error: 'Goal is required'}).min(1, 'Goal is required'),
+});
