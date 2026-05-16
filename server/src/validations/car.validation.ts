@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {objectIdSchema} from './common.validation';
 
-export const carIdParamsSchema = z.object({
+export const carRouteParamsSchema = z.object({
     id: objectIdSchema,
 });
 

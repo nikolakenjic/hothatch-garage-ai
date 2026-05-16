@@ -9,10 +9,10 @@ import {
 import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
 import {
+    aiCarParamsSchema,
     buildPlanSchema,
     recommendCarSchema,
 } from '../../validations/ai.validation';
-import {carIdParamsSchema} from '../../validations/car.validation';
 
 const router = Router();
 
@@ -20,20 +20,20 @@ router.post('/recommend', protect, validate(recommendCarSchema), recommendCar);
 router.post(
     '/upgrade/:carId',
     protect,
-    validate(carIdParamsSchema, 'params'),
+    validate(aiCarParamsSchema, 'params'),
     recommendUpgrade,
 );
 router.get('/recommendations', protect, getRecommendations);
 router.get(
     '/recommendations/car/:carId',
     protect,
-    validate(carIdParamsSchema, 'params'),
+    validate(aiCarParamsSchema, 'params'),
     getRecommendationsByCar,
 );
 router.post(
     '/build-plan/:carId',
     protect,
-    validate(carIdParamsSchema, 'params'),
+    validate(aiCarParamsSchema, 'params'),
     validate(buildPlanSchema),
     buildPlan,
 );

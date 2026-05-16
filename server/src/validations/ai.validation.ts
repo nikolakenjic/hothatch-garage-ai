@@ -18,7 +18,7 @@ export const recommendCarSchema = z.object({
         .min(1, 'Use case is required'),
 });
 
-export const carIdParamsSchema = z.object({
+export const aiCarParamsSchema = z.object({
     carId: objectIdSchema,
 });
 
