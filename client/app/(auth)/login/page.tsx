@@ -7,8 +7,11 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Input} from '@/components/ui/input';
+import {loginService} from '@/app/services/auth.service';
+import {useRouter} from 'next/navigation';
 
 export default function LoginPage() {
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -18,9 +21,15 @@ export default function LoginPage() {
     });
 
     const onSubmit = async (data: LoginInput) => {
-        console.log(data);
+        try {
+            const response = await loginService(data);
+            localStorage.setItem('token', response.token);
+            console.log('Login success:', response);
+            router.replace('/garage');
+        } catch (error: any) {
+            console.error('Login failed:', error.response?.data?.message);
+        }
     };
-
     return (
         <div className="flex min-h-screen items-center justify-center">
             <Card className="w-full max-w-md">
