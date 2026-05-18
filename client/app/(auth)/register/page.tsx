@@ -26,7 +26,7 @@ export default function RegisterPage() {
             const response = await registerService(data);
             setAuthCookie(response.token);
             console.log('Register success:', response);
-            router.replace('/garage');
+            router.replace('/login');
         } catch (error: any) {
             console.error('Register failed:', error.response?.data?.message);
         }
