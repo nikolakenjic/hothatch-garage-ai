@@ -7,8 +7,9 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Input} from '@/components/ui/input';
-import {registerService} from '@/app/services/auth.service';
 import {useRouter} from 'next/navigation';
+import {registerService} from '@/services/auth.service';
+import {setAuthCookie} from '@/lib/cookies';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -23,13 +24,14 @@ export default function RegisterPage() {
     const onSubmit = async (data: RegisterInput) => {
         try {
             const response = await registerService(data);
-            localStorage.setItem('token', response.token);
+            setAuthCookie(response.token);
             console.log('Register success:', response);
-            router.replace('/login');
+            router.replace('/garage');
         } catch (error: any) {
-            console.error('Login failed:', error.response?.data?.message);
+            console.error('Register failed:', error.response?.data?.message);
         }
     };
+
     return (
         <div className="flex min-h-screen items-center justify-center">
             <Card className="w-full max-w-md">
@@ -72,7 +74,7 @@ export default function RegisterPage() {
                         <div className="space-y-2">
                             <Label htmlFor="password">Password</Label>
                             <Input
-                                id="input"
+                                id="password"
                                 type="password"
                                 {...register('password')}
                             />

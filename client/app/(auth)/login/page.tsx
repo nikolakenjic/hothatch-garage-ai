@@ -7,8 +7,9 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Input} from '@/components/ui/input';
-import {loginService} from '@/app/services/auth.service';
+import {loginService} from '@/services/auth.service';
 import {useRouter} from 'next/navigation';
+import {setAuthCookie} from '@/lib/cookies';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -23,7 +24,7 @@ export default function LoginPage() {
     const onSubmit = async (data: LoginInput) => {
         try {
             const response = await loginService(data);
-            localStorage.setItem('token', response.token);
+            setAuthCookie(response.token);
             console.log('Login success:', response);
             router.replace('/garage');
         } catch (error: any) {
