@@ -1,5 +1,6 @@
 import AddCarForm from '@/components/cars/AddCarForm';
 import {getCarsService} from '@/services/car.service';
+import {Car} from '@/types/car';
 import {cookies} from 'next/headers';
 
 export default async function GaragePage() {
@@ -18,7 +19,7 @@ export default async function GaragePage() {
                 </p>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {cars.map((car: any) => (
+                    {cars.map((car: Car) => (
                         <div key={car._id} className="border rounded-lg p-4">
                             <h2 className="text-xl font-semibold">
                                 {car.brand} {car.model}
