@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import {Geist} from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/shared/Navbar';
+import ThemeProvider from '@/components/shared/ThemeProvider';
 
 const geist = Geist({
     variable: '--font-geist-sans',
@@ -21,8 +22,10 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${geist.variable} h-full antialiased`}>
             <body className="min-h-full flex flex-col">
-                <Navbar />
-                {children}
+                <ThemeProvider>
+                    <Navbar />
+                    {children}
+                </ThemeProvider>
             </body>
         </html>
     );
