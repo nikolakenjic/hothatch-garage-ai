@@ -17,3 +17,12 @@ export const createCarService = async (
     });
     return response.data.car;
 };
+
+export const deleteCarService = async (
+    token: string,
+    carId: string,
+): Promise<void> => {
+    await api.delete(`/cars/${carId}`, {
+        headers: {Authorization: `Bearer ${token}`},
+    });
+};

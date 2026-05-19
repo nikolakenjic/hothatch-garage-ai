@@ -1,4 +1,5 @@
 import AddCarForm from '@/components/cars/AddCarForm';
+import DeleteCarButton from '@/components/cars/DeleteCarButton';
 import {getCarsService} from '@/services/car.service';
 import {Car} from '@/types/car';
 import {cookies} from 'next/headers';
@@ -25,6 +26,9 @@ export default async function GaragePage() {
                                 {car.brand} {car.model}
                             </h2>
                             <p className="text-muted-foreground">{car.year}</p>
+                            <div className="mt-4">
+                                <DeleteCarButton carId={car._id} />
+                            </div>
                         </div>
                     ))}
                 </div>
