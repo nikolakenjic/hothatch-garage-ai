@@ -26,3 +26,13 @@ export const deleteCarService = async (
         headers: {Authorization: `Bearer ${token}`},
     });
 };
+
+export const getCarByIdService = async (
+    token: string,
+    carId: string,
+): Promise<Car> => {
+    const response = await api.get(`/cars/${carId}`, {
+        headers: {Authorization: `Bearer ${token}`},
+    });
+    return response.data.car;
+};
