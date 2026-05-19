@@ -1,3 +1,4 @@
+import AddCarForm from '@/components/cars/AddCarForm';
 import {getCarsService} from '@/services/car.service';
 import {cookies} from 'next/headers';
 
@@ -10,6 +11,7 @@ export default async function GaragePage() {
     return (
         <div className="container mx-auto p-8">
             <h1 className="text-3xl font-bold mb-6">My Garage 🚗</h1>
+            <AddCarForm />
             {cars.length === 0 ? (
                 <p className="text-muted-foreground">
                     No cars yet. Add your first car!

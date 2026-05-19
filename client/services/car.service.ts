@@ -6,3 +6,10 @@ export const getCarsService = async (token: string) => {
     });
     return response.data.cars;
 };
+
+export const createCarService = async (token: string, data: any) => {
+    const response = await api.post('/cars', data, {
+        headers: {Authorization: `Bearer ${token}`},
+    });
+    return response.data.car;
+};
