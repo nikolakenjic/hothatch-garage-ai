@@ -4,6 +4,8 @@ import {getModificationsService} from '@/services/modification.service';
 import {Modification} from '@/types/modification';
 import AddModificationForm from '@/components/cars/AddModificationForm';
 import DeleteModificationButton from '@/components/cars/DeleteModificationButton';
+import Link from 'next/link';
+import {Button} from '@/components/ui/button';
 
 type Props = {
     params: Promise<{id: string}>;
@@ -23,6 +25,9 @@ export default async function CarDetailPage({params}: Props) {
                 {car.brand} {car.model}
             </h1>
             <p className="text-muted-foreground text-lg mb-6">{car.year}</p>
+            <Link href={`/garage/${id}/build-plan`}>
+                <Button className="mb-6">AI Build Planner 🤖</Button>
+            </Link>
             <div className="border rounded-lg p-6">
                 <h2 className="text-xl font-semibold mb-4">Modifications</h2>
                 {modifications.length === 0 ? (
