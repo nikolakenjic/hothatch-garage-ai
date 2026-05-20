@@ -3,6 +3,7 @@ import {getCarByIdService} from '@/services/car.service';
 import {getModificationsService} from '@/services/modification.service';
 import {Modification} from '@/types/modification';
 import AddModificationForm from '@/components/cars/AddModificationForm';
+import DeleteModificationButton from '@/components/cars/DeleteModificationButton';
 
 type Props = {
     params: Promise<{id: string}>;
@@ -41,9 +42,14 @@ export default async function CarDetailPage({params}: Props) {
                                         {mod.category}
                                     </p>
                                 </div>
-                                {mod.price && (
-                                    <p className="font-medium">€{mod.price}</p>
-                                )}
+                                <div className="flex items-center gap-3">
+                                    {mod.price && (
+                                        <p className="font-medium">
+                                            €{mod.price}
+                                        </p>
+                                    )}
+                                    <DeleteModificationButton modId={mod._id} />
+                                </div>
                             </div>
                         ))}
                     </div>
