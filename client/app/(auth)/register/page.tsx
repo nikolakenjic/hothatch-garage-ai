@@ -46,7 +46,7 @@ export default function RegisterPage() {
                         HotHatch Garage AI
                     </p>
 
-                    <h1 className="max-w-xl text-5xl font-black leading-tight tracking-tight">
+                    <h1 className="font-heading max-w-xl text-4xl font-black leading-tight tracking-tight lg:text-5xl">
                         Build your garage.
                         <span className="block text-red-600 dark:text-red-500">
                             Tune your passion.
@@ -64,7 +64,9 @@ export default function RegisterPage() {
                                 key={item}
                                 className="rounded-2xl border border-zinc-200 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5"
                             >
-                                <p className="text-2xl font-bold">{item}</p>
+                                <p className="font-heading text-2xl font-bold">
+                                    {item}
+                                </p>
                                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                     {item === 'AI'
                                         ? 'Upgrade help'
@@ -77,13 +79,13 @@ export default function RegisterPage() {
                     </div>
                 </div>
 
-                <Card className="w-full border-zinc-200 bg-white/85 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-red-950/30">
+                <Card className="w-full border-zinc-200 bg-white/85 shadow-xl backdrop-blur-xl lg:shadow-2xl dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-red-950/30">
                     <CardHeader className="space-y-2 text-center">
                         <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-600 dark:text-red-500">
                             Create profile
                         </p>
 
-                        <CardTitle className="text-3xl font-black text-zinc-950 dark:text-white">
+                        <CardTitle className="font-heading text-3xl font-black text-zinc-950 dark:text-white">
                             Start your garage
                         </CardTitle>
 
@@ -92,7 +94,7 @@ export default function RegisterPage() {
                         </p>
                     </CardHeader>
 
-                    <CardContent>
+                    <CardContent className="pt-3">
                         <form
                             onSubmit={handleSubmit(onSubmit)}
                             className="space-y-5"
@@ -104,7 +106,7 @@ export default function RegisterPage() {
                                     type="text"
                                     placeholder="Nikola"
                                     {...register('name')}
-                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
                                 />
                                 {errors.name && (
                                     <p className="text-sm text-red-500">
@@ -120,7 +122,7 @@ export default function RegisterPage() {
                                     type="email"
                                     placeholder="you@example.com"
                                     {...register('email')}
-                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
                                 />
                                 {errors.email && (
                                     <p className="text-sm text-red-500">
@@ -136,7 +138,7 @@ export default function RegisterPage() {
                                     type="password"
                                     placeholder="••••••••"
                                     {...register('password')}
-                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
                                 />
                                 {errors.password && (
                                     <p className="text-sm text-red-500">
@@ -148,10 +150,10 @@ export default function RegisterPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="h-11 w-full bg-red-600 font-bold text-white shadow-lg shadow-red-900/30 transition hover:bg-red-500"
+                                className="h-11 w-full bg-red-600 font-bold text-white shadow-lg shadow-red-900/30 transition-all duration-200 hover:scale-[1.01] hover:bg-red-500 active:scale-[0.99]"
                             >
                                 {isSubmitting
-                                    ? 'Creating garage...'
+                                    ? 'Starting garage...'
                                     : 'Create account'}
                             </Button>
 
@@ -160,7 +162,7 @@ export default function RegisterPage() {
                                 <button
                                     type="button"
                                     onClick={() => router.push('/login')}
-                                    className="font-semibold text-red-600 hover:text-red-500 dark:text-red-500 dark:hover:text-red-400"
+                                    className="font-semibold text-red-600 transition-colors hover:text-red-500 dark:text-red-500 dark:hover:text-red-400"
                                 >
                                     Login
                                 </button>
