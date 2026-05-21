@@ -14,6 +14,7 @@ import {toast} from 'sonner';
 
 export default function RegisterPage() {
     const router = useRouter();
+
     const {
         register,
         handleSubmit,
@@ -26,77 +27,148 @@ export default function RegisterPage() {
         try {
             const response = await registerService(data);
             setAuthCookie(response.token);
-            console.log('Register success:', response);
             toast.success('Account created!');
             router.replace('/login');
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Registration failed');
-            console.error('Register failed:', error.response?.data?.message);
         }
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle className="text-center">
-                        Create account
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form
-                        onSubmit={handleSubmit(onSubmit)}
-                        className="space-y-4"
-                    >
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Name</Label>
-                            <Input
-                                id="name"
-                                type="text"
-                                {...register('name')}
-                            />
-                            {errors.name && (
-                                <p className="text-sm text-red-500">
-                                    {errors.name.message}
+        <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-50 px-4 text-zinc-950 dark:bg-[#070707] dark:text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.18),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.12),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.25),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.18),_transparent_35%)]" />
+
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[size:44px_44px] opacity-30 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] dark:opacity-20" />
+
+            <section className="relative z-10 grid w-full max-w-6xl items-center gap-10 lg:grid-cols-2">
+                <div className="hidden space-y-6 lg:block">
+                    <p className="text-sm font-semibold uppercase tracking-[0.35em] text-red-600 dark:text-red-500">
+                        HotHatch Garage AI
+                    </p>
+
+                    <h1 className="max-w-xl text-5xl font-black leading-tight tracking-tight">
+                        Build your garage.
+                        <span className="block text-red-600 dark:text-red-500">
+                            Tune your passion.
+                        </span>
+                    </h1>
+
+                    <p className="max-w-lg text-lg text-zinc-600 dark:text-zinc-400">
+                        Join a community of hot hatch enthusiasts. Add your car,
+                        track modifications, and get AI-powered upgrade ideas.
+                    </p>
+
+                    <div className="grid max-w-md grid-cols-3 gap-3 pt-4">
+                        {['AI', 'OEM+', 'Garage'].map((item) => (
+                            <div
+                                key={item}
+                                className="rounded-2xl border border-zinc-200 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5"
+                            >
+                                <p className="text-2xl font-bold">{item}</p>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                    {item === 'AI'
+                                        ? 'Upgrade help'
+                                        : item === 'OEM+'
+                                          ? 'Clean builds'
+                                          : 'Your cars'}
                                 </p>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                {...register('email')}
-                            />
-                            {errors.email && (
-                                <p className="text-sm text-red-500">
-                                    {errors.email.message}
-                                </p>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                {...register('password')}
-                            />
-                            {errors.password && (
-                                <p className="text-sm text-red-500">
-                                    {errors.password.message}
-                                </p>
-                            )}
-                        </div>
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={isSubmitting}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <Card className="w-full border-zinc-200 bg-white/85 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-red-950/30">
+                    <CardHeader className="space-y-2 text-center">
+                        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-600 dark:text-red-500">
+                            Create profile
+                        </p>
+
+                        <CardTitle className="text-3xl font-black text-zinc-950 dark:text-white">
+                            Start your garage
+                        </CardTitle>
+
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                            Register and start building your hot hatch profile.
+                        </p>
+                    </CardHeader>
+
+                    <CardContent>
+                        <form
+                            onSubmit={handleSubmit(onSubmit)}
+                            className="space-y-5"
                         >
-                            {isSubmitting ? 'Creating account...' : 'Register'}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Name</Label>
+                                <Input
+                                    id="name"
+                                    type="text"
+                                    placeholder="Nikola"
+                                    {...register('name')}
+                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                                />
+                                {errors.name && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.name.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    {...register('email')}
+                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                                />
+                                {errors.email && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.email.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Password</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    {...register('password')}
+                                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                                />
+                                {errors.password && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.password.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="h-11 w-full bg-red-600 font-bold text-white shadow-lg shadow-red-900/30 transition hover:bg-red-500"
+                            >
+                                {isSubmitting
+                                    ? 'Creating garage...'
+                                    : 'Create account'}
+                            </Button>
+
+                            <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+                                Already have an account?{' '}
+                                <button
+                                    type="button"
+                                    onClick={() => router.push('/login')}
+                                    className="font-semibold text-red-600 hover:text-red-500 dark:text-red-500 dark:hover:text-red-400"
+                                >
+                                    Login
+                                </button>
+                            </p>
+                        </form>
+                    </CardContent>
+                </Card>
+            </section>
+        </main>
     );
 }
