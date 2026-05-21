@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
+import {toast} from 'sonner';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
@@ -36,8 +37,12 @@ export default function BuildPlanForm({carId}: Props) {
         try {
             const token = getAuthToken();
             const recommendation = await buildPlanService(token!, carId, data);
+            toast.success('Build plan generated! 🤖');
             setResult(recommendation.content);
         } catch (error: any) {
+            toast.error(
+                error.response?.data?.message || 'Failed to generate plan',
+            );
             console.error(
                 'Failed to generate plan:',
                 error.response?.data?.message,

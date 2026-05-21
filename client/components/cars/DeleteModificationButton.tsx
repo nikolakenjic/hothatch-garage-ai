@@ -1,5 +1,6 @@
 'use client';
 
+import {toast} from 'sonner';
 import {Button} from '@/components/ui/button';
 import {deleteModificationService} from '@/services/modification.service';
 import {getAuthToken} from '@/lib/cookies';
@@ -16,8 +17,10 @@ export default function DeleteModificationButton({modId}: Props) {
         try {
             const token = getAuthToken();
             await deleteModificationService(token!, modId);
+            toast.success('Modification deleted');
             router.refresh();
         } catch (error: any) {
+            toast.error('Failed to delete modification');
             console.error(
                 'Failed to delete mod:',
                 error.response?.data?.message,

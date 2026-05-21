@@ -10,6 +10,7 @@ import {Input} from '@/components/ui/input';
 import {loginService} from '@/services/auth.service';
 import {useRouter} from 'next/navigation';
 import {setAuthCookie} from '@/lib/cookies';
+import {toast} from 'sonner';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -26,8 +27,10 @@ export default function LoginPage() {
             const response = await loginService(data);
             setAuthCookie(response.token);
             console.log('Login success:', response);
+            toast.success('Welcome back!');
             router.replace('/garage');
         } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Login failed');
             console.error('Login failed:', error.response?.data?.message);
         }
     };

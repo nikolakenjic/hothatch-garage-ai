@@ -2,6 +2,7 @@
 
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {toast} from 'sonner';
 import {z} from 'zod';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
@@ -33,6 +34,7 @@ export default function AddCarForm() {
         try {
             const token = getAuthToken();
             await createCarService(token!, data);
+            toast.success('Car added successfully! 🚗');
             router.refresh();
         } catch (error: any) {
             console.error('Failed to add car:', error.response?.data?.message);

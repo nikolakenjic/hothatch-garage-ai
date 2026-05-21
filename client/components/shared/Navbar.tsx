@@ -11,10 +11,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Moon, Sun} from 'lucide-react';
+import {useAuth} from '@/context/AuthContext';
 
 export default function Navbar() {
     const router = useRouter();
     const {setTheme} = useTheme();
+    const {user} = useAuth();
 
     const handleLogout = () => {
         document.cookie =
@@ -28,6 +30,11 @@ export default function Navbar() {
                 HotHatch 🔥
             </Link>
             <div className="flex items-center gap-2">
+                {user && (
+                    <span className="text-sm text-muted-foreground">
+                        {user.email}
+                    </span>
+                )}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon">

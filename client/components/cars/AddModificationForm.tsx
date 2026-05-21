@@ -3,6 +3,7 @@
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
+import {toast} from 'sonner';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
@@ -38,9 +39,13 @@ export default function AddModificationForm({carId}: Props) {
         try {
             const token = getAuthToken();
             await createModificationService(token!, carId, data);
+            toast.success('Modification added! 🔧');
             reset();
             router.refresh();
         } catch (error: any) {
+            toast.error(
+                error.response?.data?.message || 'Failed to add modification',
+            );
             console.error('Failed to add mod:', error.response?.data?.message);
         }
     };
