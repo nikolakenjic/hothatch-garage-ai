@@ -21,6 +21,11 @@ export default async function CarDetailPage({params}: Props) {
 
     return (
         <div className="container mx-auto p-8">
+            <Link href="/garage">
+                <Button variant="outline" size="sm" className="mb-4">
+                    ← Back to Garage
+                </Button>
+            </Link>
             <h1 className="text-3xl font-bold mb-2">
                 {car.brand} {car.model}
             </h1>
@@ -35,29 +40,47 @@ export default async function CarDetailPage({params}: Props) {
                         No modifications yet.
                     </p>
                 ) : (
-                    <div className="space-y-2">
-                        {modifications.map((mod: Modification) => (
-                            <div
-                                key={mod._id}
-                                className="flex items-center justify-between border rounded p-3"
-                            >
-                                <div>
-                                    <p className="font-medium">{mod.name}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {mod.category}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    {mod.price && (
+                    <>
+                        <div className="space-y-2">
+                            {modifications.map((mod: Modification) => (
+                                <div
+                                    key={mod._id}
+                                    className="flex items-center justify-between border rounded p-3"
+                                >
+                                    <div>
                                         <p className="font-medium">
-                                            €{mod.price}
+                                            {mod.name}
                                         </p>
-                                    )}
-                                    <DeleteModificationButton modId={mod._id} />
+                                        <p className="text-sm text-muted-foreground">
+                                            {mod.category}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        {mod.price && (
+                                            <p className="font-medium">
+                                                €{mod.price}
+                                            </p>
+                                        )}
+                                        <DeleteModificationButton
+                                            modId={mod._id}
+                                        />
+                                    </div>
                                 </div>
+                            ))}
+                        </div>
+                        {modifications.length > 0 && (
+                            <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                                <p className="font-semibold">Total spent</p>
+                                <p className="font-bold text-lg">
+                                    €
+                                    {modifications.reduce(
+                                        (sum, mod) => sum + (mod.price || 0),
+                                        0,
+                                    )}
+                                </p>
                             </div>
-                        ))}
-                    </div>
+                        )}
+                    </>
                 )}
             </div>
             <AddModificationForm carId={id} />
