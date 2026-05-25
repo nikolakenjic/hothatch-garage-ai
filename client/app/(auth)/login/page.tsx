@@ -7,7 +7,7 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Input} from '@/components/ui/input';
-import {loginService} from '@/services/auth.service';
+import AuthService from '@/services/auth.service';
 import {useRouter} from 'next/navigation';
 import {setAuthCookie} from '@/lib/cookies';
 import {toast} from 'sonner';
@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginInput) => {
         try {
-            const response = await loginService(data);
+            const response = await AuthService.login(data);
             setAuthCookie(response.token);
             toast.success('Welcome back!');
             router.replace('/garage');
