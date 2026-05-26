@@ -7,13 +7,13 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Input} from '@/components/ui/input';
-import AuthService from '@/services/auth.service';
 import {useRouter} from 'next/navigation';
-import {setAuthCookie} from '@/lib/cookies';
 import {toast} from 'sonner';
+import {useAuth} from '@/context/AuthContext';
 
 export default function LoginPage() {
     const router = useRouter();
+    const {login} = useAuth();
 
     const {
         register,
@@ -25,10 +25,7 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginInput) => {
         try {
-            const response = await AuthService.login(data);
-            setAuthCookie(response.token);
-            toast.success('Welcome back!');
-            router.replace('/garage');
+            await login(data);
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Login failed');
         }

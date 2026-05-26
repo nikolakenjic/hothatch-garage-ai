@@ -8,12 +8,13 @@ import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Input} from '@/components/ui/input';
 import {useRouter} from 'next/navigation';
-import AuthService, {registerService} from '@/services/auth.service';
-import {setAuthCookie} from '@/lib/cookies';
+
 import {toast} from 'sonner';
+import {useAuth} from '@/context/AuthContext';
 
 export default function RegisterPage() {
     const router = useRouter();
+    const {register: SignUp} = useAuth();
 
     const {
         register,
@@ -25,10 +26,7 @@ export default function RegisterPage() {
 
     const onSubmit = async (data: RegisterInput) => {
         try {
-            const response = await AuthService.register(data);
-            setAuthCookie(response.token);
-            toast.success('Account created!');
-            router.replace('/login');
+            await SignUp(data);
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Registration failed');
         }

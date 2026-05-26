@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
 import {useTheme} from 'next-themes';
 import {Moon, Sun} from 'lucide-react';
 
@@ -15,15 +14,8 @@ import {
 import {useAuth} from '@/context/AuthContext';
 
 export default function Navbar() {
-    const router = useRouter();
     const {setTheme} = useTheme();
-    const {user} = useAuth();
-
-    const handleLogout = () => {
-        document.cookie =
-            'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-        router.replace('/login');
-    };
+    const {user, logout} = useAuth();
 
     return (
         <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 px-4 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-[#070707]/80">
@@ -81,7 +73,7 @@ export default function Navbar() {
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={handleLogout}
+                        onClick={logout}
                         className="border-zinc-200 font-semibold transition-all hover:border-red-300 hover:text-red-600 dark:border-white/10 dark:hover:text-red-500"
                     >
                         Logout
