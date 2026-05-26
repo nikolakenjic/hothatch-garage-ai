@@ -2,9 +2,10 @@
 
 import {toast} from 'sonner';
 import {Button} from '@/components/ui/button';
-import {deleteCarService} from '@/services/car.service';
+
 import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
+import CarService from '@/services/car.service';
 
 type Props = {
     carId: string;
@@ -16,7 +17,7 @@ export default function DeleteCarButton({carId}: Props) {
     const handleDelete = async () => {
         try {
             const token = getAuthToken();
-            await deleteCarService(token!, carId);
+            await CarService.deleteCar(token!, carId);
             toast.success('Car deleted');
             router.refresh();
         } catch (error: any) {

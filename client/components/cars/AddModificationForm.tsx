@@ -8,9 +8,9 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {createModificationService} from '@/services/modification.service';
 import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
+import ModificationService from '@/services/modification.service';
 
 const addModSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -38,7 +38,7 @@ export default function AddModificationForm({carId}: Props) {
     const onSubmit = async (data: AddModInput) => {
         try {
             const token = getAuthToken();
-            await createModificationService(token!, carId, data);
+            await ModificationService.createModification(token!, carId, data);
             toast.success('Modification added! 🔧');
             reset();
             router.refresh();

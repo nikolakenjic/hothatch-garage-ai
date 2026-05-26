@@ -1,11 +1,11 @@
 import {cookies} from 'next/headers';
-import {getCarByIdService} from '@/services/car.service';
-import {getModificationsService} from '@/services/modification.service';
 import {Modification} from '@/types/modification';
 import AddModificationForm from '@/components/cars/AddModificationForm';
 import DeleteModificationButton from '@/components/cars/DeleteModificationButton';
 import Link from 'next/link';
 import {Button} from '@/components/ui/button';
+import CarService from '@/services/car.service';
+import ModificationService from '@/services/modification.service';
 
 type Props = {
     params: Promise<{id: string}>;
@@ -16,8 +16,11 @@ export default async function CarDetailPage({params}: Props) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
-    const car = await getCarByIdService(token!, id);
-    const modifications = await getModificationsService(token!, id);
+    const car = await CarService.getCarById(token!, id);
+    const modifications = await ModificationService.getModifications(
+        token!,
+        id,
+    );
 
     return (
         <div className="container mx-auto p-8">

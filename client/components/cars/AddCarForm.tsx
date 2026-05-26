@@ -8,7 +8,7 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {createCarService} from '@/services/car.service';
+import CarService from '@/services/car.service';
 import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
 
@@ -33,7 +33,7 @@ export default function AddCarForm() {
     const onSubmit = async (data: AddCarInput) => {
         try {
             const token = getAuthToken();
-            await createCarService(token!, data);
+            await CarService.createCar(token!, data);
             toast.success('Car added successfully! 🚗');
             router.refresh();
         } catch (error: any) {

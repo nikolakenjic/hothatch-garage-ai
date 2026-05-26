@@ -1,6 +1,6 @@
 import {cookies} from 'next/headers';
-import {getCarByIdService} from '@/services/car.service';
 import BuildPlanForm from '@/components/cars/BuildPlanForm';
+import CarService from '@/services/car.service';
 
 type Props = {
     params: Promise<{id: string}>;
@@ -11,7 +11,7 @@ export default async function BuildPlanPage({params}: Props) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
-    const car = await getCarByIdService(token!, id);
+    const car = await CarService.getCarById(token!, id);
 
     return (
         <div className="container mx-auto p-8">

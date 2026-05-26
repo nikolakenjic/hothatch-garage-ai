@@ -9,8 +9,8 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {buildPlanService} from '@/services/ai.service';
 import {getAuthToken} from '@/lib/cookies';
+import AiService from '@/services/ai.service';
 
 const buildPlanSchema = z.object({
     budget: z.string().min(1, 'Budget is required'),
@@ -36,7 +36,11 @@ export default function BuildPlanForm({carId}: Props) {
     const onSubmit = async (data: BuildPlanInput) => {
         try {
             const token = getAuthToken();
-            const recommendation = await buildPlanService(token!, carId, data);
+            const recommendation = await AiService.buildPlan(
+                token!,
+                carId,
+                data,
+            );
             toast.success('Build plan generated! 🤖');
             setResult(recommendation.content);
         } catch (error: any) {

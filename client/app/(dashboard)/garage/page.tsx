@@ -1,15 +1,15 @@
 import AddCarForm from '@/components/cars/AddCarForm';
 import DeleteCarButton from '@/components/cars/DeleteCarButton';
-import {getCarsService} from '@/services/car.service';
 import {Car} from '@/types/car';
 import {cookies} from 'next/headers';
 import Link from 'next/link';
 import {Button} from '@/components/ui/button';
+import CarService from '@/services/car.service';
 
 export default async function GaragePage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
-    const cars = await getCarsService(token!);
+    const cars = await CarService.getCars(token!);
 
     return (
         <main className="min-h-screen bg-zinc-50 dark:bg-[#070707] px-4 py-10">

@@ -1,32 +1,40 @@
-import api from '@/lib/axios';
+import BaseService from '@/lib/api/base.service';
 import {Modification, CreateModificationInput} from '@/types/modification';
 
-export const getModificationsService = async (
-    token: string,
-    carId: string,
-): Promise<Modification[]> => {
-    const response = await api.get(`/modifications/${carId}`, {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-    return response.data.modifications;
-};
+type ModificationsResponse = {modifications: Modification[]};
+type ModificationResponse = {modification: Modification};
 
-export const createModificationService = async (
-    token: string,
-    carId: string,
-    data: CreateModificationInput,
-): Promise<Modification> => {
-    const response = await api.post(`/modifications/${carId}`, data, {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-    return response.data.modification;
-};
+export default class ModificationService {
+    static readonly ENDPOINT = '/modifications';
 
-export const deleteModificationService = async (
-    token: string,
-    modId: string,
-): Promise<void> => {
-    await api.delete(`/modifications/${modId}`, {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-};
+    static async getModifications(
+        token: string,
+        carId: string,
+    ): Promise<Modification[]> {
+        const data = await BaseService.fetch<ModificationsResponse>(
+            `${this.ENDPOINT}/${carId}`,
+            token,
+        );
+        return data.modifications;
+    }
+
+    static async createModification(
+        token: string,
+        carId: string,
+        data: CreateModificationInput,
+    ): Promise<Modification> {
+        const response = await BaseService.create<ModificationResponse>(
+            `${this.ENDPOINT}/${carId}`,
+            data,
+            token,
+        );
+        return response.modification;
+    }
+
+    static async deleteModification(
+        token: string,
+        modId: string,
+    ): Promise<void> {
+        await BaseService.remove(`${this.ENDPOINT}/${modId}`, token);
+    }
+}

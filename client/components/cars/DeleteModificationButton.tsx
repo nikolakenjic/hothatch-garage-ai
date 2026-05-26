@@ -2,9 +2,9 @@
 
 import {toast} from 'sonner';
 import {Button} from '@/components/ui/button';
-import {deleteModificationService} from '@/services/modification.service';
 import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
+import ModificationService from '@/services/modification.service';
 
 type Props = {
     modId: string;
@@ -16,7 +16,7 @@ export default function DeleteModificationButton({modId}: Props) {
     const handleDelete = async () => {
         try {
             const token = getAuthToken();
-            await deleteModificationService(token!, modId);
+            await ModificationService.deleteModification(token!, modId);
             toast.success('Modification deleted');
             router.refresh();
         } catch (error: any) {

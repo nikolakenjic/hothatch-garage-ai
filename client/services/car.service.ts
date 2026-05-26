@@ -1,38 +1,38 @@
-import api from '@/lib/axios';
+import BaseService from '@/lib/api/base.service';
 import {Car, CreateCarInput} from '@/types/car';
 
-export const getCarsService = async (token: string): Promise<Car[]> => {
-    const response = await api.get('/cars', {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-    return response.data.cars;
-};
+type CarsResponse = {cars: Car[]};
+type CarResponse = {car: Car};
 
-export const createCarService = async (
-    token: string,
-    data: CreateCarInput,
-): Promise<Car> => {
-    const response = await api.post('/cars', data, {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-    return response.data.car;
-};
+export default class CarService {
+    static readonly ENDPOINT = '/cars';
 
-export const deleteCarService = async (
-    token: string,
-    carId: string,
-): Promise<void> => {
-    await api.delete(`/cars/${carId}`, {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-};
+    static async getCars(token: string): Promise<Car[]> {
+        const data = await BaseService.fetch<CarsResponse>(
+            this.ENDPOINT,
+            token,
+        );
+        return data.cars;
+    }
 
-export const getCarByIdService = async (
-    token: string,
-    carId: string,
-): Promise<Car> => {
-    const response = await api.get(`/cars/${carId}`, {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-    return response.data.car;
-};
+    static async getCarById(token: string, carId: string): Promise<Car> {
+        const data = await BaseService.fetch<CarResponse>(
+            `${this.ENDPOINT}/${carId}`,
+            token,
+        );
+        return data.car;
+    }
+
+    static async createCar(token: string, body: CreateCarInput): Promise<Car> {
+        const data = await BaseService.create<CarResponse>(
+            this.ENDPOINT,
+            body,
+            token,
+        );
+        return data.car;
+    }
+
+    static async deleteCar(token: string, carId: string): Promise<void> {
+        await BaseService.remove(`${this.ENDPOINT}/${carId}`, token);
+    }
+}

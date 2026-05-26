@@ -1,17 +1,21 @@
-import api from '@/lib/axios';
+import BaseService from '@/lib/api/base.service';
+import {BuildPlanInput} from '@/types/ai';
 
-export type BuildPlanInput = {
-    budget: string;
-    goal: string;
-};
+type ResponseType = {recommendation: {id: string; content: string}};
 
-export const buildPlanService = async (
-    token: string,
-    carId: string,
-    data: BuildPlanInput,
-) => {
-    const response = await api.post(`/ai/build-plan/${carId}`, data, {
-        headers: {Authorization: `Bearer ${token}`},
-    });
-    return response.data.recommendation;
-};
+export default class AiService {
+    static readonly ENDPOINT = '/ai';
+
+    static async buildPlan(
+        token: string,
+        carId: string,
+        data: BuildPlanInput,
+    ): Promise<{id: string; content: string}> {
+        const response = await BaseService.create<ResponseType>(
+            `${this.ENDPOINT}/build-plan/${carId}`,
+            data,
+            token,
+        );
+        return response.recommendation;
+    }
+}
