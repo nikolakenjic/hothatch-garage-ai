@@ -17,26 +17,25 @@ export default function Navbar() {
     const {setTheme} = useTheme();
     const {user, logout} = useAuth();
 
+    if (!user) return null;
+
     return (
         <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 px-4 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-[#070707]/80">
             <div className="mx-auto flex max-w-7xl items-center justify-between">
-                {/* Logo */}
                 <Link
-                    href="/garage"
+                    href="/"
                     className="font-heading text-xl font-black tracking-tight transition-colors hover:text-red-600 dark:hover:text-red-500"
                 >
                     HotHatch Garage
                 </Link>
 
                 <div className="flex items-center gap-3">
-                    {/* User */}
                     {user && (
                         <span className="max-w-[140px] truncate text-sm text-zinc-600 dark:text-zinc-400">
                             {user.email}
                         </span>
                     )}
 
-                    {/* Theme switcher */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
@@ -69,7 +68,6 @@ export default function Navbar() {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    {/* Logout */}
                     <Button
                         variant="outline"
                         size="sm"
