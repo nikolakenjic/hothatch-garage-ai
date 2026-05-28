@@ -3,15 +3,16 @@ import type {NextRequest} from 'next/server';
 
 export function middleware(request: NextRequest) {
     const token = request.cookies.get('token')?.value;
-    const isAuthPage =
+    const isPublicPage =
+        request.nextUrl.pathname === '/' ||
         request.nextUrl.pathname.startsWith('/login') ||
         request.nextUrl.pathname.startsWith('/register');
 
-    if (!token && !isAuthPage) {
+    if (!token && !isPublicPage) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (token && isAuthPage) {
+    if (token && isPublicPage && request.nextUrl.pathname !== '/') {
         return NextResponse.redirect(new URL('/garage', request.url));
     }
 
