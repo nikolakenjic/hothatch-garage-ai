@@ -3,7 +3,7 @@
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {UseFormReturn} from 'react-hook-form';
+import {FieldValues, UseFormReturn} from 'react-hook-form';
 
 export type Field = {
     name: string;
@@ -12,23 +12,23 @@ export type Field = {
     placeholder?: string;
 };
 
-type AuthFormProps = {
+type AuthFormProps<T extends FieldValues> = {
     fields: Field[];
     submitText: string;
     submitLoadingText: string;
-    form: UseFormReturn<any>;
-    onSubmit: (data: any) => Promise<void>;
+    form: UseFormReturn<T>;
+    onSubmit: (data: T) => Promise<void>;
     secondaryAction?: React.ReactNode;
 };
 
-export default function AuthForm({
+export default function AuthForm<T extends FieldValues>({
     fields,
     submitText,
     submitLoadingText,
     form,
     onSubmit,
     secondaryAction,
-}: AuthFormProps) {
+}: AuthFormProps<T>) {
     const {
         register,
         handleSubmit,
@@ -44,7 +44,7 @@ export default function AuthForm({
                         id={field.name}
                         type={field.type ?? 'text'}
                         placeholder={field.placeholder}
-                        {...register(field.name)}
+                        {...register(field.name as any)}
                         className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
                     />
                     {errors[field.name] && (
