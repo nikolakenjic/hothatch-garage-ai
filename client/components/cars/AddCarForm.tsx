@@ -19,8 +19,11 @@ const addCarSchema = z.object({
 });
 
 type AddCarInput = z.infer<typeof addCarSchema>;
+type AddCarFormProps = {
+    onSuccess?: () => void;
+};
 
-export default function AddCarForm() {
+export default function AddCarForm({onSuccess}: AddCarFormProps) {
     const router = useRouter();
     const {
         register,
@@ -36,6 +39,7 @@ export default function AddCarForm() {
             await CarService.createCar(token!, data);
             toast.success('Car added successfully! 🚗');
             router.refresh();
+            onSuccess?.();
         } catch (error: any) {
             console.error('Failed to add car:', error.response?.data?.message);
         }

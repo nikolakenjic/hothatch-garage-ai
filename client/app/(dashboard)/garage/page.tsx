@@ -5,6 +5,7 @@ import {cookies} from 'next/headers';
 import Link from 'next/link';
 import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
+import AddCarSection from '@/components/cars/AddCarSection';
 
 export default async function GaragePage() {
     const cookieStore = await cookies();
@@ -27,6 +28,7 @@ export default async function GaragePage() {
                             ? 'No cars yet — add your first hot hatch below'
                             : `${cars.length} car${cars.length > 1 ? 's' : ''} in your garage`}
                     </p>
+                    <AddCarSection />
                 </div>
 
                 {/* Car Grid */}
@@ -66,14 +68,6 @@ export default async function GaragePage() {
                         ))}
                     </div>
                 )}
-
-                {/* Add Car Form */}
-                <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-zinc-950/80">
-                    <h2 className="text-xl font-bold text-zinc-950 dark:text-white mb-4">
-                        Add New Car
-                    </h2>
-                    <AddCarForm />
-                </div>
             </div>
         </main>
     );
