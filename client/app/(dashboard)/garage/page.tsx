@@ -1,11 +1,10 @@
-import AddCarForm from '@/components/cars/AddCarForm';
-import DeleteCarButton from '@/components/cars/DeleteCarButton';
-import {Car} from '@/types/car';
 import {cookies} from 'next/headers';
-import Link from 'next/link';
-import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
+import {Car} from '@/types/car';
 import AddCarSection from '@/components/cars/AddCarSection';
+import EmptyGarage from '@/components/cars/EmptyGarage';
+import CarCard from '@/components/cars/CarCard';
+import GarageHeader from '@/components/cars/GarageHeader';
 
 export default async function GaragePage() {
     const cookieStore = await cookies();
@@ -13,62 +12,28 @@ export default async function GaragePage() {
     const cars = await CarService.getCars(token!);
 
     return (
-        <main className="min-h-screen bg-zinc-50 dark:bg-[#070707] px-4 py-10">
-            <div className="container mx-auto max-w-6xl">
-                {/* Header */}
-                <div className="mb-10">
-                    <p className="text-sm font-semibold uppercase tracking-[0.35em] text-red-600 dark:text-red-500 mb-2">
-                        Your Collection
-                    </p>
-                    <h1 className="text-4xl font-black tracking-tight text-zinc-950 dark:text-white">
-                        My Garage 🔥
-                    </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 mt-2">
-                        {cars.length === 0
-                            ? 'No cars yet — add your first hot hatch below'
-                            : `${cars.length} car${cars.length > 1 ? 's' : ''} in your garage`}
-                    </p>
+        <main className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-10 text-zinc-950 dark:bg-[#070707] dark:text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.16),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.10),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.22),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.14),_transparent_35%)]" />
+
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.045)_1px,transparent_1px)] bg-[size:44px_44px] opacity-30 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] dark:opacity-20" />
+
+            <section className="relative z-10 mx-auto max-w-7xl">
+                <GarageHeader carsCount={cars.length} />
+
+                <div className="mt-8">
                     <AddCarSection />
                 </div>
 
-                {/* Car Grid */}
-                {cars.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                {cars.length === 0 ? (
+                    <EmptyGarage />
+                ) : (
+                    <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                         {cars.map((car: Car) => (
-                            <div
-                                key={car._id}
-                                className="group rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:border-red-200 dark:border-white/10 dark:bg-zinc-950/80 dark:hover:border-red-500/30"
-                            >
-                                <div className="flex items-start justify-between mb-4">
-                                    <div>
-                                        <Link href={`/garage/${car._id}`}>
-                                            <h2 className="text-xl font-bold text-zinc-950 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors cursor-pointer">
-                                                {car.brand} {car.model}
-                                            </h2>
-                                        </Link>
-                                        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                                            {car.year}
-                                        </p>
-                                    </div>
-                                    <span className="text-2xl">🚗</span>
-                                </div>
-                                <div className="flex items-center justify-between mt-4 pt-4 border-t border-zinc-100 dark:border-white/5">
-                                    <Link href={`/garage/${car._id}`}>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="text-xs"
-                                        >
-                                            View Details
-                                        </Button>
-                                    </Link>
-                                    <DeleteCarButton carId={car._id} />
-                                </div>
-                            </div>
+                            <CarCard key={car._id} car={car} />
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         </main>
     );
 }

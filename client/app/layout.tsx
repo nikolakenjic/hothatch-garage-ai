@@ -30,9 +30,13 @@ export default function RootLayout({
     return (
         <html
             lang="en"
+            suppressHydrationWarning
             className={`${geist.variable} ${spaceGrotesk.variable} h-full antialiased`}
         >
-            <body className="flex min-h-full flex-col font-sans">
+            <body
+                suppressHydrationWarning
+                className="flex min-h-full flex-col font-sans"
+            >
                 <ThemeProvider>
                     <AuthProvider>
                         <Navbar />
