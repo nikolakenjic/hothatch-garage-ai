@@ -32,6 +32,20 @@ export default class CarService {
         return data.car;
     }
 
+    static async updateCar(
+        token: string,
+        carId: string,
+        body: Partial<CreateCarInput>,
+    ): Promise<Car> {
+        const data = await BaseService.update<CarResponse>(
+            `${this.ENDPOINT}/${carId}`,
+            body,
+            token,
+        );
+
+        return data.car;
+    }
+
     static async deleteCar(token: string, carId: string): Promise<void> {
         await BaseService.remove(`${this.ENDPOINT}/${carId}`, token);
     }

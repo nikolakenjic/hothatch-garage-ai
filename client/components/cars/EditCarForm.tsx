@@ -10,20 +10,23 @@ import {Label} from '@/components/ui/label';
 import CarService from '@/services/car.service';
 import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
+import {Car} from '@/types/car';
+import {getErrorMessage} from '@/lib/errors';
 
-const addCarSchema = z.object({
+const editCarSchema = z.object({
     brand: z.string().min(1, 'Brand is required'),
     model: z.string().min(1, 'Model is required'),
     year: z.coerce.number().int().min(1900).max(new Date().getFullYear()),
 });
 
-type AddCarInput = z.infer<typeof addCarSchema>;
+type EditCarInput = z.infer<typeof editCarSchema>;
 
-type AddCarFormProps = {
+type EditCarProps = {
+    car: Car;
     onSuccess?: () => void;
 };
 
-export default function AddCarForm({onSuccess}: AddCarFormProps) {
+export default function EditCarForm({car, onSuccess}: EditCarProps) {
     const router = useRouter();
 
     const {
@@ -31,27 +34,27 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
         handleSubmit,
         reset,
         formState: {errors, isSubmitting},
-    } = useForm<AddCarInput>({
-        resolver: zodResolver(addCarSchema) as any,
+    } = useForm<EditCarInput>({
+        resolver: zodResolver(editCarSchema) as any,
         defaultValues: {
-            brand: '',
-            model: '',
-            year: new Date().getFullYear(),
+            brand: car.brand,
+            model: car.model,
+            year: car.year,
         },
     });
 
-    const onSubmit = async (data: AddCarInput) => {
+    const onSubmit = async (data: EditCarInput) => {
         try {
             const token = getAuthToken();
 
-            await CarService.createCar(token!, data);
+            await CarService.updateCar(token!, car._id, data);
 
-            toast.success('Car added successfully! 🚗');
+            toast.success('Car update successfully! 🚗');
             reset();
             router.refresh();
             onSuccess?.();
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to add car');
+        } catch (error) {
+            toast.error(getErrorMessage(error));
         }
     };
 
@@ -110,7 +113,7 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
                 disabled={isSubmitting}
                 className="h-11 w-full rounded-xl bg-red-600 font-bold text-white shadow-lg shadow-red-900/25 transition-all duration-200 hover:scale-[1.01] hover:bg-red-500 active:scale-[0.99]"
             >
-                {isSubmitting ? 'Adding car...' : 'Add Car'}
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
         </form>
     );
