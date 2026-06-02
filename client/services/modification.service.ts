@@ -31,6 +31,19 @@ export default class ModificationService {
         return response.modification;
     }
 
+    static async updateModification(
+        token: string,
+        modId: string,
+        body: Partial<CreateModificationInput>,
+    ): Promise<Modification> {
+        const data = await BaseService.update<ModificationResponse>(
+            `${this.ENDPOINT}/${modId}`,
+            body,
+            token,
+        );
+        return data.modification;
+    }
+
     static async deleteModification(
         token: string,
         modId: string,
