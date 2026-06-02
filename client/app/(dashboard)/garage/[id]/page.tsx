@@ -6,6 +6,7 @@ import Link from 'next/link';
 import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
 import ModificationService from '@/services/modification.service';
+import EditCarForm from '@/components/cars/EditCarForm';
 
 type Props = {
     params: Promise<{id: string}>;
@@ -80,6 +81,12 @@ export default async function CarDetailPage({params}: Props) {
                                 AI Build Planner 🤖
                             </Button>
                         </Link>
+                    </div>
+                    <div className="mt-8 rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
+                        <h2 className="font-heading text-2xl font-black text-zinc-950 dark:text-white mb-6">
+                            Edit Car
+                        </h2>
+                        <EditCarForm car={car} />
                     </div>
                 </header>
 
