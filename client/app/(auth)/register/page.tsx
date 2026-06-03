@@ -50,17 +50,23 @@ export default function RegisterPage() {
 
     return (
         <AuthLayout
-            eyebrow="Create profile"
-            title="Start your garage"
-            description="Register and start building your hot hatch profile."
-            heroTitle="Build your garage."
-            heroHighlight="Tune your passion."
-            heroDescription="Join a community of hot hatch enthusiasts. Add your car, track modifications, and get AI-powered upgrade ideas."
-            features={[
-                {title: 'AI', description: 'Upgrade help'},
-                {title: 'OEM+', description: 'Clean builds'},
-                {title: 'Garage', description: 'Your cars'},
-            ]}
+            hero={{
+                title: 'Build your garage.',
+                highlight: 'Tune your passion.',
+                description:
+                    'Join a community of hot hatch enthusiasts. Add your car, track modifications, and get AI-powered upgrade ideas.',
+                features: [
+                    {title: 'AI', description: 'Upgrade help'},
+                    {title: 'OEM+', description: 'Clean builds'},
+                    {title: 'Garage', description: 'Your cars'},
+                ],
+            }}
+            card={{
+                eyebrow: 'Create profile',
+                title: 'Start your garage',
+                description:
+                    'Register and start building your hot hatch profile.',
+            }}
         >
             <AuthForm
                 form={form}
