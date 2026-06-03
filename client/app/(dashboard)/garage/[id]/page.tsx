@@ -7,6 +7,7 @@ import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
 import ModificationService from '@/services/modification.service';
 import EditCarForm from '@/components/cars/EditCarForm';
+import EditModificationButton from '@/components/cars/EditModificationButton';
 
 type Props = {
     params: Promise<{id: string}>;
@@ -121,6 +122,7 @@ export default async function CarDetailPage({params}: Props) {
                                                     €{mod.price}
                                                 </p>
                                             )}
+                                            <EditModificationButton mod={mod} />
                                             <DeleteModificationButton
                                                 modId={mod._id}
                                             />
