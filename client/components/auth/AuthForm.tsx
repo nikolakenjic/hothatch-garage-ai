@@ -3,7 +3,7 @@
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {FieldValues, UseFormReturn} from 'react-hook-form';
+import {FieldValues, Path, UseFormReturn} from 'react-hook-form';
 
 export type Field = {
     name: string;
@@ -19,6 +19,11 @@ type AuthFormProps<T extends FieldValues> = {
     form: UseFormReturn<T>;
     onSubmit: (data: T) => Promise<void>;
     secondaryAction?: React.ReactNode;
+};
+
+const getFieldError = (fieldName: string): string | undefined => {
+    const error = errors[fieldName as Path<T>];
+    return typeof error?.message === 'string' ? error.message : undefined;
 };
 
 export default function AuthForm<T extends FieldValues>({
@@ -44,12 +49,12 @@ export default function AuthForm<T extends FieldValues>({
                         id={field.name}
                         type={field.type ?? 'text'}
                         placeholder={field.placeholder}
-                        {...register(field.name as any)}
+                        {...register(field.name as Path<T>)}
                         className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
                     />
-                    {errors[field.name] && (
+                    {getFieldError(field.name) && (
                         <p className="text-sm text-red-500">
-                            {errors[field.name]?.message as string}
+                            {getFieldError(field.name)}
                         </p>
                     )}
                 </div>
