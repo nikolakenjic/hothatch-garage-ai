@@ -2,7 +2,7 @@
 
 import {createContext, useContext, useState} from 'react';
 import {jwtDecode} from 'jwt-decode';
-import {getAuthToken, setAuthCookie} from '@/lib/cookies';
+import {getAuthToken, removeAuthCookie, setAuthCookie} from '@/lib/cookies';
 import {LoginInput, RegisterInput} from '@/lib/validations/auth';
 import {useRouter} from 'next/navigation';
 import AuthService from '@/services/auth.service';
@@ -21,6 +21,10 @@ type AuthContextType = {
     logout: () => void;
 };
 
+type DecodedToken = User & {
+    exp: number;
+};
+
 const AuthContext = createContext<AuthContextType>({
     user: null,
     isLoading: true,
@@ -35,29 +39,51 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         if (typeof window === 'undefined') return null;
         const token = getAuthToken();
         if (!token) return null;
-        return jwtDecode<User>(token);
+
+        // jwtDecode does not verify signature - validation happens on server via middleware
+        const decoded = jwtDecode<DecodedToken>(token);
+
+        // Check if token is expired
+        if (decoded.exp * 1000 < Date.now()) {
+            removeAuthCookie();
+            return null;
+        }
+
+        return {
+            userId: decoded.userId,
+            email: decoded.email,
+        };
     });
     const [isLoading, setIsLoading] = useState(false);
 
     const login = async (data: LoginInput) => {
-        const response = await AuthService.login(data);
-        setAuthCookie(response.token);
-        setUser(jwtDecode<User>(response.token));
-        toast.success('Welcome back!');
-        router.replace('/garage');
+        setIsLoading(true);
+        try {
+            const response = await AuthService.login(data);
+            setAuthCookie(response.token);
+            setUser(jwtDecode<User>(response.token));
+            toast.success('Welcome back!');
+            router.replace('/garage');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const register = async (data: RegisterInput) => {
-        const response = await AuthService.register(data);
-        setAuthCookie(response.token);
-        setUser(jwtDecode<User>(response.token));
-        toast.success('Account created!');
-        router.replace('/garage');
+        setIsLoading(true);
+        try {
+            const response = await AuthService.register(data);
+            setAuthCookie(response.token);
+            setUser(jwtDecode<User>(response.token));
+            toast.success('Account created!');
+            router.replace('/garage');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const logout = () => {
-        document.cookie =
-            'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        removeAuthCookie();
         setUser(null);
         router.replace('/login');
     };
