@@ -4,12 +4,32 @@ import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
-
 import {RegisterInput, registerSchema} from '@/lib/validations/auth';
 import {useAuth} from '@/context/AuthContext';
 import AuthForm, {Field} from '@/components/auth/AuthForm';
 import AuthLayout from '@/components/auth/AuthLayout';
 import {getErrorMessage} from '@/lib/errors';
+
+const registerFields: Field[] = [
+    {
+        name: 'name',
+        label: 'Name',
+        type: 'text',
+        placeholder: 'Nikola',
+    },
+    {
+        name: 'email',
+        label: 'Email',
+        type: 'email',
+        placeholder: 'you@example.com',
+    },
+    {
+        name: 'password',
+        label: 'Password',
+        type: 'password',
+        placeholder: '••••••••',
+    },
+];
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -18,27 +38,6 @@ export default function RegisterPage() {
     const form = useForm<RegisterInput>({
         resolver: zodResolver(registerSchema),
     });
-
-    const registerFields: Field[] = [
-        {
-            name: 'name',
-            label: 'Name',
-            type: 'text',
-            placeholder: 'Nikola',
-        },
-        {
-            name: 'email',
-            label: 'Email',
-            type: 'email',
-            placeholder: 'you@example.com',
-        },
-        {
-            name: 'password',
-            label: 'Password',
-            type: 'password',
-            placeholder: '••••••••',
-        },
-    ];
 
     const onSubmit = async (data: RegisterInput) => {
         try {
