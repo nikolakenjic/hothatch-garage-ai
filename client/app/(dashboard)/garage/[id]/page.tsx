@@ -1,13 +1,13 @@
 import {cookies} from 'next/headers';
 import {Modification} from '@/types/modification';
-import AddModificationForm from '@/components/cars/AddModificationForm';
-import DeleteModificationButton from '@/components/cars/DeleteModificationButton';
 import Link from 'next/link';
 import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
 import ModificationService from '@/services/modification.service';
 import EditCarForm from '@/components/cars/EditCarForm';
-import EditModificationButton from '@/components/cars/EditModificationButton';
+import EditModificationButton from '@/components/modifications/EditModificationButton';
+import AddModificationForm from '@/components/modifications/AddModificationForm';
+import DeleteModificationButton from '@/components/modifications/DeleteModificationButton';
 
 type Props = {
     params: Promise<{id: string}>;

@@ -1,5 +1,5 @@
 import {cookies} from 'next/headers';
-import BuildPlanForm from '@/components/cars/BuildPlanForm';
+import BuildPlanForm from '@/components/build-plan/BuildPlanForm';
 import CarService from '@/services/car.service';
 import Link from 'next/link';
 

@@ -21,11 +21,6 @@ type AuthFormProps<T extends FieldValues> = {
     secondaryAction?: React.ReactNode;
 };
 
-const getFieldError = (fieldName: string): string | undefined => {
-    const error = errors[fieldName as Path<T>];
-    return typeof error?.message === 'string' ? error.message : undefined;
-};
-
 export default function AuthForm<T extends FieldValues>({
     fields,
     submitText,
@@ -39,6 +34,11 @@ export default function AuthForm<T extends FieldValues>({
         handleSubmit,
         formState: {errors, isSubmitting},
     } = form;
+
+    const getFieldError = (fieldName: string): string | undefined => {
+        const error = errors[fieldName as Path<T>];
+        return typeof error?.message === 'string' ? error.message : undefined;
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
