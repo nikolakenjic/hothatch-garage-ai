@@ -11,7 +11,7 @@ export default class ModificationService {
         token: string,
         carId: string,
     ): Promise<Modification[]> {
-        const data = await BaseService.fetch<ModificationsResponse>(
+        const data = await BaseService.get<ModificationsResponse>(
             `${this.ENDPOINT}/${carId}`,
             token,
         );

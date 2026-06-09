@@ -1,7 +1,5 @@
 import BaseService from '@/lib/api/base.service';
-import {BuildPlanInput} from '@/types/ai';
-
-type ResponseType = {recommendation: {id: string; content: string}};
+import {BuildPlanInput, BuildPlanResponse, Recommendation} from '@/types/ai';
 
 export default class AiService {
     static readonly ENDPOINT = '/ai';
@@ -10,8 +8,8 @@ export default class AiService {
         token: string,
         carId: string,
         data: BuildPlanInput,
-    ): Promise<{id: string; content: string}> {
-        const response = await BaseService.create<ResponseType>(
+    ): Promise<Recommendation> {
+        const response = await BaseService.create<BuildPlanResponse>(
             `${this.ENDPOINT}/build-plan/${carId}`,
             data,
             token,

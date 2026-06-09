@@ -1,9 +1,13 @@
 import api from '@/lib/axios';
 
 export default class BaseService {
-    static async fetch<T>(endpoint: string, token?: string): Promise<T> {
+    private static getHeaders(token?: string) {
+        return token ? {Authorization: `Bearer ${token}`} : {};
+    }
+
+    static async get<T>(endpoint: string, token?: string): Promise<T> {
         const response = await api.get(endpoint, {
-            headers: token ? {Authorization: `Bearer ${token}`} : {},
+            headers: this.getHeaders(token),
         });
         return response.data;
     }
@@ -14,7 +18,7 @@ export default class BaseService {
         token?: string,
     ): Promise<T> {
         const response = await api.post(endpoint, body, {
-            headers: token ? {Authorization: `Bearer ${token}`} : {},
+            headers: this.getHeaders(token),
         });
         return response.data;
     }
@@ -25,14 +29,14 @@ export default class BaseService {
         token?: string,
     ): Promise<T> {
         const response = await api.patch(endpoint, body, {
-            headers: token ? {Authorization: `Bearer ${token}`} : {},
+            headers: this.getHeaders(token),
         });
         return response.data;
     }
 
     static async remove<T>(endpoint: string, token?: string): Promise<T> {
         const response = await api.delete(endpoint, {
-            headers: token ? {Authorization: `Bearer ${token}`} : {},
+            headers: this.getHeaders(token),
         });
         return response.data;
     }

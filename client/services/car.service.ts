@@ -8,15 +8,12 @@ export default class CarService {
     static readonly ENDPOINT = '/cars';
 
     static async getCars(token: string): Promise<Car[]> {
-        const data = await BaseService.fetch<CarsResponse>(
-            this.ENDPOINT,
-            token,
-        );
+        const data = await BaseService.get<CarsResponse>(this.ENDPOINT, token);
         return data.cars;
     }
 
     static async getCarById(token: string, carId: string): Promise<Car> {
-        const data = await BaseService.fetch<CarResponse>(
+        const data = await BaseService.get<CarResponse>(
             `${this.ENDPOINT}/${carId}`,
             token,
         );
