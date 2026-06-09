@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import {Car} from '@/types/car';
 import {Button} from '@/components/ui/button';
-import DeleteCarButton from '@/components/cars/DeleteCarButton';
+import DeleteCarButton from './DeleteCarButton';
 
 type CarCardProps = {
     car: Car;
@@ -15,6 +15,7 @@ export default function CarCard({car}: CarCardProps) {
             <div className="relative flex items-start justify-between">
                 <div>
                     <p className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-red-600 dark:text-red-500">
+                        {/* TODO: use car.category when available */}
                         Hot Hatch
                     </p>
 
@@ -36,6 +37,7 @@ export default function CarCard({car}: CarCardProps) {
 
             <div className="relative mt-6 rounded-2xl border border-zinc-100 bg-zinc-50/80 p-4 dark:border-white/5 dark:bg-white/[0.03]">
                 <div className="flex items-center justify-between text-sm">
+                    {/* TODO: connect to real modification progress */}
                     <span className="text-zinc-500 dark:text-zinc-400">
                         Build status
                     </span>
