@@ -2,7 +2,7 @@
 
 import {useState} from 'react';
 import {Button} from '@/components/ui/button';
-import AddCarForm from '../../../../components/cars/AddCarForm';
+import AddCarForm from './AddCarForm';
 
 export default function AddCarSection() {
     const [isOpen, setIsOpen] = useState(false);

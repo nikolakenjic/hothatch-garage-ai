@@ -10,6 +10,7 @@ import {Label} from '@/components/ui/label';
 import CarService from '@/services/car.service';
 import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
+import {getErrorMessage} from '@/lib/errors';
 
 const addCarSchema = z.object({
     brand: z.string().min(1, 'Brand is required'),
@@ -43,15 +44,18 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
     const onSubmit = async (data: AddCarInput) => {
         try {
             const token = getAuthToken();
-
-            await CarService.createCar(token!, data);
+            if (!token) {
+                toast.error('You are not logged in');
+                return;
+            }
+            await CarService.createCar(token, data);
 
             toast.success('Car added successfully! 🚗');
             reset();
             router.refresh();
             onSuccess?.();
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to add car');
+        } catch (error) {
+            toast.error(getErrorMessage(error));
         }
     };
 
