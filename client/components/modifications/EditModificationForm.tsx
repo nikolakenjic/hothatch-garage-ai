@@ -45,7 +45,11 @@ export default function EditModificationForm({mod, onSuccess}: Props) {
     const onSubmit = async (data: EditModInput) => {
         try {
             const token = getAuthToken();
-            await ModificationService.updateModification(token!, mod._id, data);
+            if (!token) {
+                toast.error('You are not logged in');
+                return;
+            }
+            await ModificationService.updateModification(token, mod._id, data);
             toast.success('Modification updated! 🔧');
             router.refresh();
             onSuccess?.();

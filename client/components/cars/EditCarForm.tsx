@@ -46,8 +46,11 @@ export default function EditCarForm({car, onSuccess}: EditCarProps) {
     const onSubmit = async (data: EditCarInput) => {
         try {
             const token = getAuthToken();
-
-            await CarService.updateCar(token!, car._id, data);
+            if (!token) {
+                toast.error('You are not logged in');
+                return;
+            }
+            await CarService.updateCar(token, car._id, data);
 
             toast.success('Car update successfully! 🚗');
             reset();

@@ -4,13 +4,13 @@ import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import {toast} from 'sonner';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
 import ModificationService from '@/services/modification.service';
+import {getErrorMessage} from '@/lib/errors';
 
 const addModSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -38,60 +38,65 @@ export default function AddModificationForm({carId}: Props) {
     const onSubmit = async (data: AddModInput) => {
         try {
             const token = getAuthToken();
-            await ModificationService.createModification(token!, carId, data);
+            if (!token) {
+                toast.error('You are not logged in');
+                return;
+            }
+            await ModificationService.createModification(token, carId, data);
             toast.success('Modification added! 🔧');
             reset();
             router.refresh();
-        } catch (error: any) {
-            toast.error(
-                error.response?.data?.message || 'Failed to add modification',
-            );
-            console.error('Failed to add mod:', error.response?.data?.message);
+        } catch (error) {
+            toast.error(getErrorMessage(error));
         }
     };
 
     return (
-        <Card className="w-full max-w-md mt-6">
-            <CardHeader>
-                <CardTitle>Add Modification</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" {...register('name')} />
-                        {errors.name && (
-                            <p className="text-sm text-red-500">
-                                {errors.name.message}
-                            </p>
-                        )}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="category">Category</Label>
-                        <Input id="category" {...register('category')} />
-                        {errors.category && (
-                            <p className="text-sm text-red-500">
-                                {errors.category.message}
-                            </p>
-                        )}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="price">Price (optional)</Label>
-                        <Input
-                            id="price"
-                            type="number"
-                            {...register('price')}
-                        />
-                    </div>
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? 'Adding...' : 'Add Modification'}
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
+        <div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                        id="name"
+                        {...register('name')}
+                        className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                    />
+                    {errors.name && (
+                        <p className="text-sm text-red-500">
+                            {errors.name.message}
+                        </p>
+                    )}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Input
+                        id="category"
+                        {...register('category')}
+                        className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                    />
+                    {errors.category && (
+                        <p className="text-sm text-red-500">
+                            {errors.category.message}
+                        </p>
+                    )}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="price">Price (optional)</Label>
+                    <Input
+                        id="price"
+                        type="number"
+                        {...register('price')}
+                        className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? 'Adding...' : 'Add Modification'}
+                </Button>
+            </form>
+        </div>
     );
 }

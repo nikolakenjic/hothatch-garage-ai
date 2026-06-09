@@ -20,6 +20,7 @@ export default function EditModificationButton({mod}: Props) {
                     onSuccess={() => setIsEditing(false)}
                 />
                 <button
+                    type="button"
                     onClick={() => setIsEditing(false)}
                     className="mt-2 text-sm text-zinc-400 hover:text-zinc-600"
                 >
