@@ -1,5 +1,7 @@
 export function setAuthCookie(token: string) {
-    document.cookie = `token=${token}; path=/; SameSite=Strict`;
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 7); // 7 days
+    document.cookie = `token=${token}; path=/; SameSite=Strict; expires=${expires.toUTCString()}`;
 }
 
 export function removeAuthCookie() {
