@@ -1,51 +1,86 @@
 # 🚗 HotHatch Garage AI
 
-A full-stack MERN application that allows users to manage their cars, track modifications, and get AI-powered upgrade recommendations.
+A full-stack web application for hot hatch enthusiasts who want to manage their cars, track modifications, and get AI-powered upgrade recommendations — all in one place.
 
 ---
 
-## 📌 Features
+## ✨ Features
 
-- 🔐 Authentication (JWT)
-- 🚗 Car management (CRUD)
-- 🔧 Modification tracking
-- 🤖 AI upgrade recommendations (Groq API)
-- 📊 Recommendation history
+- 🔐 JWT authentication with secure cookie storage
+- 🚗 Full car management (add, edit, delete)
+- 🔧 Modification tracking with cost overview
+- 🤖 AI build planner powered by Groq (LLaMA 3)
+- 🌙 Dark mode support
+- 📱 Fully responsive design
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Backend:** Node.js, Express, TypeScript
-- **Database:** MongoDB, Mongoose
-- **AI:** Groq (LLaMA 3)
-- **Validation:** Zod
-- **Auth:** JWT + Protected Routes
+### Frontend
+
+- **Next.js 15** (App Router, Server Components)
+- **TypeScript**
+- **Tailwind CSS**
+- **shadcn/ui**
+- **React Hook Form + Zod**
+
+### Backend
+
+- **Node.js + Express**
+- **TypeScript**
+- **MongoDB + Mongoose**
+- **JWT Authentication**
+- **Groq API (LLaMA 3)**
 
 ---
 
-## ⚙️ Installation
+## ⚙️ Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- MongoDB database
+- Groq API key
+
+### Backend Setup
 
 ```bash
-git clone <repo-url>
-cd hothatch-garage-ai
+cd server
 npm install
 ```
 
-Create `.env` file:
+Create `.env` file in `/server`:
 
 ```env
-PORT=5000
+PORT=3010
 MONGO_URI=your_mongo_uri
 GROQ_API_KEY=your_api_key
 JWT_SECRET=your_secret
 ```
 
-Run server:
+```bash
+npm run dev
+```
+
+### Frontend Setup
+
+```bash
+cd client
+npm install
+```
+
+Create `.env.local` file in `/client`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3010/api/v1
+```
 
 ```bash
 npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -53,54 +88,71 @@ npm run dev
 
 ### 🔐 Auth
 
-- `POST /api/v1/auth/register`
-- `POST /api/v1/auth/login`
-- `GET /api/v1/user/me`
-
----
+| Method | Endpoint                | Description       |
+| ------ | ----------------------- | ----------------- |
+| POST   | `/api/v1/auth/register` | Register new user |
+| POST   | `/api/v1/auth/login`    | Login             |
 
 ### 🚗 Cars
 
-- `POST /api/v1/cars`
-- `GET /api/v1/cars`
-- `GET /api/v1/cars/:id`
-- `PATCH /api/v1/cars/:id`
-- `DELETE /api/v1/cars/:id`
-
----
+| Method | Endpoint           | Description       |
+| ------ | ------------------ | ----------------- |
+| GET    | `/api/v1/cars`     | Get all user cars |
+| POST   | `/api/v1/cars`     | Add new car       |
+| GET    | `/api/v1/cars/:id` | Get car by ID     |
+| PATCH  | `/api/v1/cars/:id` | Update car        |
+| DELETE | `/api/v1/cars/:id` | Delete car        |
 
 ### 🔧 Modifications
 
-- `POST /api/v1/modifications/:carId`
-- `GET /api/v1/modifications/:carId`
-- `PATCH /api/v1/modifications/:id`
-- `DELETE /api/v1/modifications/:id`
-
----
+| Method | Endpoint                       | Description           |
+| ------ | ------------------------------ | --------------------- |
+| GET    | `/api/v1/modifications/:carId` | Get car modifications |
+| POST   | `/api/v1/modifications/:carId` | Add modification      |
+| PATCH  | `/api/v1/modifications/:id`    | Update modification   |
+| DELETE | `/api/v1/modifications/:id`    | Delete modification   |
 
 ### 🤖 AI
 
-- `POST /api/v1/ai/recommend`
-- `POST /api/v1/ai/upgrade/:carId`
-- `GET /api/v1/ai/recommendations`
-- `GET /api/v1/ai/recommendations/car/:carId`
+| Method | Endpoint                       | Description            |
+| ------ | ------------------------------ | ---------------------- |
+| POST   | `/api/v1/ai/build-plan/:carId` | Generate AI build plan |
 
 ---
 
-## 🧠 Architecture
+## 🏗 Architecture Decisions
 
-- Controllers handle business logic
-- Middleware handles validation & authentication
-- Global error handler manages errors
-- Zod ensures input validation
+**Server Components for data fetching**
+Pages that need data use Next.js Server Components — data is fetched on the server before the page is sent to the browser. No loading spinners, no useEffect, faster page loads.
+
+**Service layer pattern**
+All API calls go through a `BaseService` class with shared HTTP methods. Each feature has its own service (`CarService`, `ModificationService`) that builds on top of it. One place to change if the API ever changes.
+
+**Feature-based component structure**
+Components that are only used on one page live next to that page in a `_components` folder. Shared components live in the global `components` folder. This makes the codebase easy to navigate as it grows.
+
+---
+
+## 🔐 Security Notes
+
+- Passwords are hashed with bcrypt on the server
+- JWT tokens are stored in cookies with `SameSite=Strict`
+- Token expiry checked on the client before making requests
+- Note: tokens are stored in accessible cookies — `httpOnly` cookies would be more secure and is a planned improvement
 
 ---
 
 ## 🚀 Future Improvements
 
-- Frontend with Next.js
-- AI interview simulation
-- Performance tracking
+- Real-time AI chat for build advice
 - Image upload for cars
+- Modification cost charts and analytics
+- Community features to connect with other enthusiasts
+
+---
+
+## 📸 Screenshots
+
+_Coming soon_
 
 ---
