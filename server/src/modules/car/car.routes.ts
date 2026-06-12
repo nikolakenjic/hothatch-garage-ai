@@ -12,7 +12,7 @@ import {
     carRouteParamsSchema,
     createCarSchema,
     updateCarSchema,
-} from '../../validations/car.validation';
+} from './car.validation';
 
 const router = Router();
 

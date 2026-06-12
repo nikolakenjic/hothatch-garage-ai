@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {objectIdSchema} from './common.validation';
+import {objectIdSchema} from '../../validations/common.validation';
 
 export const createModificationSchema = z.object({
     name: z.string().min(1, 'Name is required'),

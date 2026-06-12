@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {objectIdSchema} from './common.validation';
+import {objectIdSchema} from '../../validations/common.validation';
 
 export const recommendCarSchema = z.object({
     budget: z

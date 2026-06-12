@@ -12,7 +12,7 @@ import {
     createModificationSchema,
     modificationIdParamsSchema,
     updateModificationSchema,
-} from '../../validations/modification.validation';
+} from './modification.validation';
 
 const router = Router();
 

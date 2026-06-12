@@ -12,7 +12,7 @@ import {
     aiCarParamsSchema,
     buildPlanSchema,
     recommendCarSchema,
-} from '../../validations/ai.validation';
+} from './ai.validation';
 
 const router = Router();
 
