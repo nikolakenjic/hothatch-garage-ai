@@ -1,5 +1,5 @@
-import DeleteModificationButton from '@/components/modifications/DeleteModificationButton';
-import EditModificationButton from '@/components/modifications/EditModificationButton';
+import DeleteModificationButton from '@/app/(dashboard)/garage/_components/forms/DeleteModificationButton';
+import EditModificationButton from '@/app/(dashboard)/garage/_components/forms/EditModificationButton';
 import {Modification} from '@/types/modification';
 
 type ModificationListProps = {

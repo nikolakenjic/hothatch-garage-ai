@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import {Car} from '@/types/car';
 import {Button} from '@/components/ui/button';
-import DeleteCarButton from './DeleteCarButton';
+import DeleteCarButton from './forms/DeleteCarButton';
 
 type CarCardProps = {
     car: Car;

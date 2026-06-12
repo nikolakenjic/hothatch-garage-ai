@@ -1,5 +1,5 @@
 import {cookies} from 'next/headers';
-import BuildPlanForm from '@/components/build-plan/BuildPlanForm';
+import BuildPlanForm from '@/app/(dashboard)/garage/[id]/build-plan/_components/BuildPlanForm';
 import CarService from '@/services/car.service';
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
