@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-import authRoutes from './modules/auth/auth.route';
+import authRoutes from './modules/auth/auth.routes';
 import carRoutes from './modules/car/car.routes';
 import modificationRoutes from './modules/modification/modification.routes';
 import aiRoutes from './modules/ai/ai.routes';
