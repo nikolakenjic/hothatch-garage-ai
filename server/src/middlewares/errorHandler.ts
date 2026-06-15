@@ -5,7 +5,7 @@ import {INTERNAL_SERVER_ERROR} from '../constants/http';
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     if (err instanceof AppError) {
         res.status(err.statusCode).json({
-            status: 'error',
+            status: err.status,
             message: err.message,
         });
         return;
