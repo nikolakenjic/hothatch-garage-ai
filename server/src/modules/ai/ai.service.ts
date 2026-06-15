@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 import {env} from '../../config/env';
-import {getCarIfOwned} from '../car/car.service';
+import {findOwnedCarOrFail} from '../car/car.service';
 import {Modification} from '../modification/modification.model';
 import {AIRecommendation} from './ai.model';
 
@@ -12,6 +12,16 @@ type RecommendCarInput = {
     budget: string;
     fuel: string;
     use: string;
+};
+
+type CarForAI = {
+    brand: string;
+    model: string;
+    year: number;
+};
+
+type ModificationForAI = {
+    name: string;
 };
 
 export const generateCarRecommendationService = async (
@@ -55,9 +65,9 @@ Recommend ONE hot hatch car with a short explanation.
     };
 };
 
-export const generateUpgradeRecommendation = async (
-    car: any,
-    modifications: any[],
+export const generateUpgradeRecommendationContent = async (
+    car: CarForAI,
+    modifications: ModificationForAI[],
 ) => {
     const modsList = modifications.map((m) => m.name).join(', ') || 'none';
 
@@ -97,11 +107,11 @@ export const recommendUpgradeService = async (
     carId: string,
     userId: string,
 ) => {
-    const car = await getCarIfOwned(carId, userId);
+    const car = await findOwnedCarOrFail(carId, userId);
 
     const modifications = await Modification.find({car: carId});
 
-    const recommendation = await generateUpgradeRecommendation(
+    const recommendation = await generateUpgradeRecommendationContent(
         car,
         modifications,
     );
@@ -127,7 +137,7 @@ export const getRecommendationsByCarService = async (
     carId: string,
     userId: string,
 ) => {
-    await getCarIfOwned(carId, userId);
+    await findOwnedCarOrFail(carId, userId);
 
     return AIRecommendation.find({
         user: userId,
@@ -140,7 +150,7 @@ export const buildPlanService = async (
     userId: string,
     data: {budget: string; goal: string},
 ) => {
-    const car = await getCarIfOwned(carId, userId);
+    const car = await findOwnedCarOrFail(carId, userId);
     const modifications = await Modification.find({car: carId});
     const modsList = modifications.map((m) => m.name).join(', ') || 'none';
 
