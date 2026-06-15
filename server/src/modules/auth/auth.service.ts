@@ -42,7 +42,7 @@ export const loginService = async (email: string, password: string) => {
     return {user, token};
 };
 
-export const getMeService = async (userId: string) => {
+export const getCurrentUserService = async (userId: string) => {
     const user = await User.findById(userId).select('-password');
 
     if (!user) {

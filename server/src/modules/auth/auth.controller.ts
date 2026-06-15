@@ -36,7 +36,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 export const getMe = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
 
-    const user = await getMeService(userId);
+    const user = await getCurrentUserService(userId);
 
     res.status(OK).json({
         message: 'Success',
