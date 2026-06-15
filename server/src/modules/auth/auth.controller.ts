@@ -1,5 +1,10 @@
 import {Request, Response} from 'express';
-import {getMeService, loginService, registerService} from './auth.service';
+import {
+    getCurrentUserService,
+    getMeService,
+    loginService,
+    registerService,
+} from './auth.service';
 import {CREATED, OK} from '../../constants/http';
 import {catchAsync} from '../../utils/catchAsync';
 import {getUserId} from '../../utils/getUser';

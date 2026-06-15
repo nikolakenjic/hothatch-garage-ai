@@ -1,6 +1,6 @@
 import {AppError} from '../../utils/AppError';
-import {getCarIfOwned} from '../car/car.service';
 import {Car} from '../car/car.model';
+import {findOwnedCarOrFail} from '../car/car.service';
 import {Modification} from './modification.model';
 
 type CreateModificationInput = {
@@ -16,7 +16,7 @@ export const createModificationService = async (
     userId: string,
     data: CreateModificationInput,
 ) => {
-    await getCarIfOwned(carId, userId);
+    await findOwnedCarOrFail(carId, userId);
 
     return Modification.create({
         car: carId,
@@ -28,12 +28,12 @@ export const getModificationsByCarService = async (
     carId: string,
     userId: string,
 ) => {
-    await getCarIfOwned(carId, userId);
+    await findOwnedCarOrFail(carId, userId);
 
     return Modification.find({car: carId});
 };
 
-export const getModificationIfOwned = async (
+export const findOwnedModificationOrFail = async (
     modificationId: string,
     userId: string,
 ) => {
@@ -57,7 +57,10 @@ export const updateModificationService = async (
     userId: string,
     data: UpdateModificationInput,
 ) => {
-    const modification = await getModificationIfOwned(modificationId, userId);
+    const modification = await findOwnedModificationOrFail(
+        modificationId,
+        userId,
+    );
 
     if (data.name !== undefined) modification.name = data.name;
     if (data.category !== undefined) modification.category = data.category;
@@ -72,7 +75,10 @@ export const deleteModificationService = async (
     modificationId: string,
     userId: string,
 ) => {
-    const modification = await getModificationIfOwned(modificationId, userId);
+    const modification = await findOwnedModificationOrFail(
+        modificationId,
+        userId,
+    );
 
     await modification.deleteOne();
 };

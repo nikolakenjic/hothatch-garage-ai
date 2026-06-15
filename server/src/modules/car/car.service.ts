@@ -23,7 +23,7 @@ export const getMyCarsService = async (userId: string) => {
     return Car.find({user: userId});
 };
 
-export const getCarIfOwned = async (carId: string, userId: string) => {
+export const findOwnedCarOrFail = async (carId: string, userId: string) => {
     const car = await Car.findById(carId);
 
     if (!car) {
@@ -42,7 +42,7 @@ export const updateCarService = async (
     userId: string,
     data: UpdateCarInput,
 ) => {
-    const car = await getCarIfOwned(carId, userId);
+    const car = await findOwnedCarOrFail(carId, userId);
 
     if (data.brand !== undefined) car.set('brand', data.brand);
     if (data.model !== undefined) car.set('model', data.model);
@@ -54,7 +54,7 @@ export const updateCarService = async (
 };
 
 export const deleteCarService = async (carId: string, userId: string) => {
-    const car = await getCarIfOwned(carId, userId);
+    const car = await findOwnedCarOrFail(carId, userId);
 
     await car.deleteOne();
 };
