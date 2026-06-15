@@ -1,17 +1,13 @@
 import {z} from 'zod';
 import {objectIdSchema} from '../../validations/common.validation';
 
-export const recommendCarSchema = z.object({
-    budget: z
-        .string({error: 'Budget is required'})
-        .min(1, 'Budget is required'),
-    fuel: z
-        .string({error: 'Fuel type is required'})
-        .min(1, 'Fuel type is required'),
+const requiredString = (message: string) =>
+    z.string({error: message}).min(1, message);
 
-    use: z
-        .string({error: 'Use case is required'})
-        .min(1, 'Use case is required'),
+export const recommendCarSchema = z.object({
+    budget: requiredString('Budget is required'),
+    fuel: requiredString('Fuel type is required'),
+    use: requiredString('Use case is required'),
 });
 
 export const aiCarParamsSchema = z.object({
@@ -19,8 +15,6 @@ export const aiCarParamsSchema = z.object({
 });
 
 export const buildPlanSchema = z.object({
-    budget: z
-        .string({error: 'Budget is required'})
-        .min(1, 'Budget is required'),
-    goal: z.string({error: 'Goal is required'}).min(1, 'Goal is required'),
+    budget: requiredString('Budget is required'),
+    goal: requiredString('Goal is required'),
 });

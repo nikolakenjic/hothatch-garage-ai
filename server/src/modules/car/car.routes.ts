@@ -9,7 +9,7 @@ import {
 import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
 import {
-    carRouteParamsSchema,
+    carIdParamsSchema,
     createCarSchema,
     updateCarSchema,
 } from './car.validation';
@@ -22,14 +22,14 @@ router.get('/:id', protect, getCarById);
 router.patch(
     '/:id',
     protect,
-    validate(carRouteParamsSchema, 'params'),
+    validate(carIdParamsSchema, 'params'),
     validate(updateCarSchema),
     updateCar,
 );
 router.delete(
     '/:id',
     protect,
-    validate(carRouteParamsSchema, 'params'),
+    validate(carIdParamsSchema, 'params'),
     deleteCar,
 );
 

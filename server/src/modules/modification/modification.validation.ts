@@ -9,9 +9,9 @@ export const createModificationSchema = z.object({
 
 export const updateModificationSchema = z
     .object({
-        name: z.string().min(1).optional(),
-        category: z.string().min(1).optional(),
-        price: z.number().min(0).optional(),
+        name: z.string().min(1, 'Name cannot be empty').optional(),
+        category: z.string().min(1, 'Category cannot be empty').optional(),
+        price: z.number().min(0, 'Price must be positive').optional(),
     })
     .refine(
         (data) => data.name || data.category || data.price !== undefined,

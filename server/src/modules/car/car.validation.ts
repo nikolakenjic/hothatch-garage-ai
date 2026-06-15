@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {objectIdSchema} from '../../validations/common.validation';
 
-export const carRouteParamsSchema = z.object({
+export const carIdParamsSchema = z.object({
     id: objectIdSchema,
 });
 
@@ -27,6 +27,6 @@ export const updateCarSchema = z
             .optional(),
     })
     .refine(
-        (data) => data.brand || data.model || data.year,
+        (data) => data.brand || data.model || data.year !== undefined,
         'At least one field must be provided',
     );
