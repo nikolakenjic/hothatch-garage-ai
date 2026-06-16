@@ -18,7 +18,7 @@ const router = Router();
 
 router.post('/', protect, validate(createCarSchema), createCar);
 router.get('/', protect, getMyCars);
-router.get('/:id', protect, getCarById);
+router.get('/:id', protect, validate(carIdParamsSchema, 'params'), getCarById);
 router.patch(
     '/:id',
     protect,
