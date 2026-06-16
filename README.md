@@ -156,3 +156,60 @@ Components that are only used on one page live next to that page in a `_componen
 _Coming soon_
 
 ---
+
+## 🏗 Backend Architecture
+
+The backend follows a feature-based architecture.
+
+Each module contains its own:
+
+- Controller
+- Service
+- Model
+- Validation schemas
+- Routes
+
+Example:
+
+```text
+modules/
+├── auth
+├── car
+├── modification
+└── ai
+```
+
+### Request Flow
+
+```text
+Route
+↓
+Validation Middleware
+↓
+Controller
+↓
+Service
+↓
+Database
+```
+
+### Error Handling
+
+The application uses:
+
+- Custom `AppError` class
+- `catchAsync` wrapper for async controllers
+- Global error handler middleware
+
+This ensures consistent API responses and centralized error management.
+
+### Ownership Protection
+
+Users can only access resources they own.
+
+Ownership checks are implemented through reusable service helpers such as:
+
+- `findOwnedCarOrFail`
+- `findOwnedModificationOrFail`
+
+This prevents unauthorized access to cars and modifications belonging to other users.
