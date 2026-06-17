@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
 import {
     getCurrentUserService,
-    getMeService,
     loginService,
     registerService,
 } from './auth.service';
@@ -35,6 +34,15 @@ export const login = catchAsync(async (req: Request, res: Response) => {
             _id: user._id,
             email: user.email,
         },
+    });
+});
+
+export const logout = catchAsync(async (req, res) => {
+    res.clearCookie('token');
+
+    res.status(OK).json({
+        status: 'success',
+        message: 'Logged out successfully',
     });
 });
 
