@@ -3,6 +3,11 @@ import jwt from 'jsonwebtoken';
 import {env} from '../../config/env';
 import {AppError} from '../../utils/AppError';
 import {User} from './auth.model';
+import {
+    signAccessToken,
+    signRefreshToken,
+    verifyRefreshToken,
+} from '../../utils/token';
 
 export const registerService = async (email: string, password: string) => {
     const existingUser = await User.findOne({email});
@@ -33,13 +38,16 @@ export const loginService = async (email: string, password: string) => {
         throw new AppError('Invalid credentials', 400);
     }
 
-    const token = jwt.sign(
-        {userId: user._id, email: user.email},
-        env.JWT_SECRET,
-        {expiresIn: '1d'},
-    );
+    // const token = jwt.sign(
+    //     {userId: user._id, email: user.email},
+    //     env.JWT_SECRET,
+    //     {expiresIn: '1d'},
+    // );
 
-    return {user, token};
+    const accessToken = signAccessToken(user._id.toString());
+    const refreshToken = signRefreshToken(user._id.toString());
+
+    return {user, accessToken, refreshToken};
 };
 
 export const getCurrentUserService = async (userId: string) => {
@@ -50,4 +58,18 @@ export const getCurrentUserService = async (userId: string) => {
     }
 
     return user;
+};
+
+export const refreshAccessTokenService = async (refreshToken: string) => {
+    // verify Refresh token.
+    const decoded = verifyRefreshToken(refreshToken);
+    // find User
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+        throw new AppError('User not found', 404);
+    }
+    // create new access token
+    const accessToken = signAccessToken(user._id.toString());
+    // return access token
+    return accessToken;
 };

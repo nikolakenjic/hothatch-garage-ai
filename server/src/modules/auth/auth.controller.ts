@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 import {
     getCurrentUserService,
     loginService,
+    refreshAccessTokenService,
     registerService,
 } from './auth.service';
 import {CREATED, OK} from '../../constants/http';
@@ -25,11 +26,15 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 export const login = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
-    const {user, token} = await loginService(email, password);
+    const {user, accessToken, refreshToken} = await loginService(
+        email,
+        password,
+    );
 
     res.status(OK).json({
         message: 'Login successful',
-        token,
+        accessToken,
+        refreshToken,
         user: {
             _id: user._id,
             email: user.email,
@@ -54,5 +59,15 @@ export const getMe = catchAsync(async (req: Request, res: Response) => {
     res.status(OK).json({
         message: 'Success',
         user,
+    });
+});
+
+export const refresh = catchAsync(async (req: Request, res: Response) => {
+    const {refreshToken} = req.body;
+    const accessToken = await refreshAccessTokenService(refreshToken);
+
+    res.status(OK).json({
+        message: 'Access token refreshed',
+        accessToken,
     });
 });

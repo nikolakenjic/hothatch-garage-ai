@@ -1,6 +1,7 @@
 import jwt, {SignOptions} from 'jsonwebtoken';
 import {env} from '../config/env';
 
+// Later we should make stricter ENV validation, but for now let's leave like this
 const accessTokenOptions: SignOptions = {
     expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
 };
