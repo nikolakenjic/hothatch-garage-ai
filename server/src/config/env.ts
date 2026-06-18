@@ -2,7 +2,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const requiredEnv = ['MONGO_URI', 'JWT_SECRET', 'GROQ_API_KEY'];
+const requiredEnv = [
+    'MONGO_URI',
+    'JWT_SECRET',
+    'JWT_EXPIRES_IN',
+    'JWT_REFRESH_SECRET',
+    'JWT_REFRESH_EXPIRES_IN',
+    'GROQ_API_KEY',
+];
 
 for (const variable of requiredEnv) {
     if (!process.env[variable]) {
@@ -14,5 +21,8 @@ export const env = {
     PORT: process.env.PORT || '5001',
     MONGO_URI: process.env.MONGO_URI!,
     JWT_SECRET: process.env.JWT_SECRET!,
+    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN!,
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
+    JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN!,
     GROQ_API_KEY: process.env.GROQ_API_KEY!,
 };
