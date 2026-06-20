@@ -31,10 +31,15 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         password,
     );
 
+    res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+    });
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+    });
+
     res.status(OK).json({
         message: 'Login successful',
-        accessToken,
-        refreshToken,
         user: {
             _id: user._id,
             email: user.email,
