@@ -5,26 +5,22 @@ import mongoose from 'mongoose';
 
 type DecodedToken = {
     userId: string;
-    email: string;
 };
 
 export const protect = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.accessToken;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
         return res.status(401).json({
             message: 'Not authorized, no token',
         });
     }
-
-    const token = authHeader.split(' ')[1];
 
     try {
         const decoded = jwt.verify(token, env.JWT_SECRET) as DecodedToken;
 
         req.user = {
             userId: new mongoose.Types.ObjectId(decoded.userId),
-            email: decoded.email,
         };
 
         next();
