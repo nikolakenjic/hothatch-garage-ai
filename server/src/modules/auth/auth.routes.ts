@@ -1,11 +1,13 @@
 import {Router} from 'express';
 import {
+    forgotPassword,
     getMe,
     login,
     logout,
     refresh,
     register,
     resendVerification,
+    resetPassword,
     verifyEmail,
 } from './auth.controller';
 import {protect} from '../../middlewares/auth.middleware';
@@ -23,5 +25,8 @@ router.post('/refresh', refresh);
 
 router.post('/verify-email', verifyEmail);
 router.post('/resend-verification', resendVerification);
+
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
 
 export default router;

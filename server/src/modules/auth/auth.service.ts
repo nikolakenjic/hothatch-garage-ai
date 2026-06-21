@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import {env} from '../../config/env';
 import {AppError} from '../../utils/AppError';
-import {User} from './auth.model';
+import {User} from './user.model';
 import {Session} from './session.model';
 import {
     signAccessToken,
@@ -138,4 +138,43 @@ export const resendVerificationService = async (email: string) => {
     await user.save();
 
     return verificationToken;
+};
+
+export const forgotPasswordService = async (email: string) => {
+    const user = await User.findOne({email});
+
+    if (!user) {
+        throw new AppError('User not found', 404);
+    }
+
+    const resetToken = crypto.randomUUID();
+
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpires = new Date(Date.now() + 1000 * 60 * 15);
+
+    await user.save();
+
+    return resetToken;
+};
+
+export const resetPasswordService = async (
+    token: string,
+    newPassword: string,
+) => {
+    const user = await User.findOne({
+        passwordResetToken: token,
+        passwordResetExpires: {$gt: new Date()},
+    });
+
+    if (!user) {
+        throw new AppError('Invalid or expired reset token', 400);
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    return user;
 };

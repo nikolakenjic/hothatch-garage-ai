@@ -1,11 +1,13 @@
 import {Request, Response} from 'express';
 import {
+    forgotPasswordService,
     getCurrentUserService,
     loginService,
     logoutService,
     refreshAccessTokenService,
     registerService,
     resendVerificationService,
+    resetPasswordService,
     verifyEmailService,
 } from './auth.service';
 import {CREATED, OK} from '../../constants/http';
@@ -123,3 +125,26 @@ export const resendVerification = catchAsync(
         });
     },
 );
+
+export const forgotPassword = catchAsync(
+    async (req: Request, res: Response) => {
+        const {email} = req.body;
+
+        const resetToken = await forgotPasswordService(email);
+
+        res.status(OK).json({
+            message: 'Password reset token generated',
+            resetToken,
+        });
+    },
+);
+
+export const resetPassword = catchAsync(async (req: Request, res: Response) => {
+    const {token, newPassword} = req.body;
+
+    await resetPasswordService(token, newPassword);
+
+    res.status(OK).json({
+        message: 'Password reset successfully',
+    });
+});
