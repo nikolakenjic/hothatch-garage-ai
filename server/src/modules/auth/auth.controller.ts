@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 import {
     getCurrentUserService,
     loginService,
+    logoutService,
     refreshAccessTokenService,
     registerService,
 } from './auth.service';
@@ -47,11 +48,15 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export const logout = catchAsync(async (req, res) => {
-    res.clearCookie('token');
+export const logout = catchAsync(async (req: Request, res: Response) => {
+    const refreshToken = req.cookies?.refreshToken;
+
+    await logoutService(refreshToken);
+
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
 
     res.status(OK).json({
-        status: 'success',
         message: 'Logged out successfully',
     });
 });
@@ -68,11 +73,22 @@ export const getMe = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const refresh = catchAsync(async (req: Request, res: Response) => {
-    const {refreshToken} = req.body;
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+        res.status(401).json({
+            message: 'No refresh token',
+        });
+        return;
+    }
+
     const accessToken = await refreshAccessTokenService(refreshToken);
+
+    res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+    });
 
     res.status(OK).json({
         message: 'Access token refreshed',
-        accessToken,
     });
 });

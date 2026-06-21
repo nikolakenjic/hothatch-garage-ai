@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import {env} from '../../config/env';
 import {AppError} from '../../utils/AppError';
 import {User} from './auth.model';
+import {Session} from './session.model';
 import {
     signAccessToken,
     signRefreshToken,
@@ -47,6 +48,11 @@ export const loginService = async (email: string, password: string) => {
     const accessToken = signAccessToken(user._id.toString());
     const refreshToken = signRefreshToken(user._id.toString());
 
+    await Session.create({
+        user: user._id,
+        refreshToken,
+    });
+
     return {user, accessToken, refreshToken};
 };
 
@@ -63,6 +69,11 @@ export const getCurrentUserService = async (userId: string) => {
 export const refreshAccessTokenService = async (refreshToken: string) => {
     // verify Refresh token.
     const decoded = verifyRefreshToken(refreshToken);
+    // find session
+    const session = await Session.findOne({refreshToken});
+    if (!session) {
+        throw new AppError('Session not found', 401);
+    }
     // find User
     const user = await User.findById(decoded.userId);
     if (!user) {
@@ -72,4 +83,10 @@ export const refreshAccessTokenService = async (refreshToken: string) => {
     const accessToken = signAccessToken(user._id.toString());
     // return access token
     return accessToken;
+};
+
+export const logoutService = async (refreshToken?: string) => {
+    if (refreshToken) {
+        await Session.deleteOne({refreshToken});
+    }
 };
