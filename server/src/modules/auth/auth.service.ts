@@ -9,6 +9,7 @@ import {
     signRefreshToken,
     verifyRefreshToken,
 } from '../../utils/token';
+import crypto from 'crypto';
 
 export const registerService = async (email: string, password: string) => {
     const existingUser = await User.findOne({email});
@@ -18,12 +19,20 @@ export const registerService = async (email: string, password: string) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const verificationToken = crypto.randomUUID();
+
     const user = await User.create({
         email,
         password: hashedPassword,
+        isEmailVerified: false,
+        emailVerificationToken: verificationToken,
+        emailVerificationExpires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h
     });
 
-    return user;
+    return {
+        user,
+        verificationToken,
+    };
 };
 
 export const loginService = async (email: string, password: string) => {
@@ -89,4 +98,44 @@ export const logoutService = async (refreshToken?: string) => {
     if (refreshToken) {
         await Session.deleteOne({refreshToken});
     }
+};
+
+export const verifyEmailService = async (token: string) => {
+    const user = await User.findOne({
+        emailVerificationToken: token,
+        emailVerificationExpires: {$gt: new Date()},
+    });
+
+    if (!user) {
+        throw new AppError('Invalid or expired verification token', 400);
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+
+    await user.save();
+
+    return user;
+};
+
+export const resendVerificationService = async (email: string) => {
+    const user = await User.findOne({email});
+
+    if (!user) {
+        throw new AppError('User not found', 404);
+    }
+
+    if (user.isEmailVerified) {
+        throw new AppError('Email is already verified', 400);
+    }
+
+    const verificationToken = crypto.randomUUID();
+
+    user.emailVerificationToken = verificationToken;
+    user.emailVerificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
+
+    await user.save();
+
+    return verificationToken;
 };

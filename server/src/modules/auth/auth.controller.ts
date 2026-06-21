@@ -5,6 +5,8 @@ import {
     logoutService,
     refreshAccessTokenService,
     registerService,
+    resendVerificationService,
+    verifyEmailService,
 } from './auth.service';
 import {CREATED, OK} from '../../constants/http';
 import {catchAsync} from '../../utils/catchAsync';
@@ -13,10 +15,11 @@ import {getUserId} from '../../utils/getUser';
 export const register = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
-    const user = await registerService(email, password);
+    const {user, verificationToken} = await registerService(email, password);
 
     res.status(CREATED).json({
         message: 'User created',
+        verificationToken,
         user: {
             id: user._id,
             email: user.email,
@@ -92,3 +95,31 @@ export const refresh = catchAsync(async (req: Request, res: Response) => {
         message: 'Access token refreshed',
     });
 });
+
+export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
+    const {token} = req.body;
+
+    const user = await verifyEmailService(token);
+
+    res.status(OK).json({
+        message: 'Email verified successfully',
+        user: {
+            _id: user._id,
+            email: user.email,
+            isEmailVerified: user.isEmailVerified,
+        },
+    });
+});
+
+export const resendVerification = catchAsync(
+    async (req: Request, res: Response) => {
+        const {email} = req.body;
+
+        const verificationToken = await resendVerificationService(email);
+
+        res.status(OK).json({
+            message: 'Verification token resent',
+            verificationToken,
+        });
+    },
+);

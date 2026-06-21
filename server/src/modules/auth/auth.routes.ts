@@ -1,5 +1,13 @@
 import {Router} from 'express';
-import {getMe, login, logout, refresh, register} from './auth.controller';
+import {
+    getMe,
+    login,
+    logout,
+    refresh,
+    register,
+    resendVerification,
+    verifyEmail,
+} from './auth.controller';
 import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
 import {loginSchema, registerSchema} from './auth.validation';
@@ -12,5 +20,8 @@ router.post('/logout', logout);
 
 router.get('/me', protect, getMe);
 router.post('/refresh', refresh);
+
+router.post('/verify-email', verifyEmail);
+router.post('/resend-verification', resendVerification);
 
 export default router;
