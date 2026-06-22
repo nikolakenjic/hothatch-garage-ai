@@ -72,8 +72,10 @@ export const getMe = catchAsync(async (req: Request, res: Response) => {
     const user = await getCurrentUserService(userId);
 
     res.status(OK).json({
-        message: 'Success',
-        user,
+        status: 'success',
+        data: {
+            user,
+        },
     });
 });
 

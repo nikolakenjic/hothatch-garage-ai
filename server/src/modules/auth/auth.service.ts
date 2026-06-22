@@ -66,7 +66,9 @@ export const loginService = async (email: string, password: string) => {
 };
 
 export const getCurrentUserService = async (userId: string) => {
-    const user = await User.findById(userId).select('-password');
+    const user = await User.findById(userId).select(
+        '-password -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires',
+    );
 
     if (!user) {
         throw new AppError('User not found', 404);
