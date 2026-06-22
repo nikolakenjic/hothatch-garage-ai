@@ -19,6 +19,17 @@ export const updateProfileService = async (
         avatarUrl: input.avatarUrl,
     };
 
+    if (input.username) {
+        const existingUser = await User.findOne({
+            username: input.username.toLowerCase(),
+            _id: {$ne: userId},
+        });
+
+        if (existingUser) {
+            throw new AppError('Username is already taken', 409);
+        }
+    }
+
     const user = await User.findByIdAndUpdate(userId, allowedFields, {
         new: true,
         runValidators: true,
