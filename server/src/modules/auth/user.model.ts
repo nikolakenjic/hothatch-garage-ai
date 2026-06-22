@@ -8,6 +8,10 @@ export interface IUser extends Document {
     emailVerificationExpires?: Date;
     passwordResetToken?: string;
     passwordResetExpires?: Date;
+    username?: string;
+    displayName?: string;
+    bio?: string;
+    avatarUrl?: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -39,6 +43,26 @@ const userSchema = new Schema<IUser>(
         },
         passwordResetExpires: {
             type: Date,
+        },
+        username: {
+            type: String,
+            unique: true,
+            sparse: true,
+            lowercase: true,
+            trim: true,
+        },
+        displayName: {
+            type: String,
+            trim: true,
+            maxLength: 50,
+        },
+        bio: {
+            type: String,
+            trim: true,
+            maxLength: 300,
+        },
+        avatarUrl: {
+            type: String,
         },
     },
     {
