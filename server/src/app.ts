@@ -8,6 +8,8 @@ import modificationRoutes from './modules/modification/modification.routes';
 import aiRoutes from './modules/ai/ai.routes';
 import {errorHandler} from './middlewares/errorHandler';
 
+import userRoutes from './modules/user/user.routes';
+
 const app = express();
 
 app.use(
@@ -24,6 +26,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/cars', carRoutes);
 app.use('/api/v1/modifications', modificationRoutes);
 app.use('/api/v1/ai', aiRoutes);
+
+app.use('/api/v1/users', userRoutes);
 
 app.get('/api/v1/health', (_req, res) => {
     res.status(200).json({
