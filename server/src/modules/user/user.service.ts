@@ -1,6 +1,10 @@
 import {AppError} from '../../utils/AppError';
 import {User} from '../auth/user.model';
 import bcrypt from 'bcryptjs';
+import {Car} from '../car/car.model';
+import {Modification} from '../modification/modification.model';
+import {AIRecommendation} from '../ai/ai.model';
+import {Session} from '../auth/session.model';
 
 type UpdateProfileInput = {
     username?: string;
@@ -72,4 +76,16 @@ export const changePasswordService = async (
     user.password = await bcrypt.hash(input.newPassword, 10);
 
     await user.save();
+};
+
+export const deleteAccountService = async (userId: string) => {
+    const cars = await Car.find({user: userId}).select('_id');
+
+    const carIds = cars.map((car) => car._id);
+
+    await Modification.deleteMany({car: {$in: carIds}});
+    await AIRecommendation.deleteMany({user: userId});
+    await Session.deleteMany({user: userId});
+    await Car.deleteMany({user: userId});
+    await User.findByIdAndDelete(userId);
 };
