@@ -1,6 +1,11 @@
 import {Router} from 'express';
 import {protect} from '../../middlewares/auth.middleware';
-import {changePassword, deleteAccount, updateProfile} from './user.controller';
+import {
+    changePassword,
+    deleteAccount,
+    getUserStats,
+    updateProfile,
+} from './user.controller';
 import {changePasswordSchema, updateProfileSchema} from './user.validation';
 import {validate} from '../../middlewares/validate';
 
@@ -21,5 +26,7 @@ router.patch(
 );
 
 router.delete('/me', protect, deleteAccount);
+
+router.get('/me/stats', protect, getUserStats);
 
 export default router;

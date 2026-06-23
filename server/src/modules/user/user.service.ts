@@ -89,3 +89,24 @@ export const deleteAccountService = async (userId: string) => {
     await Car.deleteMany({user: userId});
     await User.findByIdAndDelete(userId);
 };
+
+export const getUserStatsService = async (userId: string) => {
+    const cars = await Car.find({user: userId});
+
+    const carIds = cars.map((car) => car._id);
+
+    const modifications = await Modification.find({
+        car: {$in: carIds},
+    });
+
+    const totalMoneySpent = modifications.reduce(
+        (sum, mod) => sum + (mod.price || 0),
+        0,
+    );
+
+    return {
+        totalCars: cars.length,
+        totalModifications: modifications.length,
+        totalMoneySpent,
+    };
+};

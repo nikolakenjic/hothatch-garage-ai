@@ -4,6 +4,7 @@ import {catchAsync} from '../../utils/catchAsync';
 import {
     changePasswordService,
     deleteAccountService,
+    getUserStatsService,
     updateProfileService,
 } from './user.service';
 import {getUserId} from '../../utils/getUser';
@@ -41,5 +42,16 @@ export const deleteAccount = catchAsync(async (req: Request, res: Response) => {
     res.status(OK).json({
         status: 'success',
         message: 'Account deleted successfully',
+    });
+});
+
+export const getUserStats = catchAsync(async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+
+    const stats = await getUserStatsService(userId);
+
+    res.status(OK).json({
+        status: 'success',
+        data: stats,
     });
 });
