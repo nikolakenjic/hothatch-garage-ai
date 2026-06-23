@@ -12,6 +12,15 @@ export interface IUser extends Document {
     displayName?: string;
     bio?: string;
     avatarUrl?: string;
+    preferences?: {
+        theme: 'light' | 'dark' | 'system';
+        emailNotifications: boolean;
+    };
+
+    privacy?: {
+        publicProfile: boolean;
+        publicGarage: boolean;
+    };
 }
 
 const userSchema = new Schema<IUser>(
@@ -63,6 +72,27 @@ const userSchema = new Schema<IUser>(
         },
         avatarUrl: {
             type: String,
+        },
+        preferences: {
+            theme: {
+                type: String,
+                enum: ['light', 'dark', 'system'],
+                default: 'system',
+            },
+            emailNotifications: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        privacy: {
+            publicProfile: {
+                type: Boolean,
+                default: true,
+            },
+            publicGarage: {
+                type: Boolean,
+                default: false,
+            },
         },
     },
     {
