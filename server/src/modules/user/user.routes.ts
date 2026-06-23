@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {protect} from '../../middlewares/auth.middleware';
-import {updateProfile} from './user.controller';
-import {updateProfileSchema} from './user.validation';
+import {changePassword, updateProfile} from './user.controller';
+import {changePasswordSchema, updateProfileSchema} from './user.validation';
 import {validate} from '../../middlewares/validate';
 
 const router = Router();
@@ -11,6 +11,13 @@ router.patch(
     protect,
     validate(updateProfileSchema),
     updateProfile,
+);
+
+router.patch(
+    '/me/password',
+    protect,
+    validate(changePasswordSchema),
+    changePassword,
 );
 
 export default router;

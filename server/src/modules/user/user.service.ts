@@ -1,11 +1,17 @@
 import {AppError} from '../../utils/AppError';
 import {User} from '../auth/user.model';
+import bcrypt from 'bcryptjs';
 
 type UpdateProfileInput = {
     username?: string;
     displayName?: string;
     bio?: string;
     avatarUrl?: string;
+};
+
+type ChangePasswordInput = {
+    currentPassword: string;
+    newPassword: string;
 };
 
 export const updateProfileService = async (
@@ -42,4 +48,28 @@ export const updateProfileService = async (
     }
 
     return user;
+};
+
+export const changePasswordService = async (
+    userId: string,
+    input: ChangePasswordInput,
+) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new AppError('User not found', 404);
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(
+        input.currentPassword,
+        user.password,
+    );
+
+    if (!isPasswordCorrect) {
+        throw new AppError('Current password is incorrect', 401);
+    }
+
+    user.password = await bcrypt.hash(input.newPassword, 10);
+
+    await user.save();
 };
