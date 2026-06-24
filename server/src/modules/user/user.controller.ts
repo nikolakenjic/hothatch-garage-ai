@@ -4,6 +4,7 @@ import {catchAsync} from '../../utils/catchAsync';
 import {
     changePasswordService,
     deleteAccountService,
+    getPublicProfileService,
     getUserStatsService,
     updateProfileService,
 } from './user.service';
@@ -55,3 +56,18 @@ export const getUserStats = catchAsync(async (req: Request, res: Response) => {
         data: stats,
     });
 });
+
+export const getPublicProfile = catchAsync(
+    async (req: Request, res: Response) => {
+        const username = req.params.username as string;
+
+        const profile = await getPublicProfileService(username);
+
+        res.status(OK).json({
+            status: 'success',
+            data: {
+                profile,
+            },
+        });
+    },
+);

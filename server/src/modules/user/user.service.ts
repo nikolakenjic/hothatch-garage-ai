@@ -110,3 +110,16 @@ export const getUserStatsService = async (userId: string) => {
         totalMoneySpent,
     };
 };
+
+export const getPublicProfileService = async (username: string) => {
+    const user = await User.findOne({
+        username: username.toLowerCase(),
+        'privacy.publicProfile': true,
+    }).select('username displayName bio avatarUrl createdAt');
+
+    if (!user) {
+        throw new AppError('Profile not found', 404);
+    }
+
+    return user;
+};

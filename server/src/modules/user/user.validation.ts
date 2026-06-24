@@ -28,3 +28,9 @@ export const changePasswordSchema = z.object({
         .string()
         .min(6, 'New password must be at least 6 characters'),
 });
+
+export const publicProfileSchema = z.object({
+    params: z.object({
+        username: z.string().min(3).max(30),
+    }),
+});
