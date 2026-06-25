@@ -3,7 +3,7 @@ import {catchAsync} from '../../utils/catchAsync';
 import {
     createCarService,
     deleteCarService,
-    getCarIfOwned,
+    findOwnedCarOrFail,
     getMyCarsService,
     updateCarService,
 } from './car.service';
@@ -37,7 +37,7 @@ export const getCarById = catchAsync(async (req: Request, res: Response) => {
     const carId = req.params.id as string;
     const userId = getUserId(req);
 
-    const car = await getCarIfOwned(carId, userId);
+    const car = await findOwnedCarOrFail(carId, userId);
 
     res.status(OK).json({
         message: 'Car fetched successfully',

@@ -5,6 +5,12 @@ type CreateCarInput = {
     brand: string;
     model: string;
     year: number;
+    nickname?: string;
+    fuelType?: 'petrol' | 'diesel' | 'hybrid' | 'electric';
+    horsepower?: number;
+    torque?: number;
+    transmission?: 'manual' | 'automatic' | 'dsg';
+    drivetrain?: 'fwd' | 'rwd' | 'awd';
 };
 
 type UpdateCarInput = Partial<CreateCarInput>;
@@ -44,9 +50,7 @@ export const updateCarService = async (
 ) => {
     const car = await findOwnedCarOrFail(carId, userId);
 
-    if (data.brand !== undefined) car.set('brand', data.brand);
-    if (data.model !== undefined) car.set('model', data.model);
-    if (data.year !== undefined) car.set('year', data.year);
+    car.set(data);
 
     await car.save();
 
