@@ -3,6 +3,7 @@ import {
     createCar,
     deleteCar,
     getCarById,
+    getGarageSummary,
     getMyCars,
     updateCar,
 } from './car.controller';
@@ -18,7 +19,9 @@ const router = Router();
 
 router.post('/', protect, validate(createCarSchema), createCar);
 router.get('/', protect, getMyCars);
+router.get('/summary', protect, getGarageSummary);
 router.get('/:id', protect, validate(carIdParamsSchema, 'params'), getCarById);
+
 router.patch(
     '/:id',
     protect,

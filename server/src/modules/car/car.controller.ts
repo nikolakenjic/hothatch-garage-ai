@@ -4,6 +4,7 @@ import {
     createCarService,
     deleteCarService,
     getCarDetailsService,
+    getGarageSummaryService,
     getMyCarsService,
     updateCarService,
 } from './car.service';
@@ -69,3 +70,18 @@ export const deleteCar = catchAsync(async (req: Request, res: Response) => {
         message: 'Car deleted successfully',
     });
 });
+
+export const getGarageSummary = catchAsync(
+    async (req: Request, res: Response) => {
+        const userId = getUserId(req);
+
+        const summary = await getGarageSummaryService(userId);
+
+        res.status(OK).json({
+            message: 'Garage summary fetched successfully',
+            data: {
+                summary,
+            },
+        });
+    },
+);

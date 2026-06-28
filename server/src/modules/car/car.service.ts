@@ -70,3 +70,37 @@ export const deleteCarService = async (carId: string, userId: string) => {
 
     await car.deleteOne();
 };
+
+export const getGarageSummaryService = async (userId: string) => {
+    const cars = await Car.find({user: userId});
+
+    const totalCars = cars.length;
+
+    const totalHorsepower = cars.reduce(
+        (sum, car) => sum + (car.horsepower || 0),
+        0,
+    );
+
+    const carsWithHorsepower = cars.filter((car) => car.horsepower);
+
+    const averageHorsepower =
+        carsWithHorsepower.length > 0
+            ? Math.round(totalHorsepower / carsWithHorsepower.length)
+            : 0;
+
+    const newestCar = cars.length
+        ? cars.reduce((newest, car) => (car.year > newest.year ? car : newest))
+        : null;
+
+    const oldestCar = cars.length
+        ? cars.reduce((oldest, car) => (car.year < oldest.year ? car : oldest))
+        : null;
+
+    return {
+        totalCars,
+        totalHorsepower,
+        averageHorsepower,
+        newestCar,
+        oldestCar,
+    };
+};
