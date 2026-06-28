@@ -25,12 +25,11 @@ export const createCar = catchAsync(async (req: Request, res: Response) => {
 export const getMyCars = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
 
-    const cars = await getMyCarsService(userId);
+    const result = await getMyCarsService(userId, req.query);
 
     res.status(OK).json({
         message: 'Cars fetched successfully',
-        count: cars.length,
-        cars,
+        data: result,
     });
 });
 

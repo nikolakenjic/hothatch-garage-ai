@@ -15,6 +15,15 @@ type CreateCarInput = {
 
 type UpdateCarInput = Partial<CreateCarInput>;
 
+type GetMyCarsQuery = {
+    search?: string;
+    fuelType?: string;
+    transmission?: string;
+    drivetrain?: string;
+    page?: string;
+    limit?: string;
+};
+
 export const createCarService = async (
     userId: string,
     data: CreateCarInput,
@@ -25,8 +34,44 @@ export const createCarService = async (
     });
 };
 
-export const getMyCarsService = async (userId: string) => {
-    return Car.find({user: userId});
+export const getMyCarsService = async (
+    userId: string,
+    query: GetMyCarsQuery,
+) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const filter: Record<string, unknown> = {
+        user: userId,
+    };
+
+    if (query.search) {
+        filter.$or = [
+            {brand: {$regex: query.search, $options: 'i'}},
+            {model: {$regex: query.search, $options: 'i'}},
+            {nickname: {$regex: query.search, $options: 'i'}},
+        ];
+    }
+
+    if (query.fuelType) filter.fuelType = query.fuelType;
+    if (query.transmission) filter.transmission = query.transmission;
+    if (query.drivetrain) filter.drivetrain = query.drivetrain;
+
+    const [cars, totalCars] = await Promise.all([
+        Car.find(filter).sort({createdAt: -1}).skip(skip).limit(limit),
+        Car.countDocuments(filter),
+    ]);
+
+    return {
+        cars,
+        pagination: {
+            totalCars,
+            currentPage: page,
+            totalPages: Math.ceil(totalCars / limit),
+            limit,
+        },
+    };
 };
 
 export const findOwnedCarOrFail = async (carId: string, userId: string) => {
