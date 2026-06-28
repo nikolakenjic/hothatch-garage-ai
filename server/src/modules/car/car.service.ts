@@ -57,6 +57,14 @@ export const updateCarService = async (
     return car;
 };
 
+export const getCarDetailsService = async (carId: string, userId: string) => {
+    const car = await findOwnedCarOrFail(carId, userId);
+
+    return {
+        car,
+    };
+};
+
 export const deleteCarService = async (carId: string, userId: string) => {
     const car = await findOwnedCarOrFail(carId, userId);
 

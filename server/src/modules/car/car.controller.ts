@@ -4,6 +4,7 @@ import {
     createCarService,
     deleteCarService,
     findOwnedCarOrFail,
+    getCarDetailsService,
     getMyCarsService,
     updateCarService,
 } from './car.service';
@@ -37,11 +38,11 @@ export const getCarById = catchAsync(async (req: Request, res: Response) => {
     const carId = req.params.id as string;
     const userId = getUserId(req);
 
-    const car = await findOwnedCarOrFail(carId, userId);
+    const carDetails = await getCarDetailsService(carId, userId);
 
     res.status(OK).json({
-        message: 'Car fetched successfully',
-        car,
+        message: 'Car details fetched successfully',
+        data: carDetails,
     });
 });
 
