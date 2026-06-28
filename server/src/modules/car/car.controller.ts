@@ -3,7 +3,6 @@ import {catchAsync} from '../../utils/catchAsync';
 import {
     createCarService,
     deleteCarService,
-    findOwnedCarOrFail,
     getCarDetailsService,
     getMyCarsService,
     updateCarService,
@@ -54,7 +53,9 @@ export const updateCar = catchAsync(async (req: Request, res: Response) => {
 
     res.status(OK).json({
         message: 'Car updated successfully',
-        car,
+        data: {
+            car,
+        },
     });
 });
 
