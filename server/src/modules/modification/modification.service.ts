@@ -4,9 +4,24 @@ import {findOwnedCarOrFail} from '../car/car.service';
 import {Modification} from './modification.model';
 
 type CreateModificationInput = {
-    name: string;
-    category: string;
-    price?: number;
+    title: string;
+    description?: string;
+    category:
+        | 'performance'
+        | 'suspension'
+        | 'brakes'
+        | 'wheels'
+        | 'exterior'
+        | 'interior'
+        | 'maintenance'
+        | 'other';
+    status?: 'planned' | 'ordered' | 'installed' | 'removed';
+    cost?: number;
+    installedAt?: Date;
+    brand?: string;
+    partNumber?: string;
+    mileage?: number;
+    notes?: string;
 };
 
 type UpdateModificationInput = Partial<CreateModificationInput>;
@@ -62,10 +77,7 @@ export const updateModificationService = async (
         userId,
     );
 
-    if (data.name !== undefined) modification.name = data.name;
-    if (data.category !== undefined) modification.category = data.category;
-    if (data.price !== undefined) modification.price = data.price;
-
+    modification.set(data);
     await modification.save();
 
     return modification;
