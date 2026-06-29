@@ -2,7 +2,7 @@ import mongoose, {Schema} from 'mongoose';
 
 export interface IModification {
     car: mongoose.Types.ObjectId;
-    name: string;
+    title: string;
     category: string;
     price?: number;
 }
@@ -14,15 +14,22 @@ const modificationSchema = new Schema<IModification>(
             ref: 'Car',
             required: true,
         },
-        name: {
+        title: {
             type: String,
             required: true,
             trim: true,
         },
         category: {
             type: String,
+            enum: [
+                'performance',
+                'suspension',
+                'brakes',
+                'wheels',
+                'maintenance',
+                'other',
+            ],
             required: true,
-            trim: true,
         },
         price: {
             type: Number,
