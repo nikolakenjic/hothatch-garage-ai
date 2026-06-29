@@ -22,7 +22,9 @@ export const createModification = catchAsync(
 
         res.status(CREATED).json({
             message: 'Modification created successfully',
-            modification,
+            data: {
+                modification,
+            },
         });
     },
 );
@@ -37,7 +39,9 @@ export const getModificationsByCar = catchAsync(
         res.status(OK).json({
             message: 'Modifications fetched successfully',
             count: modifications.length,
-            modifications,
+            data: {
+                modifications,
+            },
         });
     },
 );
@@ -55,7 +59,9 @@ export const updateModification = catchAsync(
 
         res.status(OK).json({
             message: 'Modification updated successfully',
-            modification,
+            data: {
+                modification,
+            },
         });
     },
 );
