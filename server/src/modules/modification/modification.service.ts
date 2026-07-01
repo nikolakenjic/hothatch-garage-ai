@@ -94,3 +94,45 @@ export const deleteModificationService = async (
 
     await modification.deleteOne();
 };
+
+export const getModificationSummaryService = async (userId: string) => {
+    const userCars = await Car.find({user: userId}).select('_id');
+
+    const carIds = userCars.map((car) => car._id);
+
+    const modifications = await Modification.find({
+        car: {$in: carIds},
+    });
+
+    const totalModifications = modifications.length;
+
+    const totalSpent = modifications.reduce(
+        (sum, modification) => sum + (modification.cost ?? 0),
+        0,
+    );
+
+    const installedCount = modifications.filter(
+        (modification) => modification.status === 'installed',
+    ).length;
+
+    const plannedCount = modifications.filter(
+        (modification) => modification.status === 'planned',
+    ).length;
+
+    const orderedCount = modifications.filter(
+        (modification) => modification.status === 'ordered',
+    ).length;
+
+    const removedCount = modifications.filter(
+        (modification) => modification.status === 'removed',
+    ).length;
+
+    return {
+        totalModifications,
+        totalSpent,
+        installedCount,
+        plannedCount,
+        orderedCount,
+        removedCount,
+    };
+};

@@ -4,6 +4,7 @@ import {
     createModificationService,
     deleteModificationService,
     getModificationsByCarService,
+    getModificationSummaryService,
     updateModificationService,
 } from './modification.service';
 import {CREATED, OK} from '../../constants/http';
@@ -75,6 +76,21 @@ export const deleteModification = catchAsync(
 
         res.status(OK).json({
             message: 'Modification deleted successfully',
+        });
+    },
+);
+
+export const getModificationSummary = catchAsync(
+    async (req: Request, res: Response) => {
+        const userId = getUserId(req);
+
+        const summary = await getModificationSummaryService(userId);
+
+        res.status(OK).json({
+            message: 'Modification summary fetched successfully',
+            data: {
+                summary,
+            },
         });
     },
 );

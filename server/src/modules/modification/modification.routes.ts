@@ -3,6 +3,7 @@ import {
     createModification,
     deleteModification,
     getModificationsByCar,
+    getModificationSummary,
     updateModification,
 } from './modification.controller';
 import {protect} from '../../middlewares/auth.middleware';
@@ -16,6 +17,7 @@ import {
 
 const router = Router();
 
+router.get('/summary', protect, getModificationSummary);
 router.post(
     '/:carId',
     protect,
