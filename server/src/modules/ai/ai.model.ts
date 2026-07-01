@@ -1,9 +1,10 @@
 import mongoose, {Schema} from 'mongoose';
+import {AIRecommendationType} from './ai.types';
 
 export interface IAIRecommendation {
     user: mongoose.Types.ObjectId;
-    car: mongoose.Types.ObjectId;
-    type: string;
+    car?: mongoose.Types.ObjectId;
+    type: AIRecommendationType;
     content: string;
 }
 
@@ -20,7 +21,8 @@ const aiRecommendationSchema = new Schema<IAIRecommendation>(
             required: false,
         },
         type: {
-            type: String, // "upgrade" or "car"
+            type: String,
+            enum: Object.values(AIRecommendationType),
             required: true,
         },
         content: {

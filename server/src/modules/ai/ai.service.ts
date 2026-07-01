@@ -3,6 +3,7 @@ import {env} from '../../config/env';
 import {findOwnedCarOrFail} from '../car/car.service';
 import {Modification} from '../modification/modification.model';
 import {AIRecommendation} from './ai.model';
+import {AIRecommendationType} from './ai.types';
 
 const groq = new Groq({
     apiKey: env.GROQ_API_KEY,
@@ -21,7 +22,7 @@ type CarForAI = {
 };
 
 type ModificationForAI = {
-    name: string;
+    title: string;
 };
 
 export const generateCarRecommendationService = async (
@@ -55,7 +56,7 @@ Recommend ONE hot hatch car with a short explanation.
 
     const saved = await AIRecommendation.create({
         user: userId,
-        type: 'car',
+        type: AIRecommendationType.CAR_RECOMMENDATION,
         content,
     });
 
@@ -69,7 +70,7 @@ export const generateUpgradeRecommendationContent = async (
     car: CarForAI,
     modifications: ModificationForAI[],
 ) => {
-    const modsList = modifications.map((m) => m.name).join(', ') || 'none';
+    const modsList = modifications.map((m) => m.title).join(', ') || 'none';
 
     const prompt = `
 You are a car tuning expert.
@@ -119,7 +120,7 @@ export const recommendUpgradeService = async (
     const savedRecommendation = await AIRecommendation.create({
         user: userId,
         car: carId,
-        type: 'upgrade',
+        type: AIRecommendationType.NEXT_UPGRADE,
         content: recommendation || '',
     });
 
@@ -152,7 +153,7 @@ export const buildPlanService = async (
 ) => {
     const car = await findOwnedCarOrFail(carId, userId);
     const modifications = await Modification.find({car: carId});
-    const modsList = modifications.map((m) => m.name).join(', ') || 'none';
+    const modsList = modifications.map((m) => m.title).join(', ') || 'none';
 
     const prompt = `
 You are a hot hatch tuning expert.
@@ -181,7 +182,7 @@ Also add one warning if anything in the plan could be unsafe if done out of orde
     const saved = await AIRecommendation.create({
         user: userId,
         car: carId,
-        type: 'build-plan',
+        type: AIRecommendationType.BUILD_PLAN,
         content,
     });
 
