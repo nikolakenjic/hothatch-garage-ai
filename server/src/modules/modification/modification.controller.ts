@@ -6,6 +6,7 @@ import {
     getModificationCostByCategoryService,
     getModificationsByCarService,
     getModificationSummaryService,
+    getRecentModificationsService,
     updateModificationService,
 } from './modification.service';
 import {CREATED, OK} from '../../constants/http';
@@ -107,6 +108,21 @@ export const getModificationCostByCategory = catchAsync(
             message: 'Modification cost by category fetched successfully',
             data: {
                 costByCategory,
+            },
+        });
+    },
+);
+
+export const getRecentModifications = catchAsync(
+    async (req: Request, res: Response) => {
+        const userId = getUserId(req);
+
+        const recentModifications = await getRecentModificationsService(userId);
+
+        res.status(OK).json({
+            message: 'Recent modifications fetched successfully',
+            data: {
+                recentModifications,
             },
         });
     },

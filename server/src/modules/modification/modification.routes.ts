@@ -5,6 +5,7 @@ import {
     getModificationCostByCategory,
     getModificationsByCar,
     getModificationSummary,
+    getRecentModifications,
     updateModification,
 } from './modification.controller';
 import {protect} from '../../middlewares/auth.middleware';
@@ -20,6 +21,7 @@ const router = Router();
 
 router.get('/summary', protect, getModificationSummary);
 router.get('/cost-by-category', protect, getModificationCostByCategory);
+router.get('/recent', protect, getRecentModifications);
 
 router.post(
     '/:carId',

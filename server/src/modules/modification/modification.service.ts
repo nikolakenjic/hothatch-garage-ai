@@ -155,3 +155,18 @@ export const getModificationCostByCategoryService = async (userId: string) => {
         return acc;
     }, {});
 };
+
+export const getRecentModificationsService = async (
+    userId: string,
+    limit = 10,
+) => {
+    const userCars = await Car.find({user: userId}).select('_id');
+
+    const carIds = userCars.map((car) => car._id);
+
+    return Modification.find({
+        car: {$in: carIds},
+    })
+        .sort({installedAt: -1, createdAt: -1})
+        .limit(limit);
+};
