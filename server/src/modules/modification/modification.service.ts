@@ -136,3 +136,22 @@ export const getModificationSummaryService = async (userId: string) => {
         removedCount,
     };
 };
+
+export const getModificationCostByCategoryService = async (userId: string) => {
+    const userCars = await Car.find({user: userId}).select('_id');
+
+    const carIds = userCars.map((car) => car._id);
+
+    const modifications = await Modification.find({
+        car: {$in: carIds},
+    });
+
+    return modifications.reduce<Record<string, number>>((acc, modification) => {
+        const category = modification.category;
+        const cost = modification.cost ?? 0;
+
+        acc[category] = (acc[category] ?? 0) + cost;
+
+        return acc;
+    }, {});
+};

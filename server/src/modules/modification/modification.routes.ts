@@ -2,6 +2,7 @@ import {Router} from 'express';
 import {
     createModification,
     deleteModification,
+    getModificationCostByCategory,
     getModificationsByCar,
     getModificationSummary,
     updateModification,
@@ -18,6 +19,8 @@ import {
 const router = Router();
 
 router.get('/summary', protect, getModificationSummary);
+router.get('/cost-by-category', protect, getModificationCostByCategory);
+
 router.post(
     '/:carId',
     protect,

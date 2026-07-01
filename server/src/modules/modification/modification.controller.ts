@@ -3,6 +3,7 @@ import {catchAsync} from '../../utils/catchAsync';
 import {
     createModificationService,
     deleteModificationService,
+    getModificationCostByCategoryService,
     getModificationsByCarService,
     getModificationSummaryService,
     updateModificationService,
@@ -90,6 +91,22 @@ export const getModificationSummary = catchAsync(
             message: 'Modification summary fetched successfully',
             data: {
                 summary,
+            },
+        });
+    },
+);
+
+export const getModificationCostByCategory = catchAsync(
+    async (req: Request, res: Response) => {
+        const userId = getUserId(req);
+
+        const costByCategory =
+            await getModificationCostByCategoryService(userId);
+
+        res.status(OK).json({
+            message: 'Modification cost by category fetched successfully',
+            data: {
+                costByCategory,
             },
         });
     },
