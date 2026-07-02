@@ -1,24 +1,18 @@
-export type RecommendCarPromptInput = {
-    budget: string;
-    fuel: string;
-    use: string;
-};
+import {
+    CarPromptInput,
+    ModificationPromptInput,
+    RecommendCarInput,
+    BuildPlanInput,
+} from './ai.types';
 
-export type CarPromptInput = {
-    brand: string;
-    model: string;
-    year: number;
-};
-
-export type ModificationPromptInput = {
-    title: string;
-};
+const formatModsList = (modifications: ModificationPromptInput[]) =>
+    modifications.map((m) => m.title).join(', ') || 'none';
 
 export const buildCarRecommendationPrompt = ({
     budget,
     fuel,
     use,
-}: RecommendCarPromptInput) => `
+}: RecommendCarInput) => `
 You are a car expert specialized in hot hatch cars.
 
 User preferences:
@@ -32,11 +26,7 @@ Recommend ONE hot hatch car with a short explanation.
 export const buildUpgradeRecommendationPrompt = (
     car: CarPromptInput,
     modifications: ModificationPromptInput[],
-) => {
-    const modsList = modifications.map((m) => m.title).join(', ') || 'none';
-
-    return `
-You are a car tuning expert.
+) => `You are a car tuning expert.
 
 Car:
 - Brand: ${car.brand}
@@ -44,7 +34,7 @@ Car:
 - Year: ${car.year}
 
 Current modifications:
-${modsList}
+${formatModsList(modifications)}
 
 Suggest ONE next best upgrade for this car.
 
@@ -53,20 +43,16 @@ Respond in this format:
 Upgrade: <name>
 Why: <short explanation>
 `;
-};
 
 export const buildBuildPlanPrompt = (
     car: CarPromptInput,
     modifications: ModificationPromptInput[],
     data: {budget: string; goal: string},
-) => {
-    const modsList = modifications.map((m) => m.title).join(', ') || 'none';
-
-    return `
+) => `
 You are a hot hatch tuning expert.
 
 Car: ${car.brand} ${car.model} (${car.year})
-Current mods: ${modsList}
+Current mods: ${formatModsList(modifications)}
 Budget: ${data.budget}
 Goal: ${data.goal}
 
@@ -78,4 +64,3 @@ Create a prioritized mod plan. For each mod include:
 
 Also add one warning if anything in the plan could be unsafe if done out of order.
 `;
-};
