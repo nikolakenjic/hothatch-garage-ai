@@ -76,7 +76,7 @@ export const buildPlan = catchAsync(async (req: Request, res: Response) => {
     const recommendation = await buildPlanService(carId, userId, req.body);
 
     res.status(OK).json({
-        message: 'Plan built successfully',
+        message: 'Build plan generated successfully',
         recommendation,
     });
 });

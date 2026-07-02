@@ -1,8 +1,14 @@
 import Groq from 'groq-sdk';
+
 import {env} from '../../config/env';
 import {findOwnedCarOrFail} from '../car/car.service';
 import {Modification} from '../modification/modification.model';
 import {AIRecommendation} from './ai.model';
+import {
+    buildBuildPlanPrompt,
+    buildCarRecommendationPrompt,
+    buildUpgradeRecommendationPrompt,
+} from './ai.prompts';
 import {AIRecommendationType} from './ai.types';
 
 const groq = new Groq({
@@ -15,35 +21,14 @@ type RecommendCarInput = {
     use: string;
 };
 
-type CarForAI = {
-    brand: string;
-    model: string;
-    year: number;
+type BuildPlanInput = {
+    budget: string;
+    goal: string;
 };
 
-type ModificationForAI = {
-    title: string;
-};
-
-export const generateCarRecommendationService = async (
-    userId: string,
-    data: RecommendCarInput,
-) => {
-    const {budget, fuel, use} = data;
-
-    const prompt = `
-You are a car expert specialized in hot hatch cars.
-
-User preferences:
-- Budget: ${budget}
-- Fuel: ${fuel}
-- Use: ${use}
-
-Recommend ONE hot hatch car with a short explanation.
-`;
-
+const generateAIContent = async (prompt: string, model: string) => {
     const response = await groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+        model,
         messages: [
             {
                 role: 'user',
@@ -52,11 +37,22 @@ Recommend ONE hot hatch car with a short explanation.
         ],
     });
 
-    const content = response.choices[0].message.content || '';
+    return response.choices[0].message.content || '';
+};
+
+export const generateCarRecommendationService = async (
+    userId: string,
+    data: RecommendCarInput,
+) => {
+    const prompt = buildCarRecommendationPrompt(data);
+
+    const content = await generateAIContent(prompt, 'llama-3.3-70b-versatile');
 
     const saved = await AIRecommendation.create({
         user: userId,
         type: AIRecommendationType.CAR_RECOMMENDATION,
+        prompt,
+        input: data,
         content,
     });
 
@@ -66,62 +62,26 @@ Recommend ONE hot hatch car with a short explanation.
     };
 };
 
-export const generateUpgradeRecommendationContent = async (
-    car: CarForAI,
-    modifications: ModificationForAI[],
-) => {
-    const modsList = modifications.map((m) => m.title).join(', ') || 'none';
-
-    const prompt = `
-You are a car tuning expert.
-
-Car:
-- Brand: ${car.brand}
-- Model: ${car.model}
-- Year: ${car.year}
-
-Current modifications:
-${modsList}
-
-Suggest ONE next best upgrade for this car.
-
-Respond in this format:
-
-Upgrade: <name>
-Why: <short explanation>
-`;
-
-    const response = await groq.chat.completions.create({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-            {
-                role: 'user',
-                content: prompt,
-            },
-        ],
-    });
-
-    return response.choices[0].message.content;
-};
-
 export const recommendUpgradeService = async (
     carId: string,
     userId: string,
 ) => {
     const car = await findOwnedCarOrFail(carId, userId);
-
     const modifications = await Modification.find({car: carId});
 
-    const recommendation = await generateUpgradeRecommendationContent(
-        car,
-        modifications,
-    );
+    const prompt = buildUpgradeRecommendationPrompt(car, modifications);
+
+    const content = await generateAIContent(prompt, 'llama-3.1-8b-instant');
 
     const savedRecommendation = await AIRecommendation.create({
         user: userId,
         car: carId,
         type: AIRecommendationType.NEXT_UPGRADE,
-        content: recommendation || '',
+        prompt,
+        input: {
+            carId,
+        },
+        content,
     });
 
     return {
@@ -149,42 +109,26 @@ export const getRecommendationsByCarService = async (
 export const buildPlanService = async (
     carId: string,
     userId: string,
-    data: {budget: string; goal: string},
+    data: BuildPlanInput,
 ) => {
     const car = await findOwnedCarOrFail(carId, userId);
     const modifications = await Modification.find({car: carId});
-    const modsList = modifications.map((m) => m.title).join(', ') || 'none';
 
-    const prompt = `
-You are a hot hatch tuning expert.
+    const prompt = buildBuildPlanPrompt(car, modifications, data);
 
-Car: ${car.brand} ${car.model} (${car.year})
-Current mods: ${modsList}
-Budget: ${data.budget}
-Goal: ${data.goal}
-
-Create a prioritized mod plan. For each mod include:
-1. Name
-2. Estimated cost
-3. Why it matters for the goal
-4. Order priority (do this first, second, etc.)
-
-Also add one warning if anything in the plan could be unsafe if done out of order.
-`;
-
-    const response = await groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{role: 'user', content: prompt}],
-    });
-
-    const content = response.choices[0].message.content || '';
+    const content = await generateAIContent(prompt, 'llama-3.3-70b-versatile');
 
     const saved = await AIRecommendation.create({
         user: userId,
         car: carId,
         type: AIRecommendationType.BUILD_PLAN,
+        prompt,
+        input: data,
         content,
     });
 
-    return {id: saved._id, content: saved.content};
+    return {
+        id: saved._id,
+        content: saved.content,
+    };
 };

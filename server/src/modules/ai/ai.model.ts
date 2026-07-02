@@ -6,9 +6,7 @@ export interface IAIRecommendation {
     car?: mongoose.Types.ObjectId;
     type: AIRecommendationType;
     prompt: string;
-
     input?: Record<string, unknown>;
-
     content: string;
 }
 
@@ -33,7 +31,6 @@ const aiRecommendationSchema = new Schema<IAIRecommendation>(
             type: String,
             required: true,
         },
-
         input: {
             type: Schema.Types.Mixed,
             required: false,
