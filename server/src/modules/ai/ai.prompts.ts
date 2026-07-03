@@ -1,8 +1,8 @@
 import {
+    BuildPlanInput,
     CarPromptInput,
     ModificationPromptInput,
     RecommendCarInput,
-    BuildPlanInput,
 } from './ai.types';
 
 const formatModsList = (modifications: ModificationPromptInput[]) =>
@@ -47,7 +47,7 @@ Why: <short explanation>
 export const buildBuildPlanPrompt = (
     car: CarPromptInput,
     modifications: ModificationPromptInput[],
-    data: {budget: string; goal: string},
+    data: BuildPlanInput,
 ) => `
 You are a hot hatch tuning expert.
 
