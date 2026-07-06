@@ -2,6 +2,7 @@ import {
     BuildPlanInput,
     CarPromptInput,
     ModificationPromptInput,
+    NextUpgradeInput,
     RecommendCarInput,
 } from './ai.types';
 
@@ -63,4 +64,46 @@ Create a prioritized mod plan. For each mod include:
 4. Order priority (do this first, second, etc.)
 
 Also add one warning if anything in the plan could be unsafe if done out of order.
+`;
+
+export const buildNextUpgradePrompt = (
+    car: CarPromptInput,
+    modifications: ModificationPromptInput[],
+    data: NextUpgradeInput,
+) => `
+You are a professional hot hatch garage advisor.
+
+Car:
+- Brand: ${car.brand}
+- Model: ${car.model}
+- Year: ${car.year}
+
+Current modifications:
+${formatModsList(modifications)}
+
+User goal:
+${data.goal}
+
+User budget:
+${data.budget}
+
+Recommend the best next upgrades for this car.
+
+Respond in this format:
+
+Recommended next upgrade:
+Priority 1: <upgrade name>
+Estimated cost: <cost>
+Why: <short explanation>
+
+Optional next step:
+Priority 2: <upgrade name>
+Estimated cost: <cost>
+Why: <short explanation>
+
+Budget note:
+<explain if the budget is enough or not>
+
+Safety warning:
+<one important warning>
 `;

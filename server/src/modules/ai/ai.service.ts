@@ -4,6 +4,7 @@ import {AIRecommendation} from './ai.model';
 import {
     buildBuildPlanPrompt,
     buildCarRecommendationPrompt,
+    buildNextUpgradePrompt,
     buildUpgradeRecommendationPrompt,
 } from './ai.prompts';
 import {
@@ -93,15 +94,14 @@ export const nextUpgradeService = async (
 ) => {
     const {car, modifications} = await getCarWithModifications(carId, userId);
 
-    return {
-        car: {
-            id: car._id,
-            brand: car.brand,
-            model: car.model,
-            year: car.year,
-        },
-        modificationsCount: modifications.length,
+    const prompt = buildNextUpgradePrompt(car, modifications, data);
+
+    return createAIRecommendation({
+        userId,
+        carId,
+        type: AIRecommendationType.NEXT_UPGRADE,
+        prompt,
+        model: AI_MODELS.RECOMMENDATION,
         input: data,
-        message: 'Next upgrade advisor coming soon',
-    };
+    });
 };
