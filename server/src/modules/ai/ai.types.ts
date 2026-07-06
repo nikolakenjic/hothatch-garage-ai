@@ -26,3 +26,8 @@ export type CarPromptInput = {
 export type ModificationPromptInput = {
     title: string;
 };
+
+export type NextUpgradeInput = {
+    budget: string;
+    goal: string;
+};

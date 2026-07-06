@@ -9,6 +9,7 @@ import {
 import {
     AIRecommendationType,
     BuildPlanInput,
+    NextUpgradeInput,
     RecommendCarInput,
 } from './ai.types';
 import {createAIRecommendation} from './ai.repository';
@@ -83,4 +84,24 @@ export const buildPlanService = async (
         model: AI_MODELS.RECOMMENDATION,
         input: data,
     });
+};
+
+export const nextUpgradeService = async (
+    carId: string,
+    userId: string,
+    data: NextUpgradeInput,
+) => {
+    const {car, modifications} = await getCarWithModifications(carId, userId);
+
+    return {
+        car: {
+            id: car._id,
+            brand: car.brand,
+            model: car.model,
+            year: car.year,
+        },
+        modificationsCount: modifications.length,
+        input: data,
+        message: 'Next upgrade advisor coming soon',
+    };
 };

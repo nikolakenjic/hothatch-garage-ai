@@ -3,6 +3,7 @@ import {
     buildPlan,
     getRecommendations,
     getRecommendationsByCar,
+    nextUpgrade,
     recommendCar,
     recommendUpgrade,
 } from './ai.controller';
@@ -11,6 +12,7 @@ import {validate} from '../../middlewares/validate';
 import {
     aiCarParamsSchema,
     buildPlanSchema,
+    nextUpgradeSchema,
     recommendCarSchema,
 } from './ai.validation';
 
@@ -36,6 +38,14 @@ router.post(
     validate(aiCarParamsSchema, 'params'),
     validate(buildPlanSchema),
     buildPlan,
+);
+
+router.post(
+    '/next-upgrade/:carId',
+    protect,
+    validate(aiCarParamsSchema, 'params'),
+    validate(nextUpgradeSchema),
+    nextUpgrade,
 );
 
 export default router;

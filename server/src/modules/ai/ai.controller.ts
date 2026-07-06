@@ -5,6 +5,7 @@ import {
     generateCarRecommendationService,
     getRecommendationsByCarService,
     getRecommendationsService,
+    nextUpgradeService,
     recommendUpgradeService,
 } from './ai.service';
 import {OK} from '../../constants/http';
@@ -77,6 +78,18 @@ export const buildPlan = catchAsync(async (req: Request, res: Response) => {
 
     res.status(OK).json({
         message: 'Build plan generated successfully',
+        recommendation,
+    });
+});
+
+export const nextUpgrade = catchAsync(async (req: Request, res: Response) => {
+    const carId = req.params.carId as string;
+    const userId = getUserId(req);
+
+    const recommendation = await nextUpgradeService(carId, userId, req.body);
+
+    res.status(OK).json({
+        message: 'Next upgrade recommendation generated',
         recommendation,
     });
 });
