@@ -99,7 +99,7 @@ export const nextUpgradeService = async (
     return createAIRecommendation({
         userId,
         carId,
-        type: AIRecommendationType.NEXT_UPGRADE,
+        type: AIRecommendationType.NEXT_UPGRADE_ADVISOR,
         prompt,
         model: AI_MODELS.RECOMMENDATION,
         input: data,

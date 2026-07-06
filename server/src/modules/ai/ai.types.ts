@@ -1,5 +1,6 @@
 export enum AIRecommendationType {
     NEXT_UPGRADE = 'next-upgrade',
+    NEXT_UPGRADE_ADVISOR = 'next-upgrade-advisor',
     BUILD_REVIEW = 'build-review',
     COST_ANALYSIS = 'cost-analysis',
     CAR_RECOMMENDATION = 'car-recommendation',
