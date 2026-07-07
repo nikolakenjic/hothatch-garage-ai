@@ -6,8 +6,20 @@ import {
     RecommendCarInput,
 } from './ai.types';
 
-const formatModsList = (modifications: ModificationPromptInput[]) =>
-    modifications.map((m) => m.title).join(', ') || 'none';
+const formatModsList = (modifications: ModificationPromptInput[]) => {
+    if (modifications.length === 0) {
+        return 'No modifications added yet.';
+    }
+
+    return modifications
+        .map((mod) => {
+            const brand = mod.brand ? ` | Brand: ${mod.brand}` : '';
+            const cost = mod.cost ? ` | Cost: ${mod.cost}` : '';
+
+            return `- ${mod.title} | Category: ${mod.category} | Status: ${mod.status}${brand}${cost}`;
+        })
+        .join('\n');
+};
 
 export const buildCarRecommendationPrompt = ({
     budget,

@@ -26,6 +26,10 @@ export type CarPromptInput = {
 
 export type ModificationPromptInput = {
     title: string;
+    category: string;
+    status: string;
+    cost?: number;
+    brand?: string;
 };
 
 export type NextUpgradeInput = {
