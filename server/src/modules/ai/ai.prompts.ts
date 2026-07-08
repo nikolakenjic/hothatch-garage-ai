@@ -1,5 +1,6 @@
 import {
     BuildPlanInput,
+    BuildReviewInput,
     CarPromptInput,
     ModificationPromptInput,
     NextUpgradeInput,
@@ -134,4 +135,62 @@ Budget assessment:
 Safety warning:
 
 Overall advisor summary:
+`;
+
+export const buildBuildReviewPrompt = (
+    car: CarPromptInput,
+    modifications: ModificationPromptInput[],
+    data: BuildReviewInput,
+) => `
+You are a professional hot hatch garage advisor.
+
+Review this car build like a real garage expert.
+
+Car:
+- Brand: ${car.brand}
+- Model: ${car.model}
+- Year: ${car.year}
+
+Current modifications:
+${formatModsList(modifications)}
+
+Build goal:
+${data.goal}
+
+Rules:
+- Review the whole build, not only one upgrade.
+- Focus on balance, safety, reliability, and performance.
+- Mention if important upgrades are missing.
+- Do not recommend unrealistic or unsafe upgrades.
+- Avoid recommending upgrades already installed.
+- Keep the advice useful for a daily-driven hot hatch.
+
+Respond in this format:
+
+Build score:
+<score>/10
+
+Strengths:
+- 
+- 
+- 
+
+Weaknesses:
+- 
+- 
+- 
+
+Missing upgrades:
+- 
+- 
+- 
+
+Recommended next steps:
+1.
+2.
+3.
+
+Safety warning:
+
+Overall build review summary:
 `;

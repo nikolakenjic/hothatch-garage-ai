@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {
     buildPlan,
+    buildReview,
     getRecommendations,
     getRecommendationsByCar,
     nextUpgrade,
@@ -12,6 +13,7 @@ import {validate} from '../../middlewares/validate';
 import {
     aiCarParamsSchema,
     buildPlanSchema,
+    buildReviewSchema,
     nextUpgradeSchema,
     recommendCarSchema,
 } from './ai.validation';
@@ -46,6 +48,14 @@ router.post(
     validate(aiCarParamsSchema, 'params'),
     validate(nextUpgradeSchema),
     nextUpgrade,
+);
+
+router.post(
+    '/build-review/:carId',
+    protect,
+    validate(aiCarParamsSchema, 'params'),
+    validate(buildReviewSchema),
+    buildReview,
 );
 
 export default router;

@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 import {catchAsync} from '../../utils/catchAsync';
 import {
     buildPlanService,
+    buildReviewService,
     generateCarRecommendationService,
     getRecommendationsByCarService,
     getRecommendationsService,
@@ -91,5 +92,19 @@ export const nextUpgrade = catchAsync(async (req: Request, res: Response) => {
     res.status(OK).json({
         message: 'Next upgrade recommendation generated',
         recommendation,
+    });
+});
+
+export const buildReview = catchAsync(async (req, res) => {
+    const carId = req.params.carId as string;
+    const userId = getUserId(req);
+
+    const recommendation = await buildReviewService(carId, userId, req.body);
+
+    res.status(201).json({
+        status: 'success',
+        data: {
+            recommendation,
+        },
     });
 });
