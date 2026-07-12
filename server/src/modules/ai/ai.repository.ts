@@ -33,3 +33,12 @@ export const createAIRecommendation = async ({
 
     return {id: saved._id, content: saved.content};
 };
+
+export const findRecentRecommendationsByCar = async (
+    carId: string,
+    limit = 3,
+) => {
+    return AIRecommendation.find({car: carId})
+        .sort({createdAt: -1})
+        .limit(limit);
+};
