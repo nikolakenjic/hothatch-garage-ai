@@ -43,8 +43,9 @@ export const recommendUpgrade = catchAsync(
 export const getRecommendations = catchAsync(
     async (req: Request, res: Response) => {
         const userId = getUserId(req);
+        const type = req.query.type as string | undefined;
 
-        const recommendations = await getRecommendationsService(userId);
+        const recommendations = await getRecommendationsService(userId, type);
 
         res.status(OK).json({
             message: 'Recommendations fetched successfully',

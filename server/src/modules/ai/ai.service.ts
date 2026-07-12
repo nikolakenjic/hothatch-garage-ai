@@ -58,8 +58,15 @@ export const recommendUpgradeService = async (
     });
 };
 
-export const getRecommendationsService = async (userId: string) => {
-    return AIRecommendation.find({user: userId}).sort({createdAt: -1});
+export const getRecommendationsService = async (
+    userId: string,
+    type?: string,
+) => {
+    const filter: Record<string, unknown> = {user: userId};
+
+    if (type) filter.type = type;
+
+    return AIRecommendation.find(filter).sort({createdAt: -1});
 };
 
 export const getRecommendationsByCarService = async (
