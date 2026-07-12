@@ -17,7 +17,10 @@ import {
     CostAnalysisInput,
     RecommendCarInput,
 } from './ai.types';
-import {createAIRecommendation} from './ai.repository';
+import {
+    createAIRecommendation,
+    findRecentRecommendationsByCar,
+} from './ai.repository';
 import {AI_MODELS} from './ai.constants';
 
 const getCarWithModifications = async (carId: string, userId: string) => {
@@ -105,7 +108,14 @@ export const nextUpgradeService = async (
 ) => {
     const {car, modifications} = await getCarWithModifications(carId, userId);
 
-    const prompt = buildNextUpgradePrompt(car, modifications, data);
+    const previousRecommendations = await findRecentRecommendationsByCar(carId);
+
+    const prompt = buildNextUpgradePrompt(
+        car,
+        modifications,
+        previousRecommendations,
+        data,
+    );
 
     return createAIRecommendation({
         userId,

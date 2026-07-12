@@ -45,3 +45,7 @@ export type CostAnalysisInput = {
     budget: string;
     goal: string;
 };
+
+export type PreviousRecommendationPromptInput = {
+    content: string;
+};

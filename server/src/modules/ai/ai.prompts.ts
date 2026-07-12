@@ -5,6 +5,7 @@ import {
     CostAnalysisInput,
     ModificationPromptInput,
     NextUpgradeInput,
+    PreviousRecommendationPromptInput,
     RecommendCarInput,
 } from './ai.types';
 
@@ -83,6 +84,7 @@ Also add one warning if anything in the plan could be unsafe if done out of orde
 export const buildNextUpgradePrompt = (
     car: CarPromptInput,
     modifications: ModificationPromptInput[],
+    previousRecommendations: PreviousRecommendationPromptInput[],
     data: NextUpgradeInput,
 ) => `
 You are a professional hot hatch garage advisor.
@@ -96,6 +98,9 @@ Car:
 
 Current modifications:
 ${formatModsList(modifications)}
+
+Previous recommendations:
+${formatPreviousRecommendations(previousRecommendations)}
 
 User goal:
 ${data.goal}
@@ -255,3 +260,18 @@ Recommended spending order:
 
 Cost analysis summary:
 `;
+
+const formatPreviousRecommendations = (
+    recommendations: PreviousRecommendationPromptInput[],
+) => {
+    if (recommendations.length === 0) {
+        return 'No previous recommendations available.';
+    }
+
+    return recommendations
+        .map(
+            (recommendation, index) =>
+                `${index + 1}. ${recommendation.content}`,
+        )
+        .join('\n\n');
+};

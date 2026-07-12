@@ -38,7 +38,12 @@ export const findRecentRecommendationsByCar = async (
     carId: string,
     limit = 3,
 ) => {
-    return AIRecommendation.find({car: carId})
+    return AIRecommendation.find({
+        car: new mongoose.Types.ObjectId(carId),
+        type: AIRecommendationType.NEXT_UPGRADE_ADVISOR,
+    })
         .sort({createdAt: -1})
-        .limit(limit);
+        .limit(limit)
+        .select('content createdAt')
+        .lean();
 };
