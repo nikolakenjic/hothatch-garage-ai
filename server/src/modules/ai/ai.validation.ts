@@ -27,3 +27,8 @@ export const nextUpgradeSchema = z.object({
 export const buildReviewSchema = z.object({
     goal: requiredString('Goal is required'),
 });
+
+export const costAnalysisSchema = z.object({
+    budget: requiredString('Budget is required'),
+    goal: requiredString('Goal is required'),
+});

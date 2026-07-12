@@ -2,6 +2,7 @@ import {
     BuildPlanInput,
     BuildReviewInput,
     CarPromptInput,
+    CostAnalysisInput,
     ModificationPromptInput,
     NextUpgradeInput,
     RecommendCarInput,
@@ -193,4 +194,64 @@ Recommended next steps:
 Safety warning:
 
 Overall build review summary:
+`;
+
+export const buildCostAnalysisPrompt = (
+    car: CarPromptInput,
+    modifications: ModificationPromptInput[],
+    data: CostAnalysisInput,
+) => `
+You are a professional hot hatch garage advisor.
+
+Analyze this build from a cost and value perspective.
+
+Car:
+- Brand: ${car.brand}
+- Model: ${car.model}
+- Year: ${car.year}
+
+Current modifications:
+${formatModsList(modifications)}
+
+User goal:
+${data.goal}
+
+Available budget:
+${data.budget}
+
+Rules:
+
+- Focus on value for money.
+- Consider reliability, performance and practicality.
+- Respect the user's budget.
+- Avoid recommending upgrades already installed.
+- Explain where the money should be spent first.
+- Warn about poor-value upgrades.
+
+Respond in this format:
+
+Cost efficiency score:
+<score>/10
+
+Best value upgrades:
+-
+-
+-
+
+Poor value upgrades:
+-
+-
+-
+
+Budget allocation:
+-
+-
+-
+
+Recommended spending order:
+1.
+2.
+3.
+
+Cost analysis summary:
 `;

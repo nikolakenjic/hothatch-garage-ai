@@ -3,6 +3,7 @@ import {catchAsync} from '../../utils/catchAsync';
 import {
     buildPlanService,
     buildReviewService,
+    costAnalysisService,
     generateCarRecommendationService,
     getRecommendationsByCarService,
     getRecommendationsService,
@@ -106,5 +107,17 @@ export const buildReview = catchAsync(async (req, res) => {
         data: {
             recommendation,
         },
+    });
+});
+
+export const costAnalysis = catchAsync(async (req: Request, res: Response) => {
+    const carId = req.params.carId as string;
+    const userId = getUserId(req);
+
+    const recommendation = await costAnalysisService(carId, userId, req.body);
+
+    res.status(OK).json({
+        message: 'Cost analysis generated successfully',
+        recommendation,
     });
 });

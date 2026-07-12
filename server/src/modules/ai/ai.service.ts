@@ -7,12 +7,14 @@ import {
     buildCarRecommendationPrompt,
     buildNextUpgradePrompt,
     buildUpgradeRecommendationPrompt,
+    buildCostAnalysisPrompt,
 } from './ai.prompts';
 import {
     AIRecommendationType,
     BuildPlanInput,
     BuildReviewInput,
     NextUpgradeInput,
+    CostAnalysisInput,
     RecommendCarInput,
 } from './ai.types';
 import {createAIRecommendation} from './ai.repository';
@@ -121,6 +123,25 @@ export const buildReviewService = async (
         userId,
         carId,
         type: AIRecommendationType.BUILD_REVIEW,
+        prompt,
+        model: AI_MODELS.RECOMMENDATION,
+        input: data,
+    });
+};
+
+export const costAnalysisService = async (
+    carId: string,
+    userId: string,
+    data: CostAnalysisInput,
+) => {
+    const {car, modifications} = await getCarWithModifications(carId, userId);
+
+    const prompt = buildCostAnalysisPrompt(car, modifications, data);
+
+    return createAIRecommendation({
+        userId,
+        carId,
+        type: AIRecommendationType.COST_ANALYSIS,
         prompt,
         model: AI_MODELS.RECOMMENDATION,
         input: data,

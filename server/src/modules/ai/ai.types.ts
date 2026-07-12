@@ -40,3 +40,8 @@ export type NextUpgradeInput = {
 export type BuildReviewInput = {
     goal: string;
 };
+
+export type CostAnalysisInput = {
+    budget: string;
+    goal: string;
+};
