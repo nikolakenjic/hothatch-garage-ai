@@ -19,3 +19,12 @@ export type BuildPlanResponse = {
 export type BuildReviewResponse = {
     recommendation: Recommendation;
 };
+
+export type CostAnalysisInput = {
+    budget: string;
+    goal: string;
+};
+
+export type CostAnalysisResponse = {
+    recommendation: Recommendation;
+};

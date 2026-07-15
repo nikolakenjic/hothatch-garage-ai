@@ -4,6 +4,8 @@ import {
     BuildPlanResponse,
     BuildReviewInput,
     BuildReviewResponse,
+    CostAnalysisInput,
+    CostAnalysisResponse,
     Recommendation,
 } from '@/types/ai';
 
@@ -30,6 +32,20 @@ export default class AiService {
     ): Promise<Recommendation> {
         const response = await BaseService.create<BuildReviewResponse>(
             `${this.ENDPOINT}/build-review/${carId}`,
+            data,
+            token,
+        );
+
+        return response.recommendation;
+    }
+
+    static async costAnalysis(
+        token: string,
+        carId: string,
+        data: CostAnalysisInput,
+    ): Promise<Recommendation> {
+        const response = await BaseService.create<CostAnalysisResponse>(
+            `${this.ENDPOINT}/cost-analysis/${carId}`,
             data,
             token,
         );
