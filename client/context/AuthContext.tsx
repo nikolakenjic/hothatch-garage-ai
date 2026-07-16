@@ -1,6 +1,6 @@
 'use client';
 
-import {createContext, useContext, useState} from 'react';
+import {createContext, useContext, useEffect, useState} from 'react';
 import {jwtDecode} from 'jwt-decode';
 import {getAuthToken, removeAuthCookie, setAuthCookie} from '@/lib/cookies';
 import {LoginInput, RegisterInput} from '@/lib/validations/auth';
@@ -35,27 +35,44 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({children}: {children: React.ReactNode}) {
     const router = useRouter();
-    const [user, setUser] = useState<User | null>(() => {
-        if (typeof window === 'undefined') return null;
-        const token = getAuthToken();
-        if (!token) return null;
 
-        // jwtDecode does not verify signature - validation happens on server via middleware
-        const decoded = jwtDecode<DecodedToken>(token);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-        // Check if token is expired
-        if (decoded.exp * 1000 < Date.now()) {
-            removeAuthCookie();
-            return null;
-        }
+    useEffect(() => {
+        const restoreUser = () => {
+            try {
+                const token = getAuthToken();
 
-        return {
-            userId: decoded.userId,
-            email: decoded.email,
+                if (!token) {
+                    setUser(null);
+                    return;
+                }
+
+                const decoded = jwtDecode<DecodedToken>(token);
+
+                if (decoded.exp * 1000 <= Date.now()) {
+                    removeAuthCookie();
+                    setUser(null);
+                    return;
+                }
+
+                setUser({
+                    userId: decoded.userId,
+                    email: decoded.email,
+                });
+            } catch (error) {
+                console.error('Failed to restore authenticated user:', error);
+
+                removeAuthCookie();
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
         };
-    });
-    const [isLoading, setIsLoading] = useState(false);
 
+        restoreUser();
+    }, []);
     const login = async (data: LoginInput) => {
         setIsLoading(true);
         try {
