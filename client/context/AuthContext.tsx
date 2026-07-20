@@ -1,28 +1,19 @@
 'use client';
 
 import {createContext, useContext, useEffect, useState} from 'react';
-import {jwtDecode} from 'jwt-decode';
-import {getAuthToken, removeAuthCookie, setAuthCookie} from '@/lib/cookies';
-import {LoginInput, RegisterInput} from '@/lib/validations/auth';
 import {useRouter} from 'next/navigation';
-import AuthService from '@/services/auth.service';
 import {toast} from 'sonner';
 
-type User = {
-    userId: string;
-    email: string;
-};
+import {AuthUser} from '@/types/auth';
+import {LoginInput, RegisterInput} from '@/lib/validations/auth';
+import AuthService from '@/services/auth.service';
 
 type AuthContextType = {
-    user: User | null;
+    user: AuthUser | null;
     isLoading: boolean;
     login: (data: LoginInput) => Promise<void>;
     register: (data: RegisterInput) => Promise<void>;
-    logout: () => void;
-};
-
-type DecodedToken = User & {
-    exp: number;
+    logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -30,79 +21,52 @@ const AuthContext = createContext<AuthContextType>({
     isLoading: true,
     login: async () => {},
     register: async () => {},
-    logout: () => {},
+    logout: async () => {},
 });
 
 export function AuthProvider({children}: {children: React.ReactNode}) {
     const router = useRouter();
 
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const restoreUser = () => {
+        const restoreUser = async () => {
             try {
-                const token = getAuthToken();
-
-                if (!token) {
-                    setUser(null);
-                    return;
-                }
-
-                const decoded = jwtDecode<DecodedToken>(token);
-
-                if (decoded.exp * 1000 <= Date.now()) {
-                    removeAuthCookie();
-                    setUser(null);
-                    return;
-                }
-
-                setUser({
-                    userId: decoded.userId,
-                    email: decoded.email,
-                });
+                const response = await AuthService.getMe();
+                setUser(response.data.user);
             } catch (error) {
                 console.error('Failed to restore authenticated user:', error);
-
-                removeAuthCookie();
                 setUser(null);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        restoreUser();
+        void restoreUser();
     }, []);
+
     const login = async (data: LoginInput) => {
-        setIsLoading(true);
-        try {
-            const response = await AuthService.login(data);
-            setAuthCookie(response.token);
-            setUser(jwtDecode<User>(response.token));
-            toast.success('Welcome back!');
-            router.replace('/garage');
-        } finally {
-            setIsLoading(false);
-        }
+        const response = await AuthService.login(data);
+
+        setUser(response.user);
+        toast.success('Welcome back!');
+        router.replace('/garage');
     };
 
     const register = async (data: RegisterInput) => {
-        setIsLoading(true);
-        try {
-            const response = await AuthService.register(data);
-            setAuthCookie(response.token);
-            setUser(jwtDecode<User>(response.token));
-            toast.success('Account created!');
-            router.replace('/garage');
-        } finally {
-            setIsLoading(false);
-        }
+        await AuthService.register(data);
+        toast.success('Account created. Please log in.');
+        router.replace('/login');
     };
 
-    const logout = () => {
-        removeAuthCookie();
-        setUser(null);
-        router.replace('/login');
+    const logout = async () => {
+        try {
+            await AuthService.logout();
+        } finally {
+            setUser(null);
+            router.replace('/login');
+        }
     };
 
     return (

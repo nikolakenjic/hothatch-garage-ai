@@ -1,9 +1,20 @@
-export type AuthResponse = {
+export type AuthUser = {
+    _id: string;
+    email: string;
+};
+
+export type LoginResponse = {
     message: string;
-    token: string;
-    user: {
-        id: string;
-        email: string;
-        name: string;
+    user: AuthUser;
+};
+
+export type MeResponse = {
+    status: string;
+    data: {
+        user: AuthUser;
     };
+};
+
+export type LogoutResponse = {
+    message: string;
 };
