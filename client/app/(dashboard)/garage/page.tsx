@@ -9,10 +9,22 @@ import GarageHeader from './_components/GarageHeader';
 
 export default async function GaragePage() {
     const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const accessToken = cookieStore.get('accessToken')?.value;
 
-    if (!token) redirect('/login');
-    const cars = await CarService.getCars(token);
+    if (!accessToken) {
+        redirect('/login');
+    }
+
+    const cookieHeader = cookieStore
+        .getAll()
+        .map(({name, value}) => `${name}=${value}`)
+        .join('; ');
+
+    const cars = await CarService.getCars({
+        headers: {
+            Cookie: cookieHeader,
+        },
+    });
 
     return (
         <main className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-10 text-zinc-950 dark:bg-zinc-950 dark:text-white">

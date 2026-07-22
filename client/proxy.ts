@@ -2,17 +2,18 @@ import {NextResponse} from 'next/server';
 import type {NextRequest} from 'next/server';
 
 export function proxy(request: NextRequest) {
-    const token = request.cookies.get('token')?.value;
+    const accessToken = request.cookies.get('accessToken')?.value;
+
     const isPublicPage =
         request.nextUrl.pathname === '/' ||
         request.nextUrl.pathname.startsWith('/login') ||
         request.nextUrl.pathname.startsWith('/register');
 
-    if (!token && !isPublicPage) {
+    if (!accessToken && !isPublicPage) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (token && isPublicPage && request.nextUrl.pathname !== '/') {
+    if (accessToken && isPublicPage && request.nextUrl.pathname !== '/') {
         return NextResponse.redirect(new URL('/garage', request.url));
     }
 

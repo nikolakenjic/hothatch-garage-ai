@@ -1,49 +1,71 @@
+import type {AxiosRequestConfig} from 'axios';
+
 import BaseService from '@/lib/api/base.service';
 import {Car, CreateCarInput} from '@/types/car';
 
-type CarsResponse = {cars: Car[]};
-type CarResponse = {car: Car};
+type CarsResponse = {
+    message: string;
+    data: {
+        cars: Car[];
+    };
+};
+
+type CarResponse = {
+    car: Car;
+};
 
 export default class CarService {
     static readonly ENDPOINT = '/cars';
 
-    static async getCars(token: string): Promise<Car[]> {
-        const data = await BaseService.get<CarsResponse>(this.ENDPOINT, token);
-        return data.cars;
+    static async getCars(config?: AxiosRequestConfig): Promise<Car[]> {
+        const data = await BaseService.get<CarsResponse>(this.ENDPOINT, config);
+
+        return data.data.cars;
     }
 
-    static async getCarById(token: string, carId: string): Promise<Car> {
+    static async getCarById(
+        carId: string,
+        config?: AxiosRequestConfig,
+    ): Promise<Car> {
         const data = await BaseService.get<CarResponse>(
             `${this.ENDPOINT}/${carId}`,
-            token,
+            config,
         );
+
         return data.car;
     }
 
-    static async createCar(token: string, body: CreateCarInput): Promise<Car> {
+    static async createCar(
+        body: CreateCarInput,
+        config?: AxiosRequestConfig,
+    ): Promise<Car> {
         const data = await BaseService.create<CarResponse>(
             this.ENDPOINT,
             body,
-            token,
+            config,
         );
+
         return data.car;
     }
 
     static async updateCar(
-        token: string,
         carId: string,
         body: Partial<CreateCarInput>,
+        config?: AxiosRequestConfig,
     ): Promise<Car> {
         const data = await BaseService.update<CarResponse>(
             `${this.ENDPOINT}/${carId}`,
             body,
-            token,
+            config,
         );
 
         return data.car;
     }
 
-    static async deleteCar(token: string, carId: string): Promise<void> {
-        await BaseService.remove(`${this.ENDPOINT}/${carId}`, token);
+    static async deleteCar(
+        carId: string,
+        config?: AxiosRequestConfig,
+    ): Promise<void> {
+        await BaseService.remove(`${this.ENDPOINT}/${carId}`, config);
     }
 }
