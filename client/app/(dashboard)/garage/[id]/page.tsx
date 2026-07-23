@@ -15,12 +15,28 @@ type Props = {
 export default async function CarDetailPage({params}: Props) {
     const {id} = await params;
     const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const accessToken = cookieStore.get('accessToken')?.value;
 
-    if (!token) redirect('/login');
+    if (!accessToken) {
+        redirect('/login');
+    }
 
-    const car = await CarService.getCarById(token, id);
-    const modifications = await ModificationService.getModifications(token, id);
+    const cookieHeader = cookieStore
+        .getAll()
+        .map(({name, value}) => `${name}=${value}`)
+        .join('; ');
+
+    const car = await CarService.getCarById(id, {
+        headers: {
+            Cookie: cookieHeader,
+        },
+    });
+
+    const modifications = await ModificationService.getModifications(
+        accessToken,
+        id,
+    );
+
     const totalSpent = modifications.reduce(
         (sum, mod) => sum + (mod.price || 0),
         0,

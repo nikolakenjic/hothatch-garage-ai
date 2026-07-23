@@ -48,7 +48,7 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
                 toast.error('You are not logged in');
                 return;
             }
-            await CarService.createCar(token, data);
+            await CarService.createCar(data);
 
             toast.success('Car added successfully! 🚗');
             reset();

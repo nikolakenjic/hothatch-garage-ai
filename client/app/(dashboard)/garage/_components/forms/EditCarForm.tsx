@@ -50,7 +50,7 @@ export default function EditCarForm({car, onSuccess}: EditCarProps) {
                 toast.error('You are not logged in');
                 return;
             }
-            await CarService.updateCar(token, car._id, data);
+            await CarService.updateCar(car._id, data);
 
             toast.success('Car update successfully! 🚗');
             reset();

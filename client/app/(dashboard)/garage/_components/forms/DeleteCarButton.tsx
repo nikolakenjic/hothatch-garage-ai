@@ -23,7 +23,7 @@ export default function DeleteCarButton({carId}: Props) {
                 toast.error('You are not logged in');
                 return;
             }
-            await CarService.deleteCar(token, carId);
+            await CarService.deleteCar(carId);
             toast.success('Car deleted');
             router.refresh();
         } catch (error) {

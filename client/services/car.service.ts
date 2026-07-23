@@ -10,42 +10,58 @@ type CarsResponse = {
     };
 };
 
-type CarResponse = {
+type CarDetailsResponse = {
+    message: string;
+    data: Car;
+};
+
+type CreateCarResponse = {
+    message: string;
     car: Car;
+};
+
+type UpdateCarResponse = {
+    message: string;
+    data: {
+        car: Car;
+    };
 };
 
 export default class CarService {
     static readonly ENDPOINT = '/cars';
 
     static async getCars(config?: AxiosRequestConfig): Promise<Car[]> {
-        const data = await BaseService.get<CarsResponse>(this.ENDPOINT, config);
+        const response = await BaseService.get<CarsResponse>(
+            this.ENDPOINT,
+            config,
+        );
 
-        return data.data.cars;
+        return response.data.cars;
     }
 
     static async getCarById(
         carId: string,
         config?: AxiosRequestConfig,
     ): Promise<Car> {
-        const data = await BaseService.get<CarResponse>(
+        const response = await BaseService.get<CarDetailsResponse>(
             `${this.ENDPOINT}/${carId}`,
             config,
         );
 
-        return data.car;
+        return response.data;
     }
 
     static async createCar(
         body: CreateCarInput,
         config?: AxiosRequestConfig,
     ): Promise<Car> {
-        const data = await BaseService.create<CarResponse>(
+        const response = await BaseService.create<CreateCarResponse>(
             this.ENDPOINT,
             body,
             config,
         );
 
-        return data.car;
+        return response.car;
     }
 
     static async updateCar(
@@ -53,13 +69,13 @@ export default class CarService {
         body: Partial<CreateCarInput>,
         config?: AxiosRequestConfig,
     ): Promise<Car> {
-        const data = await BaseService.update<CarResponse>(
+        const response = await BaseService.update<UpdateCarResponse>(
             `${this.ENDPOINT}/${carId}`,
             body,
             config,
         );
 
-        return data.car;
+        return response.data.car;
     }
 
     static async deleteCar(

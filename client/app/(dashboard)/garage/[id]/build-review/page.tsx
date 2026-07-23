@@ -11,13 +11,22 @@ type Props = {
 export default async function BuildReviewPage({params}: Props) {
     const {id} = await params;
     const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const accessToken = cookieStore.get('accessToken')?.value;
 
-    if (!token) {
+    if (!accessToken) {
         redirect('/login');
     }
 
-    const car = await CarService.getCarById(token, id);
+    const cookieHeader = cookieStore
+        .getAll()
+        .map(({name, value}) => `${name}=${value}`)
+        .join('; ');
+
+    const car = await CarService.getCarById(id, {
+        headers: {
+            Cookie: cookieHeader,
+        },
+    });
 
     return (
         <main className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-10 text-zinc-950 dark:bg-zinc-950 dark:text-white">
