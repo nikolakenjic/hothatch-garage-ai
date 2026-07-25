@@ -49,7 +49,7 @@ export default function EditModificationForm({mod, onSuccess}: Props) {
                 toast.error('You are not logged in');
                 return;
             }
-            await ModificationService.updateModification(token, mod._id, data);
+            await ModificationService.updateModification(mod._id, data);
             toast.success('Modification updated! 🔧');
             router.refresh();
             onSuccess?.();

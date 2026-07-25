@@ -26,15 +26,17 @@ export default async function CarDetailPage({params}: Props) {
         .map(({name, value}) => `${name}=${value}`)
         .join('; ');
 
-    const car = await CarService.getCarById(id, {
+    const requestConfig = {
         headers: {
             Cookie: cookieHeader,
         },
-    });
+    };
+
+    const car = await CarService.getCarById(id, requestConfig);
 
     const modifications = await ModificationService.getModifications(
-        accessToken,
         id,
+        requestConfig,
     );
 
     const totalSpent = modifications.reduce(

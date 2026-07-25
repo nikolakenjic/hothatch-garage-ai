@@ -42,7 +42,7 @@ export default function AddModificationForm({carId}: Props) {
                 toast.error('You are not logged in');
                 return;
             }
-            await ModificationService.createModification(token, carId, data);
+            await ModificationService.createModification(carId, data);
             toast.success('Modification added! 🔧');
             reset();
             router.refresh();

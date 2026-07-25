@@ -23,7 +23,7 @@ export default function DeleteModificationButton({modId}: Props) {
                 toast.error('You are not logged in');
                 return;
             }
-            await ModificationService.deleteModification(token, modId);
+            await ModificationService.deleteModification(modId);
             toast.success('Modification deleted');
             router.refresh();
         } catch (error) {
