@@ -8,7 +8,6 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import ModificationService from '@/services/modification.service';
-import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
 import {Modification} from '@/types/modification';
 import {getErrorMessage} from '@/lib/errors';
@@ -44,12 +43,8 @@ export default function EditModificationForm({mod, onSuccess}: Props) {
 
     const onSubmit = async (data: EditModInput) => {
         try {
-            const token = getAuthToken();
-            if (!token) {
-                toast.error('You are not logged in');
-                return;
-            }
             await ModificationService.updateModification(mod._id, data);
+
             toast.success('Modification updated! 🔧');
             router.refresh();
             onSuccess?.();

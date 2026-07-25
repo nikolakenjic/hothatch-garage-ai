@@ -8,7 +8,6 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import CarService from '@/services/car.service';
-import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
 import {getErrorMessage} from '@/lib/errors';
 
@@ -43,11 +42,6 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
 
     const onSubmit = async (data: AddCarInput) => {
         try {
-            const token = getAuthToken();
-            if (!token) {
-                toast.error('You are not logged in');
-                return;
-            }
             await CarService.createCar(data);
 
             toast.success('Car added successfully! 🚗');

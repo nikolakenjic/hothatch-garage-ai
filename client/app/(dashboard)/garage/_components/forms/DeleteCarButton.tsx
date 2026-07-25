@@ -2,8 +2,6 @@
 
 import {toast} from 'sonner';
 import {Button} from '@/components/ui/button';
-
-import {getAuthToken} from '@/lib/cookies';
 import {useRouter} from 'next/navigation';
 import CarService from '@/services/car.service';
 import {getErrorMessage} from '@/lib/errors';
@@ -18,12 +16,8 @@ export default function DeleteCarButton({carId}: Props) {
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this car?')) return;
         try {
-            const token = getAuthToken();
-            if (!token) {
-                toast.error('You are not logged in');
-                return;
-            }
             await CarService.deleteCar(carId);
+
             toast.success('Car deleted');
             router.refresh();
         } catch (error) {
