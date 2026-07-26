@@ -8,7 +8,6 @@ import {toast} from 'sonner';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {getAuthToken} from '@/lib/cookies';
 import {getErrorMessage} from '@/lib/errors';
 import AiService from '@/services/ai.service';
 
@@ -35,18 +34,7 @@ export default function BuildReviewForm({carId}: Props) {
 
     const onSubmit = async (data: BuildReviewInput) => {
         try {
-            const token = getAuthToken();
-
-            if (!token) {
-                toast.error('You are not logged in');
-                return;
-            }
-
-            const recommendation = await AiService.buildReview(
-                token,
-                carId,
-                data,
-            );
+            const recommendation = await AiService.buildReview(carId, data);
 
             setResult(recommendation.content);
             toast.success('Build review generated! 🤖');

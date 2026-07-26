@@ -8,46 +8,48 @@ import {
     CostAnalysisResponse,
     Recommendation,
 } from '@/types/ai';
+import {AxiosRequestConfig} from 'axios';
 
 export default class AiService {
     static readonly ENDPOINT = '/ai';
 
     static async buildPlan(
-        token: string,
         carId: string,
         data: BuildPlanInput,
+        config?: AxiosRequestConfig,
     ): Promise<Recommendation> {
         const response = await BaseService.create<BuildPlanResponse>(
             `${this.ENDPOINT}/build-plan/${carId}`,
             data,
-            token,
+            config,
         );
+
         return response.recommendation;
     }
 
     static async buildReview(
-        token: string,
         carId: string,
         data: BuildReviewInput,
+        config?: AxiosRequestConfig,
     ): Promise<Recommendation> {
         const response = await BaseService.create<BuildReviewResponse>(
             `${this.ENDPOINT}/build-review/${carId}`,
             data,
-            token,
+            config,
         );
 
         return response.recommendation;
     }
 
     static async costAnalysis(
-        token: string,
         carId: string,
         data: CostAnalysisInput,
+        config?: AxiosRequestConfig,
     ): Promise<Recommendation> {
         const response = await BaseService.create<CostAnalysisResponse>(
             `${this.ENDPOINT}/cost-analysis/${carId}`,
             data,
-            token,
+            config,
         );
 
         return response.recommendation;

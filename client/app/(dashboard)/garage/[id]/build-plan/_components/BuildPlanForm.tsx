@@ -8,7 +8,6 @@ import {toast} from 'sonner';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {getAuthToken} from '@/lib/cookies';
 import AiService from '@/services/ai.service';
 import {getErrorMessage} from '@/lib/errors';
 
@@ -35,16 +34,7 @@ export default function BuildPlanForm({carId}: Props) {
 
     const onSubmit = async (data: BuildPlanInput) => {
         try {
-            const token = getAuthToken();
-            if (!token) {
-                toast.error('You are not logged in');
-                return;
-            }
-            const recommendation = await AiService.buildPlan(
-                token,
-                carId,
-                data,
-            );
+            const recommendation = await AiService.buildPlan(carId, data);
             toast.success('Build plan generated! 🤖');
             setResult(recommendation.content);
         } catch (error) {
