@@ -3,11 +3,18 @@ import {Modification, CreateModificationInput} from '@/types/modification';
 import {AxiosRequestConfig} from 'axios';
 
 type ModificationsResponse = {
-    modifications: Modification[];
+    message: string;
+    count: number;
+    data: {
+        modifications: Modification[];
+    };
 };
 
 type ModificationResponse = {
-    modification: Modification;
+    message: string;
+    data: {
+        modification: Modification;
+    };
 };
 
 export default class ModificationService {
@@ -17,12 +24,12 @@ export default class ModificationService {
         carId: string,
         config?: AxiosRequestConfig,
     ): Promise<Modification[]> {
-        const data = await BaseService.get<ModificationsResponse>(
+        const response = await BaseService.get<ModificationsResponse>(
             `${this.ENDPOINT}/${carId}`,
             config,
         );
 
-        return data.modifications;
+        return response.data.modifications;
     }
 
     static async createModification(
@@ -36,7 +43,7 @@ export default class ModificationService {
             config,
         );
 
-        return response.modification;
+        return response.data.modification;
     }
 
     static async updateModification(
@@ -44,13 +51,13 @@ export default class ModificationService {
         body: Partial<CreateModificationInput>,
         config?: AxiosRequestConfig,
     ): Promise<Modification> {
-        const data = await BaseService.update<ModificationResponse>(
+        const response = await BaseService.update<ModificationResponse>(
             `${this.ENDPOINT}/${modId}`,
             body,
             config,
         );
 
-        return data.modification;
+        return response.data.modification;
     }
 
     static async deleteModification(

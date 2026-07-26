@@ -40,7 +40,7 @@ export default async function CarDetailPage({params}: Props) {
     );
 
     const totalSpent = modifications.reduce(
-        (sum, mod) => sum + (mod.price || 0),
+        (sum, mod) => sum + (mod.price ?? 0),
         0,
     );
 
