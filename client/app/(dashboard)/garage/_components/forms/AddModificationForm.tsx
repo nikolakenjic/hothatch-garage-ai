@@ -17,7 +17,10 @@ const addModSchema = z.object({
     price: z.coerce.number().optional(),
 });
 
-type AddModInput = z.infer<typeof addModSchema>;
+// type AddModInput = z.infer<typeof addModSchema>;
+
+type AddModFormInput = z.input<typeof addModSchema>;
+type AddModFormOutput = z.output<typeof addModSchema>;
 
 type Props = {
     carId: string;
@@ -30,11 +33,11 @@ export default function AddModificationForm({carId}: Props) {
         handleSubmit,
         reset,
         formState: {errors, isSubmitting},
-    } = useForm<AddModInput>({
-        resolver: zodResolver(addModSchema) as any,
+    } = useForm<AddModFormInput, unknown, AddModFormOutput>({
+        resolver: zodResolver(addModSchema),
     });
 
-    const onSubmit = async (data: AddModInput) => {
+    const onSubmit = async (data: AddModFormOutput) => {
         try {
             await ModificationService.createModification(carId, data);
 

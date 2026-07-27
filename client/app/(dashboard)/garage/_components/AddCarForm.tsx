@@ -17,7 +17,10 @@ const addCarSchema = z.object({
     year: z.coerce.number().int().min(1900).max(new Date().getFullYear()),
 });
 
-type AddCarInput = z.infer<typeof addCarSchema>;
+// type AddCarInput = z.infer<typeof addCarSchema>;
+
+type AddCarFormInput = z.input<typeof addCarSchema>;
+type AddCarFormOutput = z.output<typeof addCarSchema>;
 
 type AddCarFormProps = {
     onSuccess?: () => void;
@@ -31,8 +34,8 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
         handleSubmit,
         reset,
         formState: {errors, isSubmitting},
-    } = useForm<AddCarInput>({
-        resolver: zodResolver(addCarSchema) as any,
+    } = useForm<AddCarFormInput, unknown, AddCarFormOutput>({
+        resolver: zodResolver(addCarSchema),
         defaultValues: {
             brand: '',
             model: '',
@@ -40,7 +43,7 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
         },
     });
 
-    const onSubmit = async (data: AddCarInput) => {
+    const onSubmit = async (data: AddCarFormOutput) => {
         try {
             await CarService.createCar(data);
 

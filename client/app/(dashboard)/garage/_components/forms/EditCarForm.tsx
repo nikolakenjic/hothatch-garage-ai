@@ -18,7 +18,9 @@ const editCarSchema = z.object({
     year: z.coerce.number().int().min(1900).max(new Date().getFullYear()),
 });
 
-type EditCarInput = z.infer<typeof editCarSchema>;
+// type EditCarInput = z.infer<typeof editCarSchema>;
+type AddEditCarFormInput = z.input<typeof editCarSchema>;
+type AddEditCarFormOutput = z.output<typeof editCarSchema>;
 
 type EditCarProps = {
     car: Car;
@@ -33,8 +35,8 @@ export default function EditCarForm({car, onSuccess}: EditCarProps) {
         handleSubmit,
         reset,
         formState: {errors, isSubmitting},
-    } = useForm<EditCarInput>({
-        resolver: zodResolver(editCarSchema) as any,
+    } = useForm<AddEditCarFormInput, unknown, AddEditCarFormOutput>({
+        resolver: zodResolver(editCarSchema),
         defaultValues: {
             brand: car.brand,
             model: car.model,
@@ -42,7 +44,7 @@ export default function EditCarForm({car, onSuccess}: EditCarProps) {
         },
     });
 
-    const onSubmit = async (data: EditCarInput) => {
+    const onSubmit = async (data: AddEditCarFormOutput) => {
         try {
             await CarService.updateCar(car._id, data);
 

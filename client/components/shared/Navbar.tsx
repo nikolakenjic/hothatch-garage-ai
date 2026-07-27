@@ -12,19 +12,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {useAuth} from '@/context/AuthContext';
-import {useEffect, useState} from 'react';
+
 import {APP_NAME} from '@/lib/constants';
 
 export default function Navbar() {
     const {setTheme} = useTheme();
     const {user, logout} = useAuth();
-    const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    if (!mounted || !user) return null;
+    if (!user) return null;
 
     return (
         <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 px-4 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/80">
