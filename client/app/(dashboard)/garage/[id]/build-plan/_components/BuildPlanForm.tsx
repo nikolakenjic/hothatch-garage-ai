@@ -10,6 +10,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import AiService from '@/services/ai.service';
 import {getErrorMessage} from '@/lib/errors';
+import GlassPanel from '@/components/shared/GlassPanel';
 
 const buildPlanSchema = z.object({
     budget: z.string().min(1, 'Budget is required'),
@@ -44,7 +45,7 @@ export default function BuildPlanForm({carId}: Props) {
 
     return (
         <div className="space-y-6">
-            <div className="rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
+            <GlassPanel>
                 <h2 className="font-heading text-2xl font-black text-zinc-950 dark:text-white mb-6">
                     Tell me your goals
                 </h2>
@@ -85,7 +86,7 @@ export default function BuildPlanForm({carId}: Props) {
                             : 'Generate Build Plan 🤖'}
                     </Button>
                 </form>
-            </div>
+            </GlassPanel>
 
             {result && (
                 <div className="rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">

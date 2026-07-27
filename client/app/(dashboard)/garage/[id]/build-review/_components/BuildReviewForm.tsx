@@ -10,6 +10,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 import AiService from '@/services/ai.service';
+import GlassPanel from '@/components/shared/GlassPanel';
 
 const buildReviewSchema = z.object({
     goal: z.string().min(1, 'Goal is required'),
@@ -45,7 +46,7 @@ export default function BuildReviewForm({carId}: Props) {
 
     return (
         <div className="space-y-6">
-            <div className="rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
+            <GlassPanel>
                 <h2 className="mb-6 font-heading text-2xl font-black text-zinc-950 dark:text-white">
                     Describe your build goal
                 </h2>
@@ -77,7 +78,7 @@ export default function BuildReviewForm({carId}: Props) {
                             : 'Review My Build 🤖'}
                     </Button>
                 </form>
-            </div>
+            </GlassPanel>
 
             {result && (
                 <div className="rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
