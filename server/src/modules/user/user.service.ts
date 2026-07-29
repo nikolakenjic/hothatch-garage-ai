@@ -100,7 +100,7 @@ export const getUserStatsService = async (userId: string) => {
     });
 
     const totalMoneySpent = modifications.reduce(
-        (sum, mod) => sum + (mod.price || 0),
+        (sum, mod) => sum + (mod.cost || 0),
         0,
     );
 
