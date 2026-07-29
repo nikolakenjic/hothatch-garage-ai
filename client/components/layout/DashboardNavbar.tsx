@@ -15,7 +15,7 @@ import {useAuth} from '@/context/AuthContext';
 
 import {APP_NAME} from '@/lib/constants';
 
-export default function Navbar() {
+export default function DashboardNavbar() {
     const {setTheme} = useTheme();
     const {user, logout} = useAuth();
 

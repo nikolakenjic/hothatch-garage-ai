@@ -2,20 +2,20 @@
 
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
 import {RegisterInput, registerSchema} from '@/lib/validations/auth';
 import {useAuth} from '@/context/AuthContext';
 import AuthForm, {Field} from '@/components/auth/AuthForm';
 import AuthLayout from '@/components/auth/AuthLayout';
 import {getErrorMessage} from '@/lib/errors';
+import Link from 'next/link';
 
-const registerFields: Field[] = [
+const registerFields: Field<RegisterInput>[] = [
     {
         name: 'name',
         label: 'Name',
         type: 'text',
-        placeholder: 'Nikola',
+        placeholder: 'Name',
     },
     {
         name: 'email',
@@ -32,7 +32,6 @@ const registerFields: Field[] = [
 ];
 
 export default function RegisterPage() {
-    const router = useRouter();
     const {register: signUp} = useAuth();
 
     const form = useForm<RegisterInput>({
@@ -76,13 +75,12 @@ export default function RegisterPage() {
                 secondaryAction={
                     <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
                         Already have an account?{' '}
-                        <button
-                            type="button"
-                            onClick={() => router.push('/login')}
+                        <Link
+                            href="/login"
                             className="font-semibold text-red-600 transition-colors hover:text-red-500 dark:text-red-500 dark:hover:text-red-400"
                         >
                             Login
-                        </button>
+                        </Link>
                     </p>
                 }
             />

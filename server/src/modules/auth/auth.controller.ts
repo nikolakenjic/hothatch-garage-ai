@@ -23,7 +23,7 @@ export const register = catchAsync(async (req: Request, res: Response) => {
         message: 'User created',
         verificationToken,
         user: {
-            id: user._id,
+            id: user._id.toString(),
             email: user.email,
         },
     });
@@ -47,7 +47,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     res.status(OK).json({
         message: 'Login successful',
         user: {
-            _id: user._id,
+            id: user._id.toString(),
             email: user.email,
         },
     });
@@ -108,7 +108,7 @@ export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     res.status(OK).json({
         message: 'Email verified successfully',
         user: {
-            _id: user._id,
+            id: user._id.toString(),
             email: user.email,
             isEmailVerified: user.isEmailVerified,
         },

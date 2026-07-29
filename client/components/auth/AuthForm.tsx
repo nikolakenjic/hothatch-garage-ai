@@ -5,15 +5,15 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {FieldValues, Path, UseFormReturn} from 'react-hook-form';
 
-export type Field = {
-    name: string;
+export type Field<T extends FieldValues> = {
+    name: Path<T>;
     label: string;
     type?: 'text' | 'email' | 'password';
     placeholder?: string;
 };
 
 type AuthFormProps<T extends FieldValues> = {
-    fields: Field[];
+    fields: Field<T>[];
     submitText: string;
     submitLoadingText: string;
     form: UseFormReturn<T>;
@@ -35,8 +35,9 @@ export default function AuthForm<T extends FieldValues>({
         formState: {errors, isSubmitting},
     } = form;
 
-    const getFieldError = (fieldName: string): string | undefined => {
-        const error = errors[fieldName as Path<T>];
+    const getFieldError = (fieldName: Path<T>): string | undefined => {
+        const error = errors[fieldName];
+
         return typeof error?.message === 'string' ? error.message : undefined;
     };
 
@@ -49,7 +50,7 @@ export default function AuthForm<T extends FieldValues>({
                         id={field.name}
                         type={field.type ?? 'text'}
                         placeholder={field.placeholder}
-                        {...register(field.name as Path<T>)}
+                        {...register(field.name)}
                         className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
                     />
                     {getFieldError(field.name) && (

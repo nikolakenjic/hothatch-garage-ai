@@ -16,13 +16,7 @@ type AuthContextType = {
     logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextType>({
-    user: null,
-    isLoading: true,
-    login: async () => {},
-    register: async () => {},
-    logout: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({children}: {children: React.ReactNode}) {
     const router = useRouter();
@@ -78,4 +72,12 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth(): AuthContextType {
+    const context = useContext(AuthContext);
+
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+
+    return context;
+}

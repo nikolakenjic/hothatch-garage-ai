@@ -1,10 +1,16 @@
 export type AuthUser = {
-    _id: string;
+    id: string;
     email: string;
 };
 
 export type LoginResponse = {
     message: string;
+    user: AuthUser;
+};
+
+export type RegisterResponse = {
+    message: string;
+    verificationToken: string;
     user: AuthUser;
 };
 
