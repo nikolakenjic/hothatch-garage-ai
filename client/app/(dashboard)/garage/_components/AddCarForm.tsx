@@ -1,23 +1,29 @@
 'use client';
 
-import {useForm} from 'react-hook-form';
+import {ReactNode} from 'react';
+import {useRouter} from 'next/navigation';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {useForm} from 'react-hook-form';
 import {toast} from 'sonner';
 import {z} from 'zod';
+
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import CarService from '@/services/car.service';
-import {useRouter} from 'next/navigation';
 import {getErrorMessage} from '@/lib/errors';
+import CarService from '@/services/car.service';
+
+const currentYear = new Date().getFullYear();
 
 const addCarSchema = z.object({
-    brand: z.string().min(1, 'Brand is required'),
-    model: z.string().min(1, 'Model is required'),
-    year: z.coerce.number().int().min(1900).max(new Date().getFullYear()),
+    brand: z.string().trim().min(1, 'Brand is required'),
+    model: z.string().trim().min(1, 'Model is required'),
+    year: z.coerce
+        .number()
+        .int('Year must be a whole number')
+        .min(1900, 'Year must be 1900 or newer')
+        .max(currentYear, `Year cannot be later than ${currentYear}`),
 });
-
-// type AddCarInput = z.infer<typeof addCarSchema>;
 
 type AddCarFormInput = z.input<typeof addCarSchema>;
 type AddCarFormOutput = z.output<typeof addCarSchema>;
@@ -39,7 +45,7 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
         defaultValues: {
             brand: '',
             model: '',
-            year: new Date().getFullYear(),
+            year: currentYear,
         },
     });
 
@@ -47,7 +53,7 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
         try {
             await CarService.createCar(data);
 
-            toast.success('Car added successfully! 🚗');
+            toast.success('Vehicle added successfully');
             reset();
             router.refresh();
             onSuccess?.();
@@ -57,62 +63,102 @@ export default function AddCarForm({onSuccess}: AddCarFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5"
+            noValidate
+        >
             <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                    <Label htmlFor="brand">Brand</Label>
+                <FormField
+                    id="brand"
+                    label="Brand"
+                    error={errors.brand?.message}
+                >
                     <Input
                         id="brand"
                         placeholder="Volkswagen"
+                        aria-invalid={Boolean(errors.brand)}
+                        aria-describedby={
+                            errors.brand ? 'brand-error' : undefined
+                        }
                         {...register('brand')}
-                        className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                        className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
                     />
-                    {errors.brand && (
-                        <p className="text-sm text-red-500">
-                            {errors.brand.message}
-                        </p>
-                    )}
-                </div>
+                </FormField>
 
-                <div className="space-y-2">
-                    <Label htmlFor="model">Model</Label>
+                <FormField
+                    id="model"
+                    label="Model"
+                    error={errors.model?.message}
+                >
                     <Input
                         id="model"
-                        placeholder="Golf 6 R"
+                        placeholder="Golf GTD"
+                        aria-invalid={Boolean(errors.model)}
+                        aria-describedby={
+                            errors.model ? 'model-error' : undefined
+                        }
                         {...register('model')}
-                        className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                        className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
                     />
-                    {errors.model && (
-                        <p className="text-sm text-red-500">
-                            {errors.model.message}
-                        </p>
-                    )}
-                </div>
+                </FormField>
             </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="year">Year</Label>
+            <FormField
+                id="year"
+                label="Model year"
+                error={errors.year?.message}
+            >
                 <Input
                     id="year"
                     type="number"
-                    placeholder="2012"
+                    min={1900}
+                    max={currentYear}
+                    inputMode="numeric"
+                    aria-invalid={Boolean(errors.year)}
+                    aria-describedby={errors.year ? 'year-error' : undefined}
                     {...register('year')}
-                    className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
+                    className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
                 />
-                {errors.year && (
-                    <p className="text-sm text-red-500">
-                        {errors.year.message}
-                    </p>
-                )}
-            </div>
+            </FormField>
 
             <Button
                 type="submit"
+                size="lg"
                 disabled={isSubmitting}
-                className="h-11 w-full rounded-xl bg-red-600 font-bold text-white shadow-lg shadow-red-900/25 transition-all duration-200 hover:scale-[1.01] hover:bg-red-500 active:scale-[0.99]"
+                className="w-full font-semibold"
             >
-                {isSubmitting ? 'Adding car...' : 'Add Car'}
+                {isSubmitting ? 'Adding vehicle...' : 'Add vehicle'}
             </Button>
         </form>
+    );
+}
+
+type FormFieldProps = {
+    id: string;
+    label: string;
+    error?: string;
+    children: ReactNode;
+};
+
+function FormField({id, label, error, children}: FormFieldProps) {
+    return (
+        <div className="space-y-2">
+            <Label htmlFor={id} className="text-sm font-medium text-foreground">
+                {label}
+            </Label>
+
+            {children}
+
+            {error ? (
+                <p
+                    id={`${id}-error`}
+                    role="alert"
+                    className="text-sm text-destructive"
+                >
+                    {error}
+                </p>
+            ) : null}
+        </div>
     );
 }
