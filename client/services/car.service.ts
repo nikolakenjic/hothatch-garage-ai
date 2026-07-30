@@ -12,7 +12,9 @@ type CarsResponse = {
 
 type CarDetailsResponse = {
     message: string;
-    data: Car;
+    data: {
+        car: Car;
+    };
 };
 
 type CreateCarResponse = {
@@ -48,7 +50,7 @@ export default class CarService {
             config,
         );
 
-        return response.data;
+        return response.data.car;
     }
 
     static async createCar(

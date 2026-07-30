@@ -1,10 +1,16 @@
 import {cookies} from 'next/headers';
 import Link from 'next/link';
+import {redirect} from 'next/navigation';
+import {ArrowLeft, Plus, Settings2} from 'lucide-react';
+
+import AddModificationForm from '@/app/(dashboard)/garage/_components/forms/AddModificationForm';
+import EditCarForm from '@/app/(dashboard)/garage/_components/forms/EditCarForm';
+import {PageContainer} from '@/components/layout';
+import GlassPanel from '@/components/shared/GlassPanel';
+import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
 import ModificationService from '@/services/modification.service';
-import EditCarForm from '@/app/(dashboard)/garage/_components/forms/EditCarForm';
-import AddModificationForm from '@/app/(dashboard)/garage/_components/forms/AddModificationForm';
-import {redirect} from 'next/navigation';
+
 import CarHeader from './_components/CarHeader';
 import ModificationList from './_components/ModificationList';
 
@@ -15,6 +21,7 @@ type Props = {
 export default async function CarDetailPage({params}: Props) {
     const {id} = await params;
     const cookieStore = await cookies();
+
     const accessToken = cookieStore.get('accessToken')?.value;
 
     if (!accessToken) {
@@ -32,33 +39,31 @@ export default async function CarDetailPage({params}: Props) {
         },
     };
 
-    const car = await CarService.getCarById(id, requestConfig);
-
-    const modifications = await ModificationService.getModifications(
-        id,
-        requestConfig,
-    );
+    const [car, modifications] = await Promise.all([
+        CarService.getCarById(id, requestConfig),
+        ModificationService.getModifications(id, requestConfig),
+    ]);
 
     const totalSpent = modifications.reduce(
-        (sum, mod) => sum + (mod.price ?? 0),
+        (sum, modification) => sum + (modification.price ?? 0),
         0,
     );
 
     return (
-        <main className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-10 text-zinc-950 dark:bg-zinc-950 dark:text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.16),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.10),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.22),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.14),_transparent_35%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.045)_1px,transparent_1px)] bg-[size:44px_44px] opacity-30 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] dark:opacity-20" />
-
-            <section className="relative z-10 mx-auto max-w-5xl">
-                {/* Back button */}
-                <Link
-                    href="/garage"
-                    className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-red-600 dark:hover:text-red-500 transition-colors mb-8"
+        <main className="page-shell">
+            <PageContainer className="space-y-8 py-8 md:py-10">
+                <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="-ml-3 w-fit text-muted-foreground hover:text-foreground"
                 >
-                    ← Back to Garage
-                </Link>
+                    <Link href="/garage">
+                        <ArrowLeft className="size-4" />
+                        Back to garage
+                    </Link>
+                </Button>
 
-                {/* Car Header */}
                 <CarHeader
                     car={car}
                     modifications={modifications}
@@ -66,27 +71,59 @@ export default async function CarDetailPage({params}: Props) {
                     id={id}
                 />
 
-                <div className="mt-8 rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
-                    <h2 className="font-heading text-2xl font-black text-zinc-950 dark:text-white mb-6">
-                        Edit Car
-                    </h2>
-                    <EditCarForm car={car} />
-                </div>
+                <div className="grid gap-8 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]">
+                    <div className="space-y-8">
+                        <ModificationList
+                            modifications={modifications}
+                            totalSpent={totalSpent}
+                        />
 
-                {/* Modifications */}
-                <ModificationList
-                    modifications={modifications}
-                    totalSpent={totalSpent}
-                />
+                        <GlassPanel className="p-6 md:p-8">
+                            <div className="mb-6 flex items-start gap-3">
+                                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50">
+                                    <Plus className="size-5 text-muted-foreground" />
+                                </div>
 
-                {/* Add Modification */}
-                <div className="mt-8 rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
-                    <h2 className="font-heading text-2xl font-black text-zinc-950 dark:text-white mb-6">
-                        Add Modification
-                    </h2>
-                    <AddModificationForm carId={id} />
+                                <div>
+                                    <h2 className="text-xl font-semibold tracking-tight text-foreground">
+                                        Add modification
+                                    </h2>
+
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        Record a new upgrade and keep your build
+                                        history up to date.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <AddModificationForm carId={id} />
+                        </GlassPanel>
+                    </div>
+
+                    <aside className="space-y-8">
+                        <GlassPanel className="p-6 md:p-8">
+                            <div className="mb-6 flex items-start gap-3">
+                                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50">
+                                    <Settings2 className="size-5 text-muted-foreground" />
+                                </div>
+
+                                <div>
+                                    <h2 className="text-xl font-semibold tracking-tight text-foreground">
+                                        Vehicle details
+                                    </h2>
+
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        Update the basic information associated
+                                        with this vehicle.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <EditCarForm car={car} />
+                        </GlassPanel>
+                    </aside>
                 </div>
-            </section>
+            </PageContainer>
         </main>
     );
 }
