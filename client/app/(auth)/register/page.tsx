@@ -49,21 +49,33 @@ export default function RegisterPage() {
     return (
         <AuthLayout
             hero={{
-                title: 'Build your garage.',
-                highlight: 'Tune your passion.',
+                title: 'Your build deserves',
+                highlight: 'a better workspace.',
                 description:
-                    'Join a community of hot hatch enthusiasts. Add your car, track modifications, and get AI-powered upgrade ideas.',
+                    'Create a structured home for your car, modifications, costs, and future upgrade plans.',
                 features: [
-                    {title: 'AI', description: 'Upgrade help'},
-                    {title: 'OEM+', description: 'Clean builds'},
-                    {title: 'Garage', description: 'Your cars'},
+                    {
+                        title: 'Organized from day one',
+                        description:
+                            'Keep vehicle and build data in one place.',
+                    },
+                    {
+                        title: 'Built around your car',
+                        description:
+                            'Recommendations use your real garage context.',
+                    },
+                    {
+                        title: 'Plan with confidence',
+                        description:
+                            'Review costs and prioritize meaningful upgrades.',
+                    },
                 ],
             }}
             card={{
-                eyebrow: 'Create profile',
+                eyebrow: 'Create your account',
                 title: 'Start your garage',
                 description:
-                    'Register and start building your hot hatch profile.',
+                    'Create an account and add your first car in a few minutes.',
             }}
         >
             <AuthForm
@@ -73,11 +85,11 @@ export default function RegisterPage() {
                 submitLoadingText="Starting garage..."
                 fields={registerFields}
                 secondaryAction={
-                    <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+                    <p className="text-center text-sm text-muted-foreground">
                         Already have an account?{' '}
                         <Link
                             href="/login"
-                            className="font-semibold text-red-600 transition-colors hover:text-red-500 dark:text-red-500 dark:hover:text-red-400"
+                            className="font-semibold text-primary transition-colors hover:text-primary/80"
                         >
                             Login
                         </Link>

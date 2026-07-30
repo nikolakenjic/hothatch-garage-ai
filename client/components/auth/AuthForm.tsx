@@ -42,34 +42,64 @@ export default function AuthForm<T extends FieldValues>({
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {fields.map((field) => (
-                <div key={field.name} className="space-y-2">
-                    <Label htmlFor={field.name}>{field.label}</Label>
-                    <Input
-                        id={field.name}
-                        type={field.type ?? 'text'}
-                        placeholder={field.placeholder}
-                        {...register(field.name)}
-                        className="border-zinc-200 bg-white text-zinc-950 placeholder:text-zinc-400 transition-all duration-200 hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-zinc-600"
-                    />
-                    {getFieldError(field.name) && (
-                        <p className="text-sm text-red-500">
-                            {getFieldError(field.name)}
-                        </p>
-                    )}
-                </div>
-            ))}
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5"
+            noValidate
+        >
+            <div className="space-y-4">
+                {fields.map((field) => {
+                    const errorMessage = getFieldError(field.name);
+
+                    return (
+                        <div key={field.name} className="space-y-2">
+                            <Label
+                                htmlFor={field.name}
+                                className="text-sm font-medium text-foreground"
+                            >
+                                {field.label}
+                            </Label>
+
+                            <Input
+                                id={field.name}
+                                type={field.type ?? 'text'}
+                                placeholder={field.placeholder}
+                                aria-invalid={Boolean(errorMessage)}
+                                aria-describedby={
+                                    errorMessage
+                                        ? `${field.name}-error`
+                                        : undefined
+                                }
+                                {...register(field.name)}
+                                className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
+                            />
+
+                            {errorMessage ? (
+                                <p
+                                    id={`${field.name}-error`}
+                                    role="alert"
+                                    className="text-sm text-destructive"
+                                >
+                                    {errorMessage}
+                                </p>
+                            ) : null}
+                        </div>
+                    );
+                })}
+            </div>
 
             <Button
                 type="submit"
+                size="lg"
                 disabled={isSubmitting}
-                className="h-11 w-full bg-red-600 font-bold text-white shadow-lg shadow-red-900/30 transition-all duration-200 hover:scale-[1.01] hover:bg-red-500 active:scale-[0.99]"
+                className="w-full font-semibold"
             >
                 {isSubmitting ? submitLoadingText : submitText}
             </Button>
 
-            {secondaryAction}
+            {secondaryAction ? (
+                <div className="pt-1">{secondaryAction}</div>
+            ) : null}
         </form>
     );
 }
