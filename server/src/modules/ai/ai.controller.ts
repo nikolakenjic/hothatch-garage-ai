@@ -97,17 +97,15 @@ export const nextUpgrade = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export const buildReview = catchAsync(async (req, res) => {
+export const buildReview = catchAsync(async (req: Request, res: Response) => {
     const carId = req.params.carId as string;
     const userId = getUserId(req);
 
     const recommendation = await buildReviewService(carId, userId, req.body);
 
-    res.status(201).json({
-        status: 'success',
-        data: {
-            recommendation,
-        },
+    res.status(OK).json({
+        message: 'Build review generated successfully',
+        recommendation,
     });
 });
 

@@ -7,11 +7,26 @@ import {
     CostAnalysisInput,
     CostAnalysisResponse,
     Recommendation,
+    RecommendCarInput,
+    RecommendCarResponse,
 } from '@/types/ai';
 import {AxiosRequestConfig} from 'axios';
 
 export default class AiService {
     static readonly ENDPOINT = '/ai';
+
+    static async recommendCar(
+        data: RecommendCarInput,
+        config?: AxiosRequestConfig,
+    ): Promise<Recommendation> {
+        const response = await BaseService.create<RecommendCarResponse>(
+            `${this.ENDPOINT}/recommend`,
+            data,
+            config,
+        );
+
+        return response.recommendation;
+    }
 
     static async buildPlan(
         carId: string,
