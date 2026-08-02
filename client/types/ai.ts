@@ -1,6 +1,24 @@
+export type RecommendationType =
+    | 'next-upgrade'
+    | 'next-upgrade-advisor'
+    | 'build-review'
+    | 'cost-analysis'
+    | 'car-recommendation'
+    | 'build-plan';
+
 export type Recommendation = {
     id: string;
+    type: RecommendationType;
     content: string;
+    createdAt: string;
+    car?: string;
+    input?: Record<string, unknown>;
+};
+
+export type RecommendationsResponse = {
+    message: string;
+    count: number;
+    recommendations: Recommendation[];
 };
 
 export type RecommendCarInput = {

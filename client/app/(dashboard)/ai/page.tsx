@@ -1,4 +1,6 @@
 import {CarFront, History, Sparkles} from 'lucide-react';
+import {cookies} from 'next/headers';
+import AiService from '@/services/ai.service';
 
 import {PageContainer} from '@/components/layout';
 
@@ -33,7 +35,25 @@ const aiFeatures = [
         actionLabel: 'Open garage',
     },
 ];
-export default function AIPage() {
+export default async function AIPage() {
+    const cookieStore = await cookies();
+
+    const cookieHeader = cookieStore
+        .getAll()
+        .map(({name, value}) => `${name}=${value}`)
+        .join('; ');
+
+    const recommendations = await AiService.getRecommendations(
+        'car-recommendation',
+        {
+            headers: {
+                Cookie: cookieHeader,
+            },
+        },
+    );
+
+    const latestRecommendation = recommendations[0];
+
     return (
         <main className="page-shell">
             <PageContainer className="space-y-8 py-8 md:py-10">
@@ -62,7 +82,9 @@ export default function AIPage() {
                 </section>
 
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.6fr)]">
-                    <RecentRecommendation />
+                    <RecentRecommendation
+                        recommendation={latestRecommendation}
+                    />
                     <AITips />
                 </div>
             </PageContainer>

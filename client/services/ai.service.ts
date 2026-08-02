@@ -1,4 +1,6 @@
 import BaseService from '@/lib/api/base.service';
+import type {AxiosRequestConfig} from 'axios';
+
 import {
     BuildPlanInput,
     BuildPlanResponse,
@@ -7,13 +9,27 @@ import {
     CostAnalysisInput,
     CostAnalysisResponse,
     Recommendation,
+    RecommendationsResponse,
     RecommendCarInput,
     RecommendCarResponse,
 } from '@/types/ai';
-import {AxiosRequestConfig} from 'axios';
 
 export default class AiService {
     static readonly ENDPOINT = '/ai';
+
+    static async getRecommendations(
+        type?: string,
+        config?: AxiosRequestConfig,
+    ): Promise<Recommendation[]> {
+        const query = type ? `?type=${encodeURIComponent(type)}` : '';
+
+        const response = await BaseService.get<RecommendationsResponse>(
+            `${this.ENDPOINT}/recommendations${query}`,
+            config,
+        );
+
+        return response.recommendations;
+    }
 
     static async recommendCar(
         data: RecommendCarInput,
