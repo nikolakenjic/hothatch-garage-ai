@@ -60,3 +60,13 @@ export type CostAnalysisResponse = {
     message: string;
     recommendation: Recommendation;
 };
+
+export type NextUpgradeInput = {
+    budget: string;
+    goal: string;
+};
+
+export type NextUpgradeResponse = {
+    message: string;
+    recommendation: Recommendation;
+};

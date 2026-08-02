@@ -8,6 +8,8 @@ import {
     BuildReviewResponse,
     CostAnalysisInput,
     CostAnalysisResponse,
+    NextUpgradeInput,
+    NextUpgradeResponse,
     Recommendation,
     RecommendationsResponse,
     RecommendCarInput,
@@ -79,6 +81,20 @@ export default class AiService {
     ): Promise<Recommendation> {
         const response = await BaseService.create<CostAnalysisResponse>(
             `${this.ENDPOINT}/cost-analysis/${carId}`,
+            data,
+            config,
+        );
+
+        return response.recommendation;
+    }
+
+    static async nextUpgrade(
+        carId: string,
+        data: NextUpgradeInput,
+        config?: AxiosRequestConfig,
+    ): Promise<Recommendation> {
+        const response = await BaseService.create<NextUpgradeResponse>(
+            `${this.ENDPOINT}/next-upgrade/${carId}`,
             data,
             config,
         );

@@ -5,23 +5,26 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {toast} from 'sonner';
 import {z} from 'zod';
-import {LoaderCircle, RotateCcw, SearchCheck, Sparkles} from 'lucide-react';
+import {BrainCircuit, LoaderCircle, RotateCcw, Sparkles} from 'lucide-react';
 
 import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
-import AiService from '@/services/ai.service';
-import {BuildReviewInput, Recommendation} from '@/types/ai';
 
-const buildReviewSchema = z.object({
+import {NextUpgradeInput, Recommendation} from '@/types/ai';
+import AiService from '@/services/ai.service';
+
+const nextUpgradeSchema = z.object({
+    budget: z.string().trim().min(1, 'Budget is required'),
     goal: z.string().trim().min(1, 'Goal is required'),
 });
 
-type BuildReviewFormProps = {
+type NextUpgradeFormProps = {
     carId: string;
 };
 
-export default function BuildReviewForm({carId}: BuildReviewFormProps) {
+export default function NextUpgradeForm({carId}: NextUpgradeFormProps) {
     const [recommendation, setRecommendation] = useState<Recommendation | null>(
         null,
     );
@@ -31,19 +34,20 @@ export default function BuildReviewForm({carId}: BuildReviewFormProps) {
         handleSubmit,
         reset,
         formState: {errors, isSubmitting},
-    } = useForm<BuildReviewInput>({
-        resolver: zodResolver(buildReviewSchema),
+    } = useForm<NextUpgradeInput>({
+        resolver: zodResolver(nextUpgradeSchema),
         defaultValues: {
+            budget: '',
             goal: '',
         },
     });
 
-    const onSubmit = async (data: BuildReviewInput) => {
+    const onSubmit = async (data: NextUpgradeInput) => {
         try {
-            const result = await AiService.buildReview(carId, data);
+            const result = await AiService.nextUpgrade(carId, data);
 
             setRecommendation(result);
-            toast.success('Build review generated successfully');
+            toast.success('Next upgrade recommendation generated');
         } catch (error) {
             toast.error(getErrorMessage(error));
         }
@@ -59,19 +63,19 @@ export default function BuildReviewForm({carId}: BuildReviewFormProps) {
             <div>
                 <div className="flex items-start gap-3">
                     <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <SearchCheck className="size-5" aria-hidden="true" />
+                        <BrainCircuit className="size-5" aria-hidden="true" />
                     </div>
 
                     <div>
-                        <p className="eyebrow">Review result</p>
+                        <p className="eyebrow">Advisor result</p>
 
                         <h2 className="section-title mt-2">
-                            Your build assessment
+                            Recommended next upgrades
                         </h2>
 
                         <p className="body-text mt-2">
-                            A complete review of the current setup, including
-                            strengths, weaknesses, and recommended next steps.
+                            Prioritized suggestions based on the current vehicle
+                            setup and your stated goal.
                         </p>
                     </div>
                 </div>
@@ -89,7 +93,7 @@ export default function BuildReviewForm({carId}: BuildReviewFormProps) {
                     onClick={handleReset}
                 >
                     <RotateCcw className="size-4" aria-hidden="true" />
-                    Review another goal
+                    Generate another recommendation
                 </Button>
             </div>
         );
@@ -102,30 +106,47 @@ export default function BuildReviewForm({carId}: BuildReviewFormProps) {
             noValidate
         >
             <div>
-                <p className="eyebrow">Review input</p>
+                <p className="eyebrow">Advisor input</p>
 
                 <h2 className="section-title mt-3">
-                    Describe the intended build
+                    Define your next priority
                 </h2>
 
                 <p className="body-text mt-2">
-                    Explain what the vehicle should achieve so the advisor can
-                    judge whether the current build supports that goal.
+                    Enter your available budget and describe what you want to
+                    improve next.
                 </p>
             </div>
 
             <FormField
-                id="build-review-goal"
-                label="Build goal"
+                id="next-upgrade-budget"
+                label="Available budget"
+                error={errors.budget?.message}
+            >
+                <Input
+                    id="next-upgrade-budget"
+                    placeholder="€1,000"
+                    aria-invalid={Boolean(errors.budget)}
+                    aria-describedby={
+                        errors.budget ? 'next-upgrade-budget-error' : undefined
+                    }
+                    {...register('budget')}
+                    className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
+                />
+            </FormField>
+
+            <FormField
+                id="next-upgrade-goal"
+                label="Improvement goal"
                 error={errors.goal?.message}
             >
                 <textarea
-                    id="build-review-goal"
-                    rows={7}
-                    placeholder="A balanced fast-road build with stronger handling and braking, while maintaining reliability and daily comfort."
+                    id="next-upgrade-goal"
+                    rows={6}
+                    placeholder="Improve steering response and cornering confidence without making the daily ride excessively harsh."
                     aria-invalid={Boolean(errors.goal)}
                     aria-describedby={
-                        errors.goal ? 'build-review-goal-error' : undefined
+                        errors.goal ? 'next-upgrade-goal-error' : undefined
                     }
                     {...register('goal')}
                     className="flex w-full resize-y rounded-lg border border-border-subtle bg-background/70 px-3.5 py-3 text-sm shadow-xs outline-none transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-50"
@@ -144,12 +165,12 @@ export default function BuildReviewForm({carId}: BuildReviewFormProps) {
                             className="size-4 animate-spin"
                             aria-hidden="true"
                         />
-                        Reviewing build...
+                        Analyzing next upgrade...
                     </>
                 ) : (
                     <>
                         <Sparkles className="size-4" aria-hidden="true" />
-                        Review current build
+                        Recommend next upgrade
                     </>
                 )}
             </Button>

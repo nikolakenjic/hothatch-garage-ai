@@ -1,14 +1,26 @@
 import {cookies} from 'next/headers';
-import BuildPlanForm from '@/app/(dashboard)/garage/[id]/build-plan/_components/BuildPlanForm';
-import CarService from '@/services/car.service';
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
+import {
+    ArrowLeft,
+    BrainCircuit,
+    CircleDollarSign,
+    ListChecks,
+    Target,
+} from 'lucide-react';
 
-type Props = {
+import {PageContainer} from '@/components/layout';
+import GlassPanel from '@/components/shared/GlassPanel';
+import {Button} from '@/components/ui/button';
+import CarService from '@/services/car.service';
+
+import BuildPlanForm from './_components/BuildPlanForm';
+
+type BuildPlanPageProps = {
     params: Promise<{id: string}>;
 };
 
-export default async function BuildPlanPage({params}: Props) {
+export default async function BuildPlanPage({params}: BuildPlanPageProps) {
     const {id} = await params;
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('accessToken')?.value;
@@ -28,36 +40,161 @@ export default async function BuildPlanPage({params}: Props) {
         },
     });
 
+    const vehicleName = `${car.brand} ${car.model}`;
+
     return (
-        <main className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-10 text-zinc-950 dark:bg-zinc-950 dark:text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.16),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.10),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.22),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.14),_transparent_35%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.045)_1px,transparent_1px)] bg-[size:44px_44px] opacity-30 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] dark:opacity-20" />
-
-            <section className="relative z-10 mx-auto max-w-3xl">
-                <Link
-                    href={`/garage/${id}`}
-                    className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-red-600 dark:hover:text-red-500 transition-colors mb-8"
+        <main className="page-shell">
+            <PageContainer className="space-y-8 py-8 md:py-10">
+                <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="-ml-3 w-fit text-muted-foreground hover:text-foreground"
                 >
-                    ← Back to {car.brand} {car.model}
-                </Link>
+                    <Link href={`/garage/${id}`}>
+                        <ArrowLeft className="size-4" aria-hidden="true" />
+                        Back to {vehicleName}
+                    </Link>
+                </Button>
 
-                <header className="rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70 mb-8">
-                    <p className="mb-2 text-sm font-semibold uppercase tracking-[0.35em] text-red-600 dark:text-red-500">
-                        AI Powered
-                    </p>
-                    <h1 className="font-heading text-4xl font-black tracking-tight text-zinc-950 dark:text-white">
-                        Build Planner 🤖
-                    </h1>
-                    <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-                        Get a personalized mod plan for your {car.brand}{' '}
-                        {car.model} — tailored to your budget and goals.
-                    </p>
-                </header>
+                <GlassPanel variant="elevated" className="overflow-hidden">
+                    <div className="grid gap-8 p-6 md:p-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)] lg:items-end">
+                        <div className="max-w-3xl">
+                            <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                <ListChecks
+                                    className="size-6"
+                                    aria-hidden="true"
+                                />
+                            </div>
 
-                <div className="rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
-                    <BuildPlanForm carId={id} />
+                            <p className="eyebrow mt-6">
+                                Vehicle AI · Build planner
+                            </p>
+
+                            <h1 className="page-title mt-3">
+                                Create a focused upgrade roadmap
+                            </h1>
+
+                            <p className="body-large mt-4 max-w-2xl">
+                                Generate a prioritized build plan for your{' '}
+                                {vehicleName}, based on your budget, goals,
+                                current specifications, and modification
+                                history.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3">
+                            <PlannerStat
+                                icon={
+                                    <CircleDollarSign
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                label="Budget"
+                                value="Defined by you"
+                            />
+
+                            <PlannerStat
+                                icon={
+                                    <Target
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                label="Goal"
+                                value="Personalized"
+                            />
+
+                            <PlannerStat
+                                icon={
+                                    <BrainCircuit
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                label="Context"
+                                value="Vehicle-aware"
+                            />
+                        </div>
+                    </div>
+                </GlassPanel>
+
+                <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+                    <GlassPanel variant="solid" padding="lg">
+                        <BuildPlanForm carId={id} />
+                    </GlassPanel>
+
+                    <GlassPanel variant="solid" padding="lg" className="h-fit">
+                        <p className="eyebrow">How it works</p>
+
+                        <h2 className="section-title mt-3">
+                            What the planner considers
+                        </h2>
+
+                        <p className="body-text mt-3">
+                            The recommendation combines your stated goal with
+                            the vehicle and modification data already stored in
+                            your garage.
+                        </p>
+
+                        <div className="mt-6 space-y-4">
+                            <PlannerGuidance
+                                title="Current build"
+                                description="Installed modifications are considered so the planner does not repeat completed upgrades."
+                            />
+
+                            <PlannerGuidance
+                                title="Upgrade order"
+                                description="The result prioritizes sensible sequencing, including reliability and safety dependencies."
+                            />
+
+                            <PlannerGuidance
+                                title="Budget alignment"
+                                description="Recommendations are organized around the budget you provide rather than unlimited spending."
+                            />
+                        </div>
+                    </GlassPanel>
                 </div>
-            </section>
+            </PageContainer>
         </main>
+    );
+}
+
+type PlannerStatProps = {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+};
+
+function PlannerStat({icon, label, value}: PlannerStatProps) {
+    return (
+        <div className="rounded-xl border border-border-subtle bg-surface px-3 py-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+                {icon}
+                <span className="caption">{label}</span>
+            </div>
+
+            <p className="mt-2 text-sm font-semibold text-foreground">
+                {value}
+            </p>
+        </div>
+    );
+}
+
+type PlannerGuidanceProps = {
+    title: string;
+    description: string;
+};
+
+function PlannerGuidance({title, description}: PlannerGuidanceProps) {
+    return (
+        <div className="rounded-xl border border-border-subtle bg-surface-muted/40 p-4">
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {description}
+            </p>
+        </div>
     );
 }

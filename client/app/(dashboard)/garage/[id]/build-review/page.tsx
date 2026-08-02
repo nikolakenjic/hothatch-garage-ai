@@ -1,14 +1,21 @@
+import {ReactNode} from 'react';
 import {cookies} from 'next/headers';
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
+import {ArrowLeft, SearchCheck, ShieldCheck, Target} from 'lucide-react';
+
+import {PageContainer} from '@/components/layout';
+import GlassPanel from '@/components/shared/GlassPanel';
+import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
+
 import BuildReviewForm from './_components/BuildReviewForm';
 
-type Props = {
+type BuildReviewPageProps = {
     params: Promise<{id: string}>;
 };
 
-export default async function BuildReviewPage({params}: Props) {
+export default async function BuildReviewPage({params}: BuildReviewPageProps) {
     const {id} = await params;
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('accessToken')?.value;
@@ -28,37 +35,160 @@ export default async function BuildReviewPage({params}: Props) {
         },
     });
 
+    const vehicleName = `${car.brand} ${car.model}`;
+
     return (
-        <main className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-10 text-zinc-950 dark:bg-zinc-950 dark:text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.16),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.10),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.22),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.14),_transparent_35%)]" />
-
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.045)_1px,transparent_1px)] bg-[size:44px_44px] opacity-30 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] dark:opacity-20" />
-
-            <section className="relative z-10 mx-auto max-w-3xl">
-                <Link
-                    href={`/garage/${id}`}
-                    className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-red-600 dark:hover:text-red-500"
+        <main className="page-shell">
+            <PageContainer className="space-y-8 py-8 md:py-10">
+                <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="-ml-3 w-fit text-muted-foreground hover:text-foreground"
                 >
-                    ← Back to {car.brand} {car.model}
-                </Link>
+                    <Link href={`/garage/${id}`}>
+                        <ArrowLeft className="size-4" aria-hidden="true" />
+                        Back to {vehicleName}
+                    </Link>
+                </Button>
 
-                <header className="mb-8 rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70">
-                    <p className="mb-2 text-sm font-semibold uppercase tracking-[0.35em] text-red-600 dark:text-red-500">
-                        AI Powered
-                    </p>
+                <GlassPanel variant="elevated" className="overflow-hidden">
+                    <div className="grid gap-8 p-6 md:p-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)] lg:items-end">
+                        <div className="max-w-3xl">
+                            <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                <SearchCheck
+                                    className="size-6"
+                                    aria-hidden="true"
+                                />
+                            </div>
 
-                    <h1 className="font-heading text-4xl font-black tracking-tight text-zinc-950 dark:text-white">
-                        Build Review 🤖
-                    </h1>
+                            <p className="eyebrow mt-6">
+                                Vehicle AI · Build review
+                            </p>
 
-                    <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-                        Review the balance, strengths, weaknesses, and safety of
-                        your {car.brand} {car.model} build.
-                    </p>
-                </header>
+                            <h1 className="page-title mt-3">
+                                Review the balance of your current build
+                            </h1>
 
-                <BuildReviewForm carId={id} />
-            </section>
+                            <p className="body-large mt-4 max-w-2xl">
+                                Analyze the strengths, weaknesses, missing
+                                upgrades, and safety of your {vehicleName} based
+                                on its current specifications and modification
+                                history.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3">
+                            <ReviewStat
+                                icon={
+                                    <SearchCheck
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                label="Review"
+                                value="Complete"
+                            />
+
+                            <ReviewStat
+                                icon={
+                                    <Target
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                label="Goal"
+                                value="Considered"
+                            />
+
+                            <ReviewStat
+                                icon={
+                                    <ShieldCheck
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                label="Safety"
+                                value="Included"
+                            />
+                        </div>
+                    </div>
+                </GlassPanel>
+
+                <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+                    <GlassPanel variant="solid" padding="lg">
+                        <BuildReviewForm carId={id} />
+                    </GlassPanel>
+
+                    <GlassPanel variant="solid" padding="lg" className="h-fit">
+                        <p className="eyebrow">Review criteria</p>
+
+                        <h2 className="section-title mt-3">
+                            What the advisor evaluates
+                        </h2>
+
+                        <p className="body-text mt-3">
+                            The review considers the complete vehicle setup,
+                            rather than judging one modification in isolation.
+                        </p>
+
+                        <div className="mt-6 space-y-4">
+                            <ReviewGuidance
+                                title="Build balance"
+                                description="The advisor checks whether power, handling, braking, and supporting upgrades work together."
+                            />
+
+                            <ReviewGuidance
+                                title="Missing foundations"
+                                description="Important reliability, safety, and chassis upgrades can be identified before further performance changes."
+                            />
+
+                            <ReviewGuidance
+                                title="Practical next steps"
+                                description="The result includes a prioritized list of realistic improvements for a daily-driven hot hatch."
+                            />
+                        </div>
+                    </GlassPanel>
+                </div>
+            </PageContainer>
         </main>
+    );
+}
+
+type ReviewStatProps = {
+    icon: ReactNode;
+    label: string;
+    value: string;
+};
+
+function ReviewStat({icon, label, value}: ReviewStatProps) {
+    return (
+        <div className="rounded-xl border border-border-subtle bg-surface px-3 py-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+                {icon}
+                <span className="caption">{label}</span>
+            </div>
+
+            <p className="mt-2 text-sm font-semibold text-foreground">
+                {value}
+            </p>
+        </div>
+    );
+}
+
+type ReviewGuidanceProps = {
+    title: string;
+    description: string;
+};
+
+function ReviewGuidance({title, description}: ReviewGuidanceProps) {
+    return (
+        <div className="rounded-xl border border-border-subtle bg-surface-muted/40 p-4">
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {description}
+            </p>
+        </div>
     );
 }
