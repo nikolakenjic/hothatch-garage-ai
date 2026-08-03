@@ -14,6 +14,7 @@ type AuthContextType = {
     login: (data: LoginInput) => Promise<void>;
     register: (data: RegisterInput) => Promise<void>;
     logout: () => Promise<void>;
+    updateUser: (user: AuthUser) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +29,7 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         const restoreUser = async () => {
             try {
                 const response = await AuthService.getMe();
-                setUser(response.data.user);
+                setUser(response.user);
             } catch (error) {
                 console.error('Failed to restore authenticated user:', error);
                 setUser(null);
@@ -54,6 +55,10 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         router.replace('/login');
     };
 
+    const updateUser = (updatedUser: AuthUser) => {
+        setUser(updatedUser);
+    };
+
     const logout = async () => {
         try {
             await AuthService.logout();
@@ -65,7 +70,7 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
 
     return (
         <AuthContext.Provider
-            value={{user, isLoading, login, register, logout}}
+            value={{user, isLoading, login, register, updateUser, logout}}
         >
             {children}
         </AuthContext.Provider>

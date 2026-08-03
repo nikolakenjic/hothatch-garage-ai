@@ -13,6 +13,7 @@ import {
 import {CREATED, OK} from '../../constants/http';
 import {catchAsync} from '../../utils/catchAsync';
 import {getUserId} from '../../utils/getUser';
+import {toUserResponse} from '../user/user.mapper';
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;
@@ -22,10 +23,7 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     res.status(CREATED).json({
         message: 'User created',
         verificationToken,
-        user: {
-            id: user._id.toString(),
-            email: user.email,
-        },
+        user: toUserResponse(user),
     });
 });
 
@@ -46,10 +44,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 
     res.status(OK).json({
         message: 'Login successful',
-        user: {
-            id: user._id.toString(),
-            email: user.email,
-        },
+        user: toUserResponse(user),
     });
 });
 
@@ -72,10 +67,8 @@ export const getMe = catchAsync(async (req: Request, res: Response) => {
     const user = await getCurrentUserService(userId);
 
     res.status(OK).json({
-        status: 'success',
-        data: {
-            user,
-        },
+        message: 'Current user fetched successfully',
+        user: toUserResponse(user),
     });
 });
 
@@ -107,11 +100,12 @@ export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 
     res.status(OK).json({
         message: 'Email verified successfully',
-        user: {
-            id: user._id.toString(),
-            email: user.email,
-            isEmailVerified: user.isEmailVerified,
-        },
+        user: toUserResponse(user),
+        // user: {
+        //     id: user._id.toString(),
+        //     email: user.email,
+        //     isEmailVerified: user.isEmailVerified,
+        // },
     });
 });
 

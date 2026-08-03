@@ -7,8 +7,10 @@ import {
     getPublicProfileService,
     getUserStatsService,
     updateProfileService,
+    updateSettingsService,
 } from './user.service';
 import {getUserId} from '../../utils/getUser';
+import {toUserResponse} from './user.mapper';
 
 export const updateProfile = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
@@ -16,10 +18,8 @@ export const updateProfile = catchAsync(async (req: Request, res: Response) => {
     const user = await updateProfileService(userId, req.body);
 
     res.status(OK).json({
-        status: 'success',
-        data: {
-            user,
-        },
+        message: 'Profile updated successfully',
+        user: toUserResponse(user),
     });
 });
 
@@ -68,6 +68,19 @@ export const getPublicProfile = catchAsync(
             data: {
                 profile,
             },
+        });
+    },
+);
+
+export const updateSettings = catchAsync(
+    async (req: Request, res: Response) => {
+        const userId = getUserId(req);
+
+        const user = await updateSettingsService(userId, req.body);
+
+        res.status(OK).json({
+            message: 'Settings updated successfully',
+            user: toUserResponse(user),
         });
     },
 );

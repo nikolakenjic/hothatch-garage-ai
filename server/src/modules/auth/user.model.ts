@@ -21,6 +21,8 @@ export interface IUser extends Document {
         publicProfile: boolean;
         publicGarage: boolean;
     };
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>(

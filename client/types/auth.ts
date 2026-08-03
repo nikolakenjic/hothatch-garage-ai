@@ -1,7 +1,6 @@
-export type AuthUser = {
-    id: string;
-    email: string;
-};
+import {User} from '@/types/user';
+
+export type AuthUser = User;
 
 export type LoginResponse = {
     message: string;
@@ -15,10 +14,8 @@ export type RegisterResponse = {
 };
 
 export type MeResponse = {
-    status: string;
-    data: {
-        user: AuthUser;
-    };
+    message: string;
+    user: AuthUser;
 };
 
 export type LogoutResponse = {

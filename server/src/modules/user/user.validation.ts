@@ -34,3 +34,26 @@ export const publicProfileSchema = z.object({
         username: z.string().min(3).max(30),
     }),
 });
+
+export const updateSettingsSchema = z
+    .object({
+        preferences: z
+            .object({
+                theme: z.enum(['light', 'dark', 'system']).optional(),
+                emailNotifications: z.boolean().optional(),
+            })
+            .optional(),
+
+        privacy: z
+            .object({
+                publicProfile: z.boolean().optional(),
+                publicGarage: z.boolean().optional(),
+            })
+            .optional(),
+    })
+    .refine(
+        (data) => data.preferences !== undefined || data.privacy !== undefined,
+        {
+            message: 'At least one settings field is required',
+        },
+    );

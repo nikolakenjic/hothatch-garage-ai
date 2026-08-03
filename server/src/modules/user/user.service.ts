@@ -18,6 +18,17 @@ type ChangePasswordInput = {
     newPassword: string;
 };
 
+type UpdateSettingsInput = {
+    preferences?: {
+        theme?: 'light' | 'dark' | 'system';
+        emailNotifications?: boolean;
+    };
+    privacy?: {
+        publicProfile?: boolean;
+        publicGarage?: boolean;
+    };
+};
+
 export const updateProfileService = async (
     userId: string,
     input: UpdateProfileInput,
@@ -76,6 +87,8 @@ export const changePasswordService = async (
     user.password = await bcrypt.hash(input.newPassword, 10);
 
     await user.save();
+
+    await Session.deleteMany({user: userId});
 };
 
 export const deleteAccountService = async (userId: string) => {
@@ -119,6 +132,47 @@ export const getPublicProfileService = async (username: string) => {
 
     if (!user) {
         throw new AppError('Profile not found', 404);
+    }
+
+    return user;
+};
+
+export const updateSettingsService = async (
+    userId: string,
+    input: UpdateSettingsInput,
+) => {
+    const update: Record<string, unknown> = {};
+
+    if (input.preferences?.theme !== undefined) {
+        update['preferences.theme'] = input.preferences.theme;
+    }
+
+    if (input.preferences?.emailNotifications !== undefined) {
+        update['preferences.emailNotifications'] =
+            input.preferences.emailNotifications;
+    }
+
+    if (input.privacy?.publicProfile !== undefined) {
+        update['privacy.publicProfile'] = input.privacy.publicProfile;
+    }
+
+    if (input.privacy?.publicGarage !== undefined) {
+        update['privacy.publicGarage'] = input.privacy.publicGarage;
+    }
+
+    const user = await User.findByIdAndUpdate(
+        userId,
+        {$set: update},
+        {
+            new: true,
+            runValidators: true,
+        },
+    ).select(
+        '-password -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires -__v',
+    );
+
+    if (!user) {
+        throw new AppError('User not found', 404);
     }
 
     return user;

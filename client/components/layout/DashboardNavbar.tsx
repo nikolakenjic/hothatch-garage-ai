@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import {useRouter} from 'next/navigation';
 import {usePathname} from 'next/navigation';
 import {useTheme} from 'next-themes';
 import {
@@ -12,6 +13,7 @@ import {
     Moon,
     Sun,
     UserRound,
+    Settings,
 } from 'lucide-react';
 
 import {Button} from '@/components/ui/button';
@@ -39,6 +41,7 @@ const navigationItems = [
 
 export default function DashboardNavbar() {
     const pathname = usePathname();
+    const router = useRouter();
     const {theme, setTheme} = useTheme();
     const {user, logout} = useAuth();
 
@@ -130,6 +133,16 @@ export default function DashboardNavbar() {
                                     {user.email}
                                 </p>
                             </div>
+
+                            <div className="my-1 h-px bg-border" />
+
+                            <DropdownMenuItem
+                                onClick={() => router.push('/settings')}
+                                className="gap-2"
+                            >
+                                <Settings className="size-4" />
+                                Settings
+                            </DropdownMenuItem>
 
                             <div className="my-1 h-px bg-border" />
 
