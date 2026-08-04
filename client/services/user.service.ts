@@ -1,7 +1,7 @@
 import BaseService from '@/lib/api/base.service';
 import {
     ChangePasswordInput,
-    PublicProfile,
+    PublicProfileResponse,
     UpdateProfileInput,
     UpdateSettingsInput,
     User,
@@ -18,15 +18,16 @@ export type UserStatsResponse = {
     data: UserStats;
 };
 
-export type PublicProfileResponse = {
-    status: string;
-    data: {
-        profile: PublicProfile;
-    };
-};
-
 export default class UserService {
     static readonly ENDPOINT = '/users';
+
+    static async getPublicProfile(
+        username: string,
+    ): Promise<PublicProfileResponse> {
+        return BaseService.get<PublicProfileResponse>(
+            `${this.ENDPOINT}/${encodeURIComponent(username)}`,
+        );
+    }
 
     static async updateProfile(data: UpdateProfileInput): Promise<User> {
         const response = await BaseService.update<UserResponse>(
@@ -60,13 +61,5 @@ export default class UserService {
         );
 
         return response.data;
-    }
-
-    static async getPublicProfile(username: string): Promise<PublicProfile> {
-        const response = await BaseService.get<PublicProfileResponse>(
-            `${this.ENDPOINT}/${username}`,
-        );
-
-        return response.data.profile;
     }
 }

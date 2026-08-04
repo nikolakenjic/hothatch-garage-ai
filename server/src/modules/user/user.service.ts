@@ -128,13 +128,73 @@ export const getPublicProfileService = async (username: string) => {
     const user = await User.findOne({
         username: username.toLowerCase(),
         'privacy.publicProfile': true,
-    }).select('username displayName bio avatarUrl createdAt');
+    }).select(
+        'username displayName bio avatarUrl createdAt privacy.publicGarage',
+    );
 
-    if (!user) {
+    if (!user || !user.username) {
         throw new AppError('Profile not found', 404);
     }
 
-    return user;
+    const publicGarage = user.privacy?.publicGarage ?? false;
+
+    const profile = {
+        id: user._id.toString(),
+        username: user.username,
+        displayName: user.displayName,
+        bio: user.bio,
+        avatarUrl: user.avatarUrl,
+        createdAt: user.createdAt,
+        publicGarage,
+    };
+
+    if (!publicGarage) {
+        return {
+            profile,
+            stats: null,
+            cars: [],
+        };
+    }
+
+    const cars = await Car.find({user: user._id})
+        .select(
+            'brand model year nickname fuelType horsepower torque transmission drivetrain createdAt',
+        )
+        .sort({createdAt: -1})
+        .lean();
+
+    const carIds = cars.map((car) => car._id);
+
+    const modifications = await Modification.find({
+        car: {$in: carIds},
+    }).select('car cost');
+
+    const totalMoneySpent = modifications.reduce(
+        (sum, modification) => sum + (modification.cost ?? 0),
+        0,
+    );
+
+    return {
+        profile,
+        stats: {
+            totalCars: cars.length,
+            totalModifications: modifications.length,
+            totalMoneySpent,
+        },
+        cars: cars.map((car) => ({
+            id: car._id.toString(),
+            brand: car.brand,
+            model: car.model,
+            year: car.year,
+            nickname: car.nickname,
+            fuelType: car.fuelType,
+            horsepower: car.horsepower,
+            torque: car.torque,
+            transmission: car.transmission,
+            drivetrain: car.drivetrain,
+            createdAt: car.createdAt,
+        })),
+    };
 };
 
 export const updateSettingsService = async (

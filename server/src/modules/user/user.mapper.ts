@@ -1,5 +1,15 @@
 import {IUser} from '../auth/user.model';
 
+type PublicProfileMapperInput = {
+    id: string;
+    username: string;
+    displayName?: string;
+    bio?: string;
+    avatarUrl?: string;
+    createdAt: Date;
+    publicGarage: boolean;
+};
+
 export const toUserResponse = (user: IUser) => ({
     id: user._id.toString(),
     email: user.email,
@@ -18,4 +28,22 @@ export const toUserResponse = (user: IUser) => ({
     },
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+});
+
+export const toPublicProfileResponse = ({
+    id,
+    username,
+    displayName,
+    bio,
+    avatarUrl,
+    createdAt,
+    publicGarage,
+}: PublicProfileMapperInput) => ({
+    id,
+    username,
+    displayName,
+    bio,
+    avatarUrl,
+    createdAt,
+    publicGarage,
 });

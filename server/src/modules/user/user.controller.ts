@@ -61,13 +61,13 @@ export const getPublicProfile = catchAsync(
     async (req: Request, res: Response) => {
         const username = req.params.username as string;
 
-        const profile = await getPublicProfileService(username);
+        const result = await getPublicProfileService(username);
 
         res.status(OK).json({
-            status: 'success',
-            data: {
-                profile,
-            },
+            message: 'Public profile fetched successfully',
+            profile: result.profile,
+            stats: result.stats,
+            cars: result.cars,
         });
     },
 );

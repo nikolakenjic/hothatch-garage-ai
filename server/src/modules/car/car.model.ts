@@ -15,6 +15,8 @@ export interface ICar {
     torque?: number;
     transmission?: Transmission;
     drivetrain?: Drivetrain;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const carSchema = new Schema<ICar>(
@@ -64,6 +66,14 @@ const carSchema = new Schema<ICar>(
         drivetrain: {
             type: String,
             enum: ['fwd', 'rwd', 'awd'],
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now,
         },
     },
     {

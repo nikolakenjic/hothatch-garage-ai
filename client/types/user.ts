@@ -54,4 +54,32 @@ export type PublicProfile = {
     bio?: string;
     avatarUrl?: string;
     createdAt: string;
+    publicGarage: boolean;
+};
+
+export type PublicCar = {
+    id: string;
+    brand: string;
+    model: string;
+    year: number;
+    nickname?: string;
+    fuelType?: string;
+    horsepower?: number;
+    torque?: number;
+    transmission?: string;
+    drivetrain?: string;
+    createdAt: string;
+};
+
+export type PublicProfileStats = {
+    totalCars: number;
+    totalModifications: number;
+    totalMoneySpent: number;
+};
+
+export type PublicProfileResponse = {
+    message: string;
+    profile: PublicProfile;
+    stats: PublicProfileStats | null;
+    cars: PublicCar[];
 };
