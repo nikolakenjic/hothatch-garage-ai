@@ -30,9 +30,10 @@ export const changePasswordSchema = z.object({
 });
 
 export const publicProfileSchema = z.object({
-    params: z.object({
-        username: z.string().min(3).max(30),
-    }),
+    username: z
+        .string()
+        .min(3, 'Username must be at least 3 characters')
+        .max(30, 'Username must be at most 30 characters'),
 });
 
 export const updateSettingsSchema = z

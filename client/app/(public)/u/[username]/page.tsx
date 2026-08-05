@@ -16,7 +16,16 @@ type Props = {
 export default async function PublicProfilePage({params}: Props) {
     const {username} = await params;
 
-    const data = await UserService.getPublicProfile(username).catch(() => null);
+    const data = await UserService.getPublicProfile(username).catch((error) => {
+        console.error(
+            'PUBLIC PROFILE ERROR:',
+            error?.response?.status,
+            error?.response?.data,
+            error,
+        );
+
+        return null;
+    });
 
     if (!data) {
         notFound();

@@ -43,6 +43,10 @@ router.delete('/me', protect, deleteAccount);
 
 router.get('/me/stats', protect, getUserStats);
 
-router.get('/:username', validate(publicProfileSchema), getPublicProfile);
+router.get(
+    '/:username',
+    validate(publicProfileSchema, 'params'),
+    getPublicProfile,
+);
 
 export default router;

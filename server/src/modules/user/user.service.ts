@@ -125,12 +125,19 @@ export const getUserStatsService = async (userId: string) => {
 };
 
 export const getPublicProfileService = async (username: string) => {
+    console.log(username);
+
     const user = await User.findOne({
         username: username.toLowerCase(),
-        'privacy.publicProfile': true,
-    }).select(
-        'username displayName bio avatarUrl createdAt privacy.publicGarage',
-    );
+    });
+
+    console.log(user);
+    // const user = await User.findOne({
+    //     username: username.toLowerCase(),
+    //     'privacy.publicProfile': true,
+    // }).select(
+    //     'username displayName bio avatarUrl createdAt privacy.publicGarage',
+    // );
 
     if (!user || !user.username) {
         throw new AppError('Profile not found', 404);
