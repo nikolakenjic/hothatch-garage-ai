@@ -1,4 +1,5 @@
 import jwt, {SignOptions} from 'jsonwebtoken';
+import crypto from 'crypto';
 import {env} from '../config/env';
 
 // Later we should make stricter ENV validation, but for now let's leave like this
@@ -22,4 +23,12 @@ export const verifyRefreshToken = (token: string) => {
     return jwt.verify(token, env.JWT_REFRESH_SECRET) as unknown as {
         userId: string;
     };
+};
+
+export const generateToken = (): string => {
+    return crypto.randomBytes(32).toString('hex');
+};
+
+export const hashToken = (token: string): string => {
+    return crypto.createHash('sha256').update(token).digest('hex');
 };

@@ -9,6 +9,9 @@ const requiredEnv = [
     'JWT_REFRESH_SECRET',
     'JWT_REFRESH_EXPIRES_IN',
     'GROQ_API_KEY',
+    'RESEND_API_KEY',
+    'CLIENT_URL',
+    'EMAIL_FROM',
 ];
 
 for (const variable of requiredEnv) {
@@ -25,4 +28,7 @@ export const env = {
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
     JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN!,
     GROQ_API_KEY: process.env.GROQ_API_KEY!,
+    RESEND_API_KEY: process.env.RESEND_API_KEY!,
+    CLIENT_URL: process.env.CLIENT_URL!,
+    EMAIL_FROM: process.env.EMAIL_FROM!,
 };
