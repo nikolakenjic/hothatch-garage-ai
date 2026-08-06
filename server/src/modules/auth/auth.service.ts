@@ -5,11 +5,17 @@ import {AppError} from '../../utils/AppError';
 import {User} from './user.model';
 import {Session} from './session.model';
 import {
+    generateToken,
+    hashToken,
     signAccessToken,
     signRefreshToken,
     verifyRefreshToken,
 } from '../../utils/token';
 import crypto from 'crypto';
+import {
+    sendPasswordResetEmail,
+    sendVerificationEmail,
+} from '../../utils/email/email.service';
 
 export const registerService = async (email: string, password: string) => {
     const existingUser = await User.findOne({email});
@@ -17,22 +23,23 @@ export const registerService = async (email: string, password: string) => {
     if (existingUser) {
         throw new AppError('User already exists', 400);
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const verificationToken = crypto.randomUUID();
+    const verificationToken = generateToken();
+    const hashedVerificationToken = hashToken(verificationToken);
 
     const user = await User.create({
         email,
         password: hashedPassword,
         isEmailVerified: false,
-        emailVerificationToken: verificationToken,
+        emailVerificationToken: hashedVerificationToken,
         emailVerificationExpires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h
     });
 
-    return {
-        user,
-        verificationToken,
-    };
+    await sendVerificationEmail(user.email, verificationToken);
+
+    return {user};
 };
 
 export const loginService = async (email: string, password: string) => {
@@ -103,8 +110,10 @@ export const logoutService = async (refreshToken?: string) => {
 };
 
 export const verifyEmailService = async (token: string) => {
+    const hashedToken = hashToken(token);
+
     const user = await User.findOne({
-        emailVerificationToken: token,
+        emailVerificationToken: hashedToken,
         emailVerificationExpires: {$gt: new Date()},
     });
 
@@ -125,46 +134,46 @@ export const resendVerificationService = async (email: string) => {
     const user = await User.findOne({email});
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        return;
     }
 
     if (user.isEmailVerified) {
-        throw new AppError('Email is already verified', 400);
+        return;
     }
 
-    const verificationToken = crypto.randomUUID();
-
-    user.emailVerificationToken = verificationToken;
+    const verificationToken = generateToken();
+    user.emailVerificationToken = hashToken(verificationToken);
     user.emailVerificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
-
     await user.save();
 
-    return verificationToken;
+    await sendVerificationEmail(user.email, verificationToken);
 };
 
 export const forgotPasswordService = async (email: string) => {
     const user = await User.findOne({email});
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        return;
     }
 
-    const resetToken = crypto.randomUUID();
+    const resetToken = generateToken();
+    const hashResetToken = hashToken(resetToken);
 
-    user.passwordResetToken = resetToken;
+    user.passwordResetToken = hashResetToken;
     user.passwordResetExpires = new Date(Date.now() + 1000 * 60 * 15);
 
     await user.save();
 
-    return resetToken;
+    await sendPasswordResetEmail(user.email, resetToken);
 };
 
 export const resetPasswordService = async (
     token: string,
     newPassword: string,
 ) => {
+    const hashedToken = hashToken(token);
     const user = await User.findOne({
-        passwordResetToken: token,
+        passwordResetToken: hashedToken,
         passwordResetExpires: {$gt: new Date()},
     });
 

@@ -18,11 +18,11 @@ import {toUserResponse} from '../user/user.mapper';
 export const register = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
-    const {user, verificationToken} = await registerService(email, password);
+    const {user} = await registerService(email, password);
 
     res.status(CREATED).json({
         message: 'User created',
-        verificationToken,
+
         user: toUserResponse(user),
     });
 });
@@ -113,11 +113,11 @@ export const resendVerification = catchAsync(
     async (req: Request, res: Response) => {
         const {email} = req.body;
 
-        const verificationToken = await resendVerificationService(email);
+        await resendVerificationService(email);
 
         res.status(OK).json({
-            message: 'Verification token resent',
-            verificationToken,
+            message:
+                'If that email exists and is unverified, a verification link has been sent.',
         });
     },
 );
@@ -126,11 +126,11 @@ export const forgotPassword = catchAsync(
     async (req: Request, res: Response) => {
         const {email} = req.body;
 
-        const resetToken = await forgotPasswordService(email);
+        await forgotPasswordService(email);
 
         res.status(OK).json({
-            message: 'Password reset token generated',
-            resetToken,
+            message:
+                'If that email exists, a password reset link has been sent.',
         });
     },
 );
