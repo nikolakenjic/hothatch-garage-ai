@@ -101,11 +101,6 @@ export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     res.status(OK).json({
         message: 'Email verified successfully',
         user: toUserResponse(user),
-        // user: {
-        //     id: user._id.toString(),
-        //     email: user.email,
-        //     isEmailVerified: user.isEmailVerified,
-        // },
     });
 });
 

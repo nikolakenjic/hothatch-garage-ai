@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import {env} from '../../config/env';
+
 import {AppError} from '../../utils/AppError';
 import {User} from './user.model';
 import {Session} from './session.model';
@@ -11,7 +10,6 @@ import {
     signRefreshToken,
     verifyRefreshToken,
 } from '../../utils/token';
-import crypto from 'crypto';
 import {
     sendPasswordResetEmail,
     sendVerificationEmail,
@@ -54,12 +52,6 @@ export const loginService = async (email: string, password: string) => {
     if (!isPasswordCorrect) {
         throw new AppError('Invalid credentials', 400);
     }
-
-    // const token = jwt.sign(
-    //     {userId: user._id, email: user.email},
-    //     env.JWT_SECRET,
-    //     {expiresIn: '1d'},
-    // );
 
     const accessToken = signAccessToken(user._id.toString());
     const refreshToken = signRefreshToken(user._id.toString());
