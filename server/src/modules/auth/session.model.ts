@@ -1,15 +1,30 @@
-import mongoose from 'mongoose';
+import mongoose, {Document, Schema, Types} from 'mongoose';
 
-const sessionSchema = new mongoose.Schema(
+export interface ISession extends Document {
+    user: Types.ObjectId;
+    refreshTokenHash: string;
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const sessionSchema = new Schema<ISession>(
     {
         user: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
+            index: true,
         },
-        refreshToken: {
+        refreshTokenHash: {
             type: String,
             required: true,
+            unique: true,
+        },
+        expiresAt: {
+            type: Date,
+            required: true,
+            expires: 0,
         },
     },
     {
@@ -17,4 +32,4 @@ const sessionSchema = new mongoose.Schema(
     },
 );
 
-export const Session = mongoose.model('Session', sessionSchema);
+export const Session = mongoose.model<ISession>('Session', sessionSchema);

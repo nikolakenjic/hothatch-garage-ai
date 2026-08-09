@@ -5,6 +5,7 @@ import {User} from './user.model';
 import {Session} from './session.model';
 import {
     generateToken,
+    getTokenExpiration,
     hashToken,
     signAccessToken,
     signRefreshToken,
@@ -58,7 +59,8 @@ export const loginService = async (email: string, password: string) => {
 
     await Session.create({
         user: user._id,
-        refreshToken,
+        refreshTokenHash: hashToken(refreshToken),
+        expiresAt: getTokenExpiration(refreshToken),
     });
 
     return {user, accessToken, refreshToken};
@@ -77,28 +79,44 @@ export const getCurrentUserService = async (userId: string) => {
 };
 
 export const refreshAccessTokenService = async (refreshToken: string) => {
-    // verify Refresh token.
     const decoded = verifyRefreshToken(refreshToken);
-    // find session
-    const session = await Session.findOne({refreshToken});
+
+    const refreshTokenHash = hashToken(refreshToken);
+
+    const session = await Session.findOne({
+        refreshTokenHash,
+        user: decoded.userId,
+    });
+
     if (!session) {
-        throw new AppError('Session not found', 401);
+        throw new AppError('Invalid session', 401);
     }
-    // find User
+
+    if (session.expiresAt <= new Date()) {
+        await Session.deleteOne({_id: session._id});
+
+        throw new AppError('Session expired', 401);
+    }
+
     const user = await User.findById(decoded.userId);
+
     if (!user) {
-        throw new AppError('User not found', 404);
+        await Session.deleteOne({_id: session._id});
+
+        throw new AppError('Invalid session', 401);
     }
-    // create new access token
-    const accessToken = signAccessToken(user._id.toString());
-    // return access token
-    return accessToken;
+
+    return signAccessToken(user._id.toString());
 };
 
 export const logoutService = async (refreshToken?: string) => {
-    if (refreshToken) {
-        await Session.deleteOne({refreshToken});
+    if (!refreshToken) {
+        return;
     }
+
+    const refreshTokenHash = hashToken(refreshToken);
+
+    await Session.deleteOne({refreshTokenHash});
 };
 
 export const verifyEmailService = async (token: string) => {
@@ -179,5 +197,5 @@ export const resetPasswordService = async (
 
     await user.save();
 
-    return user;
+    await Session.deleteMany({user: user._id});
 };
