@@ -1,6 +1,6 @@
-import mongoose, {Document, Schema, Types} from 'mongoose';
+import mongoose, {Schema, Types} from 'mongoose';
 
-export interface ISession extends Document {
+export interface ISession {
     user: Types.ObjectId;
     refreshTokenHash: string;
     expiresAt: Date;
@@ -20,6 +20,7 @@ const sessionSchema = new Schema<ISession>(
             type: String,
             required: true,
             unique: true,
+            select: false,
         },
         expiresAt: {
             type: Date,

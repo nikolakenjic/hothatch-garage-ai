@@ -1,26 +1,31 @@
-import mongoose, {Schema, Document} from 'mongoose';
+import mongoose, {Schema} from 'mongoose';
 
-export interface IUser extends Document {
+export type UserTheme = 'light' | 'dark' | 'system';
+
+export interface IUserPreferences {
+    theme: UserTheme;
+    emailNotifications: boolean;
+}
+
+export interface IUserPrivacy {
+    publicProfile: boolean;
+    publicGarage: boolean;
+}
+
+export interface IUser {
     email: string;
-    password: string;
+    passwordHash: string;
     isEmailVerified: boolean;
-    emailVerificationToken?: string;
+    emailVerificationTokenHash?: string;
     emailVerificationExpires?: Date;
-    passwordResetToken?: string;
+    passwordResetTokenHash?: string;
     passwordResetExpires?: Date;
     username?: string;
     displayName?: string;
     bio?: string;
     avatarUrl?: string;
-    preferences?: {
-        theme: 'light' | 'dark' | 'system';
-        emailNotifications: boolean;
-    };
-
-    privacy?: {
-        publicProfile: boolean;
-        publicGarage: boolean;
-    };
+    preferences?: IUserPreferences;
+    privacy?: IUserPrivacy;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -34,26 +39,33 @@ const userSchema = new Schema<IUser>(
             lowercase: true,
             trim: true,
         },
-        password: {
+        passwordHash: {
             type: String,
             required: true,
-            minlength: 6,
+            select: false,
         },
         isEmailVerified: {
             type: Boolean,
             default: false,
+            required: true,
         },
-        emailVerificationToken: {
+        emailVerificationTokenHash: {
             type: String,
+            select: false,
+            index: true,
         },
         emailVerificationExpires: {
             type: Date,
+            select: false,
         },
-        passwordResetToken: {
+        passwordResetTokenHash: {
             type: String,
+            select: false,
+            index: true,
         },
         passwordResetExpires: {
             type: Date,
+            select: false,
         },
         username: {
             type: String,
