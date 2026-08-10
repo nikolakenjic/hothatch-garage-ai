@@ -1,6 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {z} from 'zod';
 import {AppError} from '../utils/AppError';
+import {BAD_REQUEST} from '../constants/http';
 
 type ValidateTarget = 'body' | 'params' | 'query';
 
@@ -10,8 +11,12 @@ export const validate =
         const result = schema.safeParse(req[target]);
 
         if (!result.success) {
-            const message = result.error.issues[0]?.message || 'Invalid input';
-            throw new AppError(message, 400);
+            const details = result.error.issues.map((issue) => ({
+                field: issue.path.join('.') || target,
+                message: issue.message,
+            }));
+
+            throw new AppError('Validation failed', BAD_REQUEST, details);
         }
 
         req[target] = result.data;
