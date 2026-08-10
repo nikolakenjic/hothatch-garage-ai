@@ -12,7 +12,14 @@ import {
 } from './auth.controller';
 import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
-import {loginSchema, registerSchema} from './auth.validation';
+import {
+    forgotPasswordSchema,
+    loginSchema,
+    registerSchema,
+    resendVerificationSchema,
+    resetPasswordSchema,
+    verifyEmailSchema,
+} from './auth.validation';
 import rateLimit from 'express-rate-limit';
 
 const authLimiter = rateLimit({
@@ -29,10 +36,20 @@ router.post('/logout', logout);
 router.get('/me', protect, getMe);
 router.post('/refresh', refresh);
 
-router.post('/verify-email', verifyEmail);
-router.post('/resend-verification', resendVerification);
+router.post('/verify-email', validate(verifyEmailSchema), verifyEmail);
+router.post(
+    '/resend-verification',
+    validate(resendVerificationSchema),
+    resendVerification,
+);
 
-router.post('/forgot-password', authLimiter, forgotPassword);
-router.post('/reset-password', resetPassword);
+router.post(
+    '/forgot-password',
+    authLimiter,
+    validate(forgotPasswordSchema),
+    forgotPassword,
+);
+
+router.post('/reset-password', validate(resetPasswordSchema), resetPassword);
 
 export default router;

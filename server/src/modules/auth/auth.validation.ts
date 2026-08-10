@@ -29,3 +29,25 @@ export const loginSchema = z.object({
     email: emailSchema,
     password: loginPasswordSchema,
 });
+
+const tokenSchema = z
+    .string({error: 'Token is required'})
+    .min(1, 'Token is required')
+    .max(512, 'Invalid token');
+
+export const verifyEmailSchema = z.object({
+    token: tokenSchema,
+});
+
+export const resendVerificationSchema = z.object({
+    email: emailSchema,
+});
+
+export const forgotPasswordSchema = z.object({
+    email: emailSchema,
+});
+
+export const resetPasswordSchema = z.object({
+    token: tokenSchema,
+    newPassword: newPasswordSchema,
+});
