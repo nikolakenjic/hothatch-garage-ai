@@ -15,40 +15,57 @@ import {
     sendPasswordResetEmail,
     sendVerificationEmail,
 } from '../../utils/email/email.service';
+import {RegisterInput} from './auth.validation';
+import {appAssert} from '../../utils/appAssert';
+import {CONFLICT} from '../../constants/http';
+import {
+    BCRYPT_SALT_ROUNDS,
+    EMAIL_VERIFICATION_TOKEN_TTL_MS,
+} from '../../constants/auth.constants';
 
-export const registerService = async (email: string, password: string) => {
-    const existingUser = await User.findOne({email});
+export const registerService = async ({email, password}: RegisterInput) => {
+    const existingUser = await User.exists({email});
 
-    if (existingUser) {
-        throw new AppError('User already exists', 400);
-    }
+    appAssert(!existingUser, CONFLICT, 'User already exists');
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
     const verificationToken = generateToken();
-    const hashedVerificationToken = hashToken(verificationToken);
+    const verificationTokenHash = hashToken(verificationToken);
 
     const user = await User.create({
         email,
-        password: hashedPassword,
-        isEmailVerified: false,
-        emailVerificationToken: hashedVerificationToken,
-        emailVerificationExpires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h
+        passwordHash,
+        emailVerificationTokenHash: verificationTokenHash,
+        emailVerificationExpires: new Date(
+            Date.now() + EMAIL_VERIFICATION_TOKEN_TTL_MS,
+        ),
     });
 
-    await sendVerificationEmail(user.email, verificationToken);
+    let verificationEmailSent = true;
 
-    return {user};
+    try {
+        await sendVerificationEmail(user.email, verificationToken);
+    } catch (error) {
+        verificationEmailSent = false;
+
+        console.error('Failed to send verification email:', error);
+    }
+
+    return {
+        user,
+        verificationEmailSent,
+    };
 };
 
 export const loginService = async (email: string, password: string) => {
-    const user = await User.findOne({email});
+    const user = await User.findOne({email}).select('+passwordHash');
 
     if (!user) {
         throw new AppError('Invalid credentials', 400);
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
 
     if (!isPasswordCorrect) {
         throw new AppError('Invalid credentials', 400);
@@ -67,9 +84,7 @@ export const loginService = async (email: string, password: string) => {
 };
 
 export const getCurrentUserService = async (userId: string) => {
-    const user = await User.findById(userId).select(
-        '-password -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires',
-    );
+    const user = await User.findById(userId);
 
     if (!user) {
         throw new AppError('User not found', 404);
@@ -123,7 +138,7 @@ export const verifyEmailService = async (token: string) => {
     const hashedToken = hashToken(token);
 
     const user = await User.findOne({
-        emailVerificationToken: hashedToken,
+        emailVerificationTokenHash: hashedToken,
         emailVerificationExpires: {$gt: new Date()},
     });
 
@@ -132,7 +147,7 @@ export const verifyEmailService = async (token: string) => {
     }
 
     user.isEmailVerified = true;
-    user.emailVerificationToken = undefined;
+    user.emailVerificationTokenHash = undefined;
     user.emailVerificationExpires = undefined;
 
     await user.save();
@@ -152,7 +167,7 @@ export const resendVerificationService = async (email: string) => {
     }
 
     const verificationToken = generateToken();
-    user.emailVerificationToken = hashToken(verificationToken);
+    user.emailVerificationTokenHash = hashToken(verificationToken);
     user.emailVerificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
     await user.save();
 
@@ -169,7 +184,7 @@ export const forgotPasswordService = async (email: string) => {
     const resetToken = generateToken();
     const hashResetToken = hashToken(resetToken);
 
-    user.passwordResetToken = hashResetToken;
+    user.passwordResetTokenHash = hashResetToken;
     user.passwordResetExpires = new Date(Date.now() + 1000 * 60 * 15);
 
     await user.save();
@@ -183,7 +198,7 @@ export const resetPasswordService = async (
 ) => {
     const hashedToken = hashToken(token);
     const user = await User.findOne({
-        passwordResetToken: hashedToken,
+        passwordResetTokenHash: hashedToken,
         passwordResetExpires: {$gt: new Date()},
     });
 
@@ -191,8 +206,8 @@ export const resetPasswordService = async (
         throw new AppError('Invalid or expired reset token', 400);
     }
 
-    user.password = await bcrypt.hash(newPassword, 10);
-    user.passwordResetToken = undefined;
+    user.passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+    user.passwordResetTokenHash = undefined;
     user.passwordResetExpires = undefined;
 
     await user.save();

@@ -1,6 +1,7 @@
 import {ErrorRequestHandler} from 'express';
+import {MongoServerError} from 'mongodb';
 import {AppError} from '../utils/AppError';
-import {INTERNAL_SERVER_ERROR} from '../constants/http';
+import {CONFLICT, INTERNAL_SERVER_ERROR} from '../constants/http';
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     if (err instanceof AppError) {
@@ -11,6 +12,15 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
                 errors: err.details,
             }),
         });
+        return;
+    }
+
+    if (err instanceof MongoServerError && err.code === 11000) {
+        res.status(CONFLICT).json({
+            status: 'fail',
+            message: 'Resource already exists',
+        });
+
         return;
     }
 

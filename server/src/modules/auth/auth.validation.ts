@@ -51,3 +51,5 @@ export const resetPasswordSchema = z.object({
     token: tokenSchema,
     newPassword: newPasswordSchema,
 });
+
+export type RegisterInput = z.infer<typeof registerSchema>;

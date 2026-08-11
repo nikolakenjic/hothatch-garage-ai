@@ -18,11 +18,15 @@ import {toUserResponse} from '../user/user.mapper';
 export const register = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;
 
-    const {user} = await registerService(email, password);
+    const {user, verificationEmailSent} = await registerService({
+        email,
+        password,
+    });
 
     res.status(CREATED).json({
-        message: 'User created',
-
+        message: verificationEmailSent
+            ? 'Registration successful. Please verify your email.'
+            : 'Registration successful, but the verification email could not be sent. Please request a new verification email.',
         user: toUserResponse(user),
     });
 });
