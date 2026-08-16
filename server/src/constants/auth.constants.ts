@@ -1,2 +1,11 @@
 export const BCRYPT_SALT_ROUNDS = 12;
-export const EMAIL_VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+export const EMAIL_VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+export const PASSWORD_RESET_TOKEN_TTL_MS = 15 * 60 * 1000; // 15min
+
+export const REGISTER_RATE_LIMIT = {
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: 'Too many registration attempts, try again later',
+};
+export const LOGIN_RATE_LIMIT = {windowMs: 15 * 60 * 1000, max: 10};
+export const PASSWORD_RESET_RATE_LIMIT = {windowMs: 60 * 60 * 1000, max: 3};

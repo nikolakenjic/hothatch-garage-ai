@@ -21,6 +21,7 @@ import {
     verifyEmailSchema,
 } from './auth.validation';
 import rateLimit from 'express-rate-limit';
+import {REGISTER_RATE_LIMIT} from '../../constants/auth.constants';
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -28,8 +29,10 @@ const authLimiter = rateLimit({
     message: 'Too many requests, try again later',
 });
 
+const registerLimiter = rateLimit(REGISTER_RATE_LIMIT);
+
 const router = Router();
-router.post('/register', authLimiter, validate(registerSchema), register);
+router.post('/register', registerLimiter, validate(registerSchema), register);
 router.post('/login', authLimiter, validate(loginSchema), login);
 router.post('/logout', logout);
 
