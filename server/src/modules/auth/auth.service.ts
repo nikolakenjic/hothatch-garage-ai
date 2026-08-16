@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 import {AppError} from '../../utils/AppError';
-import {User} from './user.model';
+import {IUser, User} from './user.model';
 import {Session} from './session.model';
 import {
     generateToken,
@@ -22,11 +22,24 @@ import {
     BCRYPT_SALT_ROUNDS,
     EMAIL_VERIFICATION_TOKEN_TTL_MS,
 } from '../../constants/auth.constants';
+import {HydratedDocument} from 'mongoose';
 
-export const registerService = async ({email, password}: RegisterInput) => {
+type RegisterServiceResult = {
+    user: HydratedDocument<IUser>;
+    verificationEmailSent: boolean;
+};
+
+export const registerService = async ({
+    email,
+    password,
+}: RegisterInput): Promise<RegisterServiceResult> => {
     const existingUser = await User.exists({email});
 
-    appAssert(!existingUser, CONFLICT, 'User already exists');
+    appAssert(
+        !existingUser,
+        CONFLICT,
+        'An account with this email already exists',
+    );
 
     const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
@@ -48,7 +61,6 @@ export const registerService = async ({email, password}: RegisterInput) => {
         await sendVerificationEmail(user.email, verificationToken);
     } catch (error) {
         verificationEmailSent = false;
-
         console.error('Failed to send verification email:', error);
     }
 

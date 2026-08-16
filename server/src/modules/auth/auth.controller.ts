@@ -14,22 +14,26 @@ import {CREATED, OK} from '../../constants/http';
 import {catchAsync} from '../../utils/catchAsync';
 import {getUserId} from '../../utils/getUser';
 import {toUserResponse} from '../user/user.mapper';
+import {RegisterInput} from './auth.validation';
 
-export const register = catchAsync(async (req: Request, res: Response) => {
-    const {email, password} = req.body;
+export const register = catchAsync(
+    async (req: Request<{}, {}, RegisterInput>, res: Response) => {
+        const {email, password} = req.body;
 
-    const {user, verificationEmailSent} = await registerService({
-        email,
-        password,
-    });
+        const {user, verificationEmailSent} = await registerService({
+            email,
+            password,
+        });
 
-    res.status(CREATED).json({
-        message: verificationEmailSent
-            ? 'Registration successful. Please verify your email.'
-            : 'Registration successful, but the verification email could not be sent. Please request a new verification email.',
-        user: toUserResponse(user),
-    });
-});
+        res.status(CREATED).json({
+            message: verificationEmailSent
+                ? 'Registration successful. Please verify your email.'
+                : 'Registration successful, but the verification email could not be sent. Please request a new verification email.',
+            verificationEmailSent,
+            user: toUserResponse(user),
+        });
+    },
+);
 
 export const login = catchAsync(async (req: Request, res: Response) => {
     const {email, password} = req.body;

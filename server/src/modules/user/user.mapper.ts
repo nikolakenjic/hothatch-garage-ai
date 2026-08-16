@@ -1,3 +1,4 @@
+import {HydratedDocument} from 'mongoose';
 import {IUser} from '../auth/user.model';
 
 type PublicProfileMapperInput = {
@@ -10,7 +11,7 @@ type PublicProfileMapperInput = {
     publicGarage: boolean;
 };
 
-export const toUserResponse = (user: IUser) => ({
+export const toUserResponse = (user: HydratedDocument<IUser>) => ({
     id: user._id.toString(),
     email: user.email,
     isEmailVerified: user.isEmailVerified,

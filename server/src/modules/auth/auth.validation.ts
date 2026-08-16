@@ -8,12 +8,25 @@ const emailSchema = z
     .email('Invalid email address')
     .toLowerCase();
 
-const newPasswordSchema = z
+const passwordPolicySchema = z
     .string({error: 'Password is required'})
     .min(8, 'Password must be at least 8 characters')
+    .max(72, 'Password must not exceed 72 characters')
     .refine(
         (password) => Buffer.byteLength(password, 'utf8') <= 72,
         'Password must not exceed 72 bytes',
+    )
+    .refine(
+        (password) => /[a-z]/.test(password),
+        'Password must contain at least one lowercase letter',
+    )
+    .refine(
+        (password) => /[A-Z]/.test(password),
+        'Password must contain at least one uppercase letter',
+    )
+    .refine(
+        (password) => /[0-9]/.test(password),
+        'Password must contain at least one number',
     );
 
 const loginPasswordSchema = z
@@ -22,7 +35,7 @@ const loginPasswordSchema = z
 
 export const registerSchema = z.object({
     email: emailSchema,
-    password: newPasswordSchema,
+    password: passwordPolicySchema,
 });
 
 export const loginSchema = z.object({
@@ -49,7 +62,7 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
     token: tokenSchema,
-    newPassword: newPasswordSchema,
+    newPassword: passwordPolicySchema,
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
