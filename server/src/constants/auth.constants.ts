@@ -7,7 +7,11 @@ export const REGISTER_RATE_LIMIT = {
     max: 5,
     message: 'Too many registration attempts, try again later',
 };
-export const LOGIN_RATE_LIMIT = {windowMs: 15 * 60 * 1000, max: 10};
+export const LOGIN_RATE_LIMIT = {
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: 'Too many login attempts, try again later',
+};
 export const PASSWORD_RESET_RATE_LIMIT = {windowMs: 60 * 60 * 1000, max: 3};
 
 export const ACCESS_TOKEN_COOKIE_TTL_MS = 15 * 60 * 1000; // 15 min

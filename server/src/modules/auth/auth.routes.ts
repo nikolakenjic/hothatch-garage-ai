@@ -21,7 +21,10 @@ import {
     verifyEmailSchema,
 } from './auth.validation';
 import rateLimit from 'express-rate-limit';
-import {REGISTER_RATE_LIMIT} from '../../constants/auth.constants';
+import {
+    LOGIN_RATE_LIMIT,
+    REGISTER_RATE_LIMIT,
+} from '../../constants/auth.constants';
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -30,10 +33,11 @@ const authLimiter = rateLimit({
 });
 
 const registerLimiter = rateLimit(REGISTER_RATE_LIMIT);
+const loginLimiter = rateLimit(LOGIN_RATE_LIMIT);
 
 const router = Router();
 router.post('/register', registerLimiter, validate(registerSchema), register);
-router.post('/login', authLimiter, validate(loginSchema), login);
+router.post('/login', loginLimiter, validate(loginSchema), login);
 router.post('/logout', logout);
 
 router.get('/me', protect, getMe);
