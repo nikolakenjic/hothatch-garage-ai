@@ -92,9 +92,7 @@ export const refresh = catchAsync(async (req: Request, res: Response) => {
 
     const accessToken = await refreshAccessTokenService(refreshToken);
 
-    res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-    });
+    res.cookie('accessToken', accessToken, accessTokenCookieOptions);
 
     res.status(OK).json({
         message: 'Access token refreshed',
