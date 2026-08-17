@@ -5,6 +5,7 @@ import {Car} from '../car/car.model';
 import {Modification} from '../modification/modification.model';
 import {AIRecommendation} from '../ai/ai.model';
 import {Session} from '../auth/session.model';
+import {BCRYPT_SALT_ROUNDS} from '../../constants/auth.constants';
 
 type UpdateProfileInput = {
     username?: string;
@@ -69,7 +70,7 @@ export const changePasswordService = async (
     userId: string,
     input: ChangePasswordInput,
 ) => {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select('+passwordHash');
 
     if (!user) {
         throw new AppError('User not found', 404);
@@ -77,14 +78,17 @@ export const changePasswordService = async (
 
     const isPasswordCorrect = await bcrypt.compare(
         input.currentPassword,
-        user.password,
+        user.passwordHash,
     );
 
     if (!isPasswordCorrect) {
         throw new AppError('Current password is incorrect', 401);
     }
 
-    user.password = await bcrypt.hash(input.newPassword, 10);
+    user.passwordHash = await bcrypt.hash(
+        input.newPassword,
+        BCRYPT_SALT_ROUNDS,
+    );
 
     await user.save();
 
