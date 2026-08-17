@@ -20,3 +20,9 @@ export const refreshTokenCookieOptions: CookieOptions = {
     ...baseCookieOptions,
     maxAge: REFRESH_TOKEN_COOKIE_TTL_MS,
 };
+
+export const authCookieClearOptions: CookieOptions = {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'lax',
+};

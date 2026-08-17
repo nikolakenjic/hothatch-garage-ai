@@ -17,6 +17,7 @@ import {toUserResponse} from '../user/user.mapper';
 import {RegisterInput} from './auth.validation';
 import {
     accessTokenCookieOptions,
+    authCookieClearOptions,
     refreshTokenCookieOptions,
 } from './auth.cookies';
 
@@ -61,8 +62,8 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
 
     await logoutService(refreshToken);
 
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken', authCookieClearOptions);
+    res.clearCookie('refreshToken', authCookieClearOptions);
 
     res.status(OK).json({
         message: 'Logged out successfully',
