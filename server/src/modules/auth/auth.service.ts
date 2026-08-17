@@ -74,7 +74,7 @@ export const loginService = async (email: string, password: string) => {
     const user = await User.findOne({email}).select('+passwordHash');
 
     if (!user) {
-        throw new AppError('Invalid credentials', 400);
+        throw new AppError('Invalid credentials', 401);
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);

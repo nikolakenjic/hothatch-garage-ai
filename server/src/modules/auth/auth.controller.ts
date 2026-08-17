@@ -15,6 +15,10 @@ import {catchAsync} from '../../utils/catchAsync';
 import {getUserId} from '../../utils/getUser';
 import {toUserResponse} from '../user/user.mapper';
 import {RegisterInput} from './auth.validation';
+import {
+    accessTokenCookieOptions,
+    refreshTokenCookieOptions,
+} from './auth.cookies';
 
 export const register = catchAsync(
     async (req: Request<{}, {}, RegisterInput>, res: Response) => {
@@ -43,12 +47,8 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         password,
     );
 
-    res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-    });
-    res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-    });
+    res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
     res.status(OK).json({
         message: 'Login successful',
