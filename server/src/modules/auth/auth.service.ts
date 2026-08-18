@@ -206,7 +206,11 @@ export const forgotPasswordService = async (email: string) => {
 
     await user.save();
 
-    await sendPasswordResetEmail(user.email, resetToken);
+    try {
+        await sendPasswordResetEmail(user.email, resetToken);
+    } catch (error) {
+        console.error('Failed to send password reset email:', error);
+    }
 };
 
 export const resetPasswordService = async (
