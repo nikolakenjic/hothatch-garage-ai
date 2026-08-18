@@ -23,6 +23,7 @@ import {
 import rateLimit from 'express-rate-limit';
 import {
     LOGIN_RATE_LIMIT,
+    PASSWORD_RESET_RATE_LIMIT,
     REGISTER_RATE_LIMIT,
     RESEND_VERIFICATION_RATE_LIMIT,
 } from '../../constants/auth.constants';
@@ -36,6 +37,8 @@ const authLimiter = rateLimit({
 const registerLimiter = rateLimit(REGISTER_RATE_LIMIT);
 const loginLimiter = rateLimit(LOGIN_RATE_LIMIT);
 const resendVerificationLimiter = rateLimit(RESEND_VERIFICATION_RATE_LIMIT);
+const passwordResetLimiter = rateLimit(PASSWORD_RESET_RATE_LIMIT);
+const resetPasswordLimiter = rateLimit(PASSWORD_RESET_RATE_LIMIT);
 
 const router = Router();
 
@@ -56,11 +59,16 @@ router.post(
 
 router.post(
     '/forgot-password',
-    authLimiter,
+    passwordResetLimiter,
     validate(forgotPasswordSchema),
     forgotPassword,
 );
 
-router.post('/reset-password', validate(resetPasswordSchema), resetPassword);
+router.post(
+    '/reset-password',
+    resetPasswordLimiter,
+    validate(resetPasswordSchema),
+    resetPassword,
+);
 
 export default router;

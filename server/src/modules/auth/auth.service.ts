@@ -21,6 +21,7 @@ import {CONFLICT} from '../../constants/http';
 import {
     BCRYPT_SALT_ROUNDS,
     EMAIL_VERIFICATION_TOKEN_TTL_MS,
+    PASSWORD_RESET_TOKEN_TTL_MS,
 } from '../../constants/auth.constants';
 import {HydratedDocument} from 'mongoose';
 
@@ -199,7 +200,9 @@ export const forgotPasswordService = async (email: string) => {
     const hashResetToken = hashToken(resetToken);
 
     user.passwordResetTokenHash = hashResetToken;
-    user.passwordResetExpires = new Date(Date.now() + 1000 * 60 * 15);
+    user.passwordResetExpires = new Date(
+        Date.now() + PASSWORD_RESET_TOKEN_TTL_MS,
+    );
 
     await user.save();
 
