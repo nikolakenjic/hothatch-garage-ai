@@ -9,7 +9,7 @@ export type LoginResponse = {
 
 export type RegisterResponse = {
     message: string;
-    verificationToken: string;
+    verificationEmailSent: boolean;
     user: AuthUser;
 };
 

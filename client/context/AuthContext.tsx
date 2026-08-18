@@ -41,18 +41,28 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         void restoreUser();
     }, []);
 
+    const register = async (data: RegisterInput) => {
+        const response = await AuthService.register(data);
+
+        if (response.verificationEmailSent) {
+            toast.success(
+                'Account created. Check your email to verify your account.',
+            );
+        } else {
+            toast.warning(
+                'Account created, but the verification email could not be sent. You can request a new one.',
+            );
+        }
+
+        router.replace('/login');
+    };
+
     const login = async (data: LoginInput) => {
         const response = await AuthService.login(data);
 
         setUser(response.user);
         toast.success('Welcome back!');
         router.replace('/garage');
-    };
-
-    const register = async (data: RegisterInput) => {
-        await AuthService.register(data);
-        toast.success('Account created. Please log in.');
-        router.replace('/login');
     };
 
     const updateUser = (updatedUser: AuthUser) => {

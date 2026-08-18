@@ -12,12 +12,6 @@ import Link from 'next/link';
 
 const registerFields: Field<RegisterInput>[] = [
     {
-        name: 'name',
-        label: 'Name',
-        type: 'text',
-        placeholder: 'Name',
-    },
-    {
         name: 'email',
         label: 'Email',
         type: 'email',
