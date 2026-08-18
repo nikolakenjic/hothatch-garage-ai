@@ -24,6 +24,7 @@ import rateLimit from 'express-rate-limit';
 import {
     LOGIN_RATE_LIMIT,
     REGISTER_RATE_LIMIT,
+    RESEND_VERIFICATION_RATE_LIMIT,
 } from '../../constants/auth.constants';
 
 const authLimiter = rateLimit({
@@ -34,8 +35,10 @@ const authLimiter = rateLimit({
 
 const registerLimiter = rateLimit(REGISTER_RATE_LIMIT);
 const loginLimiter = rateLimit(LOGIN_RATE_LIMIT);
+const resendVerificationLimiter = rateLimit(RESEND_VERIFICATION_RATE_LIMIT);
 
 const router = Router();
+
 router.post('/register', registerLimiter, validate(registerSchema), register);
 router.post('/login', loginLimiter, validate(loginSchema), login);
 router.post('/logout', logout);
@@ -46,6 +49,7 @@ router.post('/refresh', refresh);
 router.post('/verify-email', validate(verifyEmailSchema), verifyEmail);
 router.post(
     '/resend-verification',
+    resendVerificationLimiter,
     validate(resendVerificationSchema),
     resendVerification,
 );

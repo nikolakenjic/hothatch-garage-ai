@@ -14,5 +14,11 @@ export const LOGIN_RATE_LIMIT = {
 };
 export const PASSWORD_RESET_RATE_LIMIT = {windowMs: 60 * 60 * 1000, max: 3};
 
+export const RESEND_VERIFICATION_RATE_LIMIT = {
+    windowMs: 60 * 60 * 1000,
+    max: 3,
+    message: 'Too many verification email requests, try again later',
+};
+
 export const ACCESS_TOKEN_COOKIE_TTL_MS = 15 * 60 * 1000; // 15 min
 export const REFRESH_TOKEN_COOKIE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days

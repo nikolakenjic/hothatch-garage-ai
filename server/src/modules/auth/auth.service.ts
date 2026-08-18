@@ -180,7 +180,9 @@ export const resendVerificationService = async (email: string) => {
 
     const verificationToken = generateToken();
     user.emailVerificationTokenHash = hashToken(verificationToken);
-    user.emailVerificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
+    user.emailVerificationExpires = new Date(
+        Date.now() + EMAIL_VERIFICATION_TOKEN_TTL_MS,
+    );
     await user.save();
 
     await sendVerificationEmail(user.email, verificationToken);
