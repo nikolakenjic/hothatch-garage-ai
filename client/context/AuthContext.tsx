@@ -3,6 +3,7 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
+import {isAxiosError} from 'axios';
 
 import {AuthUser} from '@/types/auth';
 import {LoginInput, RegisterInput} from '@/lib/validations/auth';
@@ -31,6 +32,11 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
                 const response = await AuthService.getMe();
                 setUser(response.user);
             } catch (error) {
+                if (isAxiosError(error) && error.response?.status === 401) {
+                    setUser(null);
+                    return;
+                }
+
                 console.error('Failed to restore authenticated user:', error);
                 setUser(null);
             } finally {

@@ -77,15 +77,24 @@ export default function LoginPage() {
                 submitLoadingText="Opening garage..."
                 fields={loginFields}
                 secondaryAction={
-                    <p className="text-center text-sm text-muted-foreground">
-                        Don&apos;t have an account?{' '}
+                    <div className="space-y-3 text-center text-sm">
                         <Link
-                            href="/register"
+                            href="/forgot-password"
                             className="font-semibold text-primary transition-colors hover:text-primary/80"
                         >
-                            Create account
+                            Forgot password?
                         </Link>
-                    </p>
+
+                        <p className="text-muted-foreground">
+                            Don&apos;t have an account?{' '}
+                            <Link
+                                href="/register"
+                                className="font-semibold text-primary transition-colors hover:text-primary/80"
+                            >
+                                Create account
+                            </Link>
+                        </p>
+                    </div>
                 }
             />
         </AuthLayout>
