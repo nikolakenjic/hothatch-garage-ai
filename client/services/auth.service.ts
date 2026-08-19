@@ -1,4 +1,5 @@
 import BaseService from '@/lib/api/base.service';
+import type {AxiosRequestConfig} from 'axios';
 import {LoginInput, RegisterInput} from '@/lib/validations/auth';
 import {
     LoginResponse,
@@ -24,8 +25,8 @@ export default class AuthService {
         );
     }
 
-    static async getMe(): Promise<MeResponse> {
-        return BaseService.get<MeResponse>(`${this.ENDPOINT}/me`);
+    static async getMe(config?: AxiosRequestConfig): Promise<MeResponse> {
+        return BaseService.get<MeResponse>(`${this.ENDPOINT}/me`, config);
     }
 
     static async logout(): Promise<LogoutResponse> {

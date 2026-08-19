@@ -1,7 +1,5 @@
-import {cookies} from 'next/headers';
-import {redirect} from 'next/navigation';
-
 import {PageContainer} from '@/components/layout';
+import {getServerCookieHeader} from '@/lib/auth/server-auth';
 import CarService from '@/services/car.service';
 import {Car} from '@/types/car';
 
@@ -11,17 +9,7 @@ import EmptyGarage from './_components/EmptyGarage';
 import GarageHeader from './_components/GarageHeader';
 
 export default async function GaragePage() {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('accessToken')?.value;
-
-    if (!accessToken) {
-        redirect('/login');
-    }
-
-    const cookieHeader = cookieStore
-        .getAll()
-        .map(({name, value}) => `${name}=${value}`)
-        .join('; ');
+    const cookieHeader = await getServerCookieHeader();
 
     const cars = await CarService.getCars({
         headers: {
