@@ -16,9 +16,13 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     }
 
     if (err instanceof MongoServerError && err.code === 11000) {
+        const duplicateField = Object.keys(err.keyValue ?? {})[0];
+
         res.status(CONFLICT).json({
             status: 'fail',
-            message: 'Resource already exists',
+            message: duplicateField
+                ? `An account with this ${duplicateField} already exists`
+                : 'Resource already exists',
         });
 
         return;
