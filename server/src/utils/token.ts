@@ -1,14 +1,16 @@
 import jwt, {SignOptions} from 'jsonwebtoken';
 import crypto from 'crypto';
 import {env} from '../config/env';
+import {AppError} from './AppError';
 
-// Later we should make stricter ENV validation, but for now let's leave like this
 const accessTokenOptions: SignOptions = {
     expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
+    algorithm: 'HS256',
 };
 
 const refreshTokenOptions: SignOptions = {
     expiresIn: env.JWT_REFRESH_EXPIRES_IN as SignOptions['expiresIn'],
+    algorithm: 'HS256',
 };
 
 export const signAccessToken = (userId: string) => {
@@ -20,9 +22,13 @@ export const signRefreshToken = (userId: string) => {
 };
 
 export const verifyRefreshToken = (token: string) => {
-    return jwt.verify(token, env.JWT_REFRESH_SECRET) as unknown as {
-        userId: string;
-    };
+    try {
+        return jwt.verify(token, env.JWT_REFRESH_SECRET, {
+            algorithms: ['HS256'],
+        }) as unknown as {userId: string};
+    } catch {
+        throw new AppError('Invalid or expired refresh token', 401);
+    }
 };
 
 export const generateToken = (): string => {
