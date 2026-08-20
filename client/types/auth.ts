@@ -21,3 +21,8 @@ export type MeResponse = {
 export type LogoutResponse = {
     message: string;
 };
+
+export type VerifyEmailResponse = {
+    message: string;
+    user: AuthUser;
+};

@@ -6,6 +6,7 @@ import {
     LogoutResponse,
     MeResponse,
     RegisterResponse,
+    VerifyEmailResponse,
 } from '@/types/auth';
 
 export default class AuthService {
@@ -33,6 +34,13 @@ export default class AuthService {
         return BaseService.create<LogoutResponse>(
             `${this.ENDPOINT}/logout`,
             {},
+        );
+    }
+
+    static async verifyEmail(token: string): Promise<VerifyEmailResponse> {
+        return BaseService.create<VerifyEmailResponse>(
+            `${this.ENDPOINT}/verify-email`,
+            {token},
         );
     }
 }
