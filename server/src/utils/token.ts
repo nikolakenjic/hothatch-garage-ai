@@ -2,6 +2,7 @@ import jwt, {SignOptions} from 'jsonwebtoken';
 import crypto from 'crypto';
 import {env} from '../config/env';
 import {AppError} from './AppError';
+import {UNAUTHORIZED} from '../constants/http';
 
 const accessTokenOptions: SignOptions = {
     expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'],
@@ -27,7 +28,7 @@ export const verifyRefreshToken = (token: string) => {
             algorithms: ['HS256'],
         }) as unknown as {userId: string};
     } catch {
-        throw new AppError('Invalid or expired refresh token', 401);
+        throw new AppError('Invalid or expired refresh token', UNAUTHORIZED);
     }
 };
 

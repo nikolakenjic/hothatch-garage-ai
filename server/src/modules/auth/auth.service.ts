@@ -17,7 +17,12 @@ import {
 } from '../../utils/email/email.service';
 import {RegisterInput} from './auth.validation';
 import {appAssert} from '../../utils/appAssert';
-import {CONFLICT, UNAUTHORIZED} from '../../constants/http';
+import {
+    BAD_REQUEST,
+    CONFLICT,
+    NOT_FOUND,
+    UNAUTHORIZED,
+} from '../../constants/http';
 import {
     BCRYPT_SALT_ROUNDS,
     EMAIL_VERIFICATION_TOKEN_TTL_MS,
@@ -105,7 +110,7 @@ export const getCurrentUserService = async (userId: string) => {
     const user = await User.findById(userId);
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        throw new AppError('User not found', NOT_FOUND);
     }
 
     return user;
@@ -122,13 +127,13 @@ export const refreshAccessTokenService = async (refreshToken: string) => {
     });
 
     if (!session) {
-        throw new AppError('Invalid session', 401);
+        throw new AppError('Invalid session', UNAUTHORIZED);
     }
 
     if (session.expiresAt <= new Date()) {
         await Session.deleteOne({_id: session._id});
 
-        throw new AppError('Session expired', 401);
+        throw new AppError('Session expired', UNAUTHORIZED);
     }
 
     const user = await User.findById(decoded.userId);
@@ -136,7 +141,7 @@ export const refreshAccessTokenService = async (refreshToken: string) => {
     if (!user) {
         await Session.deleteOne({_id: session._id});
 
-        throw new AppError('Invalid session', 401);
+        throw new AppError('Invalid session', UNAUTHORIZED);
     }
 
     return signAccessToken(user._id.toString());
@@ -161,7 +166,10 @@ export const verifyEmailService = async (token: string) => {
     });
 
     if (!user) {
-        throw new AppError('Invalid or expired verification token', 400);
+        throw new AppError(
+            'Invalid or expired verification token',
+            BAD_REQUEST,
+        );
     }
 
     user.isEmailVerified = true;
@@ -229,7 +237,7 @@ export const resetPasswordService = async (
     });
 
     if (!user) {
-        throw new AppError('Invalid or expired reset token', 400);
+        throw new AppError('Invalid or expired reset token', BAD_REQUEST);
     }
 
     user.passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
