@@ -10,7 +10,7 @@ import {
     resetPasswordService,
     verifyEmailService,
 } from './auth.service';
-import {CREATED, OK} from '../../constants/http';
+import {CREATED, OK, UNAUTHORIZED} from '../../constants/http';
 import {catchAsync} from '../../utils/catchAsync';
 import {getUserId} from '../../utils/getUser';
 import {toUserResponse} from '../user/user.mapper';
@@ -20,6 +20,7 @@ import {
     authCookieClearOptions,
     refreshTokenCookieOptions,
 } from './auth.cookies';
+import {AppError} from '../../utils/AppError';
 
 export const register = catchAsync(
     async (req: Request<{}, {}, RegisterInput>, res: Response) => {
@@ -85,10 +86,7 @@ export const refresh = catchAsync(async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
-        res.status(401).json({
-            message: 'No refresh token',
-        });
-        return;
+        throw new AppError('No refresh token', UNAUTHORIZED);
     }
 
     const accessToken = await refreshAccessTokenService(refreshToken);
