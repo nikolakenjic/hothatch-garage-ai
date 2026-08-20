@@ -28,12 +28,6 @@ import {
     RESEND_VERIFICATION_RATE_LIMIT,
 } from '../../constants/auth.constants';
 
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    message: 'Too many requests, try again later',
-});
-
 const registerLimiter = rateLimit(REGISTER_RATE_LIMIT);
 const loginLimiter = rateLimit(LOGIN_RATE_LIMIT);
 const resendVerificationLimiter = rateLimit(RESEND_VERIFICATION_RATE_LIMIT);
