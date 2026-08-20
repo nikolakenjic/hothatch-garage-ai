@@ -13,11 +13,15 @@ export function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (accessToken && isPublicPage && request.nextUrl.pathname !== '/') {
-        return NextResponse.redirect(new URL('/garage', request.url));
-    }
+    const requestHeaders = new Headers(request.headers);
 
-    return NextResponse.next();
+    requestHeaders.set('x-current-path', request.nextUrl.pathname);
+
+    return NextResponse.next({
+        request: {
+            headers: requestHeaders,
+        },
+    });
 }
 
 export const config = {
