@@ -17,7 +17,7 @@ import {
 } from '../../utils/email/email.service';
 import {RegisterInput} from './auth.validation';
 import {appAssert} from '../../utils/appAssert';
-import {CONFLICT} from '../../constants/http';
+import {CONFLICT, UNAUTHORIZED} from '../../constants/http';
 import {
     BCRYPT_SALT_ROUNDS,
     EMAIL_VERIFICATION_TOKEN_TTL_MS,
@@ -71,17 +71,22 @@ export const registerService = async ({
     };
 };
 
+// Pre-generated bcrypt hash of a random value — never a real user's hash.
+// Used so bcrypt.compare() always runs the same expensive work, whether
+// or not the account exists, so response time can't leak account existence.
+const DUMMY_PASSWORD_HASH =
+    '$2a$12$CwTycUXWue0Thq9StjUM0uJ8qDJnQxdT5' + 'Y2A/1a1zM9GJdN2q5F3S';
+
 export const loginService = async (email: string, password: string) => {
     const user = await User.findOne({email}).select('+passwordHash');
 
-    if (!user) {
-        throw new AppError('Invalid credentials', 401);
-    }
+    const isPasswordCorrect = await bcrypt.compare(
+        password,
+        user?.passwordHash ?? DUMMY_PASSWORD_HASH,
+    );
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
-
-    if (!isPasswordCorrect) {
-        throw new AppError('Invalid credentials', 400);
+    if (!user || !isPasswordCorrect) {
+        throw new AppError('Invalid credentials', UNAUTHORIZED);
     }
 
     const accessToken = signAccessToken(user._id.toString());
