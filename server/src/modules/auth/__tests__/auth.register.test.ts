@@ -2,6 +2,7 @@ import request from 'supertest';
 import {describe, expect, it, vi} from 'vitest';
 import app from '../../../app';
 import {User} from '../user.model';
+import bcrypt from 'bcryptjs';
 
 vi.mock('../../../utils/email/email.service', () => ({
     sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
@@ -40,6 +41,11 @@ describe('POST /api/v1/auth/register', () => {
 
         expect(createdUser).not.toBeNull();
         expect(createdUser?.passwordHash).not.toBe(input.password);
+        const isPasswordHashValid = await bcrypt.compare(
+            input.password,
+            createdUser!.passwordHash,
+        );
+        expect(isPasswordHashValid).toBe(true);
         expect(createdUser?.emailVerificationTokenHash).toBeDefined();
     });
 
