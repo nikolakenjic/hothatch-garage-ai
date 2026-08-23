@@ -7,6 +7,8 @@ import carRoutes from './modules/car/car.routes';
 import modificationRoutes from './modules/modification/modification.routes';
 import aiRoutes from './modules/ai/ai.routes';
 import {errorHandler} from './middlewares/errorHandler';
+import {AppError} from './utils/AppError';
+import {NOT_FOUND} from './constants/http';
 
 import userRoutes from './modules/user/user.routes';
 
@@ -33,6 +35,10 @@ app.get('/api/v1/health', (_req, res) => {
     res.status(200).json({
         message: 'HotHatch Garage AI API is running',
     });
+});
+
+app.use((_req, _res, next) => {
+    next(new AppError('Route not found', NOT_FOUND));
 });
 
 app.use(errorHandler);
