@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import {env} from './config/env';
 
 import authRoutes from './modules/auth/auth.routes';
 import carRoutes from './modules/car/car.routes';
@@ -16,7 +17,7 @@ const app = express();
 
 app.use(
     cors({
-        origin: ['http://localhost:3000', 'http://localhost:3001'],
+        origin: env.CLIENT_URL,
         credentials: true,
     }),
 );
