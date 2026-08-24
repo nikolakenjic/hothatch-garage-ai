@@ -7,6 +7,7 @@ import authRoutes from './modules/auth/auth.routes';
 import carRoutes from './modules/car/car.routes';
 import modificationRoutes from './modules/modification/modification.routes';
 import aiRoutes from './modules/ai/ai.routes';
+
 import {errorHandler} from './middlewares/errorHandler';
 import {AppError} from './utils/AppError';
 import {NOT_FOUND} from './constants/http';
