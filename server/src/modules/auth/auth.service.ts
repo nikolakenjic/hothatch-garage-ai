@@ -22,6 +22,7 @@ import {
     CONFLICT,
     NOT_FOUND,
     UNAUTHORIZED,
+    FORBIDDEN,
 } from '../../constants/http';
 import {
     BCRYPT_SALT_ROUNDS,
@@ -92,6 +93,10 @@ export const loginService = async (email: string, password: string) => {
 
     if (!user || !isPasswordCorrect) {
         throw new AppError('Invalid credentials', UNAUTHORIZED);
+    }
+
+    if (!user.isEmailVerified) {
+        throw new AppError('Email verification required', FORBIDDEN);
     }
 
     const accessToken = signAccessToken(user._id.toString());
