@@ -22,17 +22,26 @@ import {
 } from './auth.validation';
 import rateLimit from 'express-rate-limit';
 import {
+    CONFIRM_PASSWORD_RESET_RATE_LIMIT,
     LOGIN_RATE_LIMIT,
-    PASSWORD_RESET_RATE_LIMIT,
+    REFRESH_RATE_LIMIT,
     REGISTER_RATE_LIMIT,
+    REQUEST_PASSWORD_RESET_RATE_LIMIT,
     RESEND_VERIFICATION_RATE_LIMIT,
+    VERIFY_EMAIL_RATE_LIMIT,
 } from '../../constants/auth.constants';
 
 const registerLimiter = rateLimit(REGISTER_RATE_LIMIT);
 const loginLimiter = rateLimit(LOGIN_RATE_LIMIT);
 const resendVerificationLimiter = rateLimit(RESEND_VERIFICATION_RATE_LIMIT);
-const passwordResetLimiter = rateLimit(PASSWORD_RESET_RATE_LIMIT);
-const resetPasswordLimiter = rateLimit(PASSWORD_RESET_RATE_LIMIT);
+const requestPasswordResetLimiter = rateLimit(
+    REQUEST_PASSWORD_RESET_RATE_LIMIT,
+);
+const confirmPasswordResetLimiter = rateLimit(
+    CONFIRM_PASSWORD_RESET_RATE_LIMIT,
+);
+const refreshLimiter = rateLimit(REFRESH_RATE_LIMIT);
+const verifyEmailLimiter = rateLimit(VERIFY_EMAIL_RATE_LIMIT);
 
 const router = Router();
 
@@ -41,9 +50,15 @@ router.post('/login', loginLimiter, validate(loginSchema), login);
 router.post('/logout', logout);
 
 router.get('/me', protect, getMe);
-router.post('/refresh', refresh);
+router.post('/refresh', refreshLimiter, refresh);
 
-router.post('/verify-email', validate(verifyEmailSchema), verifyEmail);
+router.post(
+    '/verify-email',
+    verifyEmailLimiter,
+    validate(verifyEmailSchema),
+    verifyEmail,
+);
+
 router.post(
     '/resend-verification',
     resendVerificationLimiter,
@@ -53,14 +68,14 @@ router.post(
 
 router.post(
     '/forgot-password',
-    passwordResetLimiter,
+    requestPasswordResetLimiter,
     validate(forgotPasswordSchema),
     forgotPassword,
 );
 
 router.post(
     '/reset-password',
-    resetPasswordLimiter,
+    confirmPasswordResetLimiter,
     validate(resetPasswordSchema),
     resetPassword,
 );
