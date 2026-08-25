@@ -5,6 +5,12 @@ import {BAD_REQUEST} from '../constants/http';
 
 type ValidateTarget = 'body' | 'params' | 'query';
 
+declare module 'express-serve-static-core' {
+    interface Request {
+        validated?: Partial<Record<ValidateTarget, unknown>>;
+    }
+}
+
 export const validate =
     (schema: z.ZodType, target: ValidateTarget = 'body') =>
     (req: Request, _res: Response, next: NextFunction) => {
@@ -19,6 +25,11 @@ export const validate =
             throw new AppError('Validation failed', BAD_REQUEST, details);
         }
 
-        req[target] = result.data;
+        if (target === 'body') {
+            req.body = result.data;
+        } else {
+            req.validated = {...req.validated, [target]: result.data};
+        }
+
         next();
     };
