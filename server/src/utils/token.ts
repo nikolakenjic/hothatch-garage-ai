@@ -29,7 +29,11 @@ const verifyToken = (token: string, secret: string): TokenPayload => {
         });
 
         return tokenPayloadSchema.parse(decoded);
-    } catch {
+    } catch (error) {
+        console.error(
+            'Token verification failed:',
+            error instanceof Error ? error.message : error,
+        );
         throw new AppError('Invalid or expired token', UNAUTHORIZED);
     }
 };
