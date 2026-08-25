@@ -5,7 +5,6 @@ import {IUser, User} from './user.model';
 import {Session} from './session.model';
 import {
     generateToken,
-    getTokenExpiration,
     hashToken,
     signAccessToken,
     signRefreshToken,
@@ -28,6 +27,7 @@ import {
     BCRYPT_SALT_ROUNDS,
     EMAIL_VERIFICATION_TOKEN_TTL_MS,
     PASSWORD_RESET_TOKEN_TTL_MS,
+    REFRESH_TOKEN_TTL_SECONDS,
 } from '../../constants/auth.constants';
 import {HydratedDocument} from 'mongoose';
 
@@ -105,7 +105,7 @@ export const loginService = async (email: string, password: string) => {
     await Session.create({
         user: user._id,
         refreshTokenHash: hashToken(refreshToken),
-        expiresAt: getTokenExpiration(refreshToken),
+        expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000),
     });
 
     return {user, accessToken, refreshToken};

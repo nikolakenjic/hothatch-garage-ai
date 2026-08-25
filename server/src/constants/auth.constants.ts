@@ -20,5 +20,10 @@ export const RESEND_VERIFICATION_RATE_LIMIT = {
     message: 'Too many verification email requests, try again later',
 };
 
-export const ACCESS_TOKEN_COOKIE_TTL_MS = 15 * 60 * 1000; // 15 min
-export const REFRESH_TOKEN_COOKIE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+export const ACCESS_TOKEN_TTL_SECONDS = 15 * 60; // 15 min
+
+export const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+
+export const ACCESS_TOKEN_COOKIE_TTL_MS = ACCESS_TOKEN_TTL_SECONDS * 1000;
+
+export const REFRESH_TOKEN_COOKIE_TTL_MS = REFRESH_TOKEN_TTL_SECONDS * 1000;
