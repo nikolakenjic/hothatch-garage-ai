@@ -14,7 +14,14 @@ import {CREATED, OK, UNAUTHORIZED} from '../../constants/http';
 import {catchAsync} from '../../utils/catchAsync';
 import {getUserId} from '../../utils/getUser';
 import {toUserResponse} from '../user/user.mapper';
-import {RegisterInput} from './auth.validation';
+import {
+    ForgotPasswordInput,
+    LoginInput,
+    RegisterInput,
+    ResendVerificationInput,
+    ResetPasswordInput,
+    VerifyEmailInput,
+} from './auth.validation';
 import {
     accessTokenCookieOptions,
     authCookieClearOptions,
@@ -41,22 +48,24 @@ export const register = catchAsync(
     },
 );
 
-export const login = catchAsync(async (req: Request, res: Response) => {
-    const {email, password} = req.body;
+export const login = catchAsync(
+    async (req: Request<{}, {}, LoginInput>, res: Response) => {
+        const {email, password} = req.body;
 
-    const {user, accessToken, refreshToken} = await loginService(
-        email,
-        password,
-    );
+        const {user, accessToken, refreshToken} = await loginService(
+            email,
+            password,
+        );
 
-    res.cookie('accessToken', accessToken, accessTokenCookieOptions);
-    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
+        res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+        res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
-    res.status(OK).json({
-        message: 'Login successful',
-        user: toUserResponse(user),
-    });
-});
+        res.status(OK).json({
+            message: 'Login successful',
+            user: toUserResponse(user),
+        });
+    },
+);
 
 export const logout = catchAsync(async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
@@ -98,19 +107,21 @@ export const refresh = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
-    const {token} = req.body;
+export const verifyEmail = catchAsync(
+    async (req: Request<{}, {}, VerifyEmailInput>, res: Response) => {
+        const {token} = req.body;
 
-    const user = await verifyEmailService(token);
+        const user = await verifyEmailService(token);
 
-    res.status(OK).json({
-        message: 'Email verified successfully',
-        user: toUserResponse(user),
-    });
-});
+        res.status(OK).json({
+            message: 'Email verified successfully',
+            user: toUserResponse(user),
+        });
+    },
+);
 
 export const resendVerification = catchAsync(
-    async (req: Request, res: Response) => {
+    async (req: Request<{}, {}, ResendVerificationInput>, res: Response) => {
         const {email} = req.body;
 
         await resendVerificationService(email);
@@ -123,7 +134,7 @@ export const resendVerification = catchAsync(
 );
 
 export const forgotPassword = catchAsync(
-    async (req: Request, res: Response) => {
+    async (req: Request<{}, {}, ForgotPasswordInput>, res: Response) => {
         const {email} = req.body;
 
         await forgotPasswordService(email);
@@ -135,12 +146,14 @@ export const forgotPassword = catchAsync(
     },
 );
 
-export const resetPassword = catchAsync(async (req: Request, res: Response) => {
-    const {token, newPassword} = req.body;
+export const resetPassword = catchAsync(
+    async (req: Request<{}, {}, ResetPasswordInput>, res: Response) => {
+        const {token, newPassword} = req.body;
 
-    await resetPasswordService(token, newPassword);
+        await resetPasswordService(token, newPassword);
 
-    res.status(OK).json({
-        message: 'Password reset successfully',
-    });
-});
+        res.status(OK).json({
+            message: 'Password reset successfully',
+        });
+    },
+);

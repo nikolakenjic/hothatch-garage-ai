@@ -31,7 +31,7 @@ export const REQUEST_PASSWORD_RESET_RATE_LIMIT: RateLimitConfig = {
 export const CONFIRM_PASSWORD_RESET_RATE_LIMIT: RateLimitConfig = {
     windowMs: 15 * 60 * 1000,
     max: 10,
-    message: 'Too many attempts, try again later',
+    message: 'Too many password reset attempts, try again later',
 };
 
 export const RESEND_VERIFICATION_RATE_LIMIT: RateLimitConfig = {
