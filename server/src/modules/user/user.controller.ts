@@ -13,10 +13,10 @@ import {getUserId} from '../../utils/getUser';
 import {toUserResponse} from './user.mapper';
 import type {
     ChangePasswordInput,
-    PublicProfileInput,
     UpdateProfileInput,
     UpdateSettingsInput,
 } from './user.validation';
+import {authCookieClearOptions} from '../auth/auth.cookies';
 
 export const updateProfile = catchAsync(
     async (req: Request<{}, {}, UpdateProfileInput>, res: Response) => {
@@ -47,6 +47,9 @@ export const changePassword = catchAsync(
 export const deleteAccount = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
     await deleteAccountService(userId);
+
+    res.clearCookie('accessToken', authCookieClearOptions);
+    res.clearCookie('refreshToken', authCookieClearOptions);
 
     res.status(OK).json({
         status: 'success',
