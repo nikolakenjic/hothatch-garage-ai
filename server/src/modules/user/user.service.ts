@@ -6,26 +6,13 @@ import {Modification} from '../modification/modification.model';
 import {AIRecommendation} from '../ai/ai.model';
 import {Session} from '../auth/session.model';
 import {BCRYPT_SALT_ROUNDS} from '../../constants/auth.constants';
-import {NOT_FOUND, UNAUTHORIZED} from '../../constants/http';
-import type {ChangePasswordInput} from './user.validation';
-
-type UpdateProfileInput = {
-    username?: string;
-    displayName?: string;
-    bio?: string;
-    avatarUrl?: string;
-};
-
-type UpdateSettingsInput = {
-    preferences?: {
-        theme?: 'light' | 'dark' | 'system';
-        emailNotifications?: boolean;
-    };
-    privacy?: {
-        publicProfile?: boolean;
-        publicGarage?: boolean;
-    };
-};
+import {NOT_FOUND, UNAUTHORIZED, CONFLICT} from '../../constants/http';
+import type {
+    ChangePasswordInput,
+    UpdateProfileInput,
+    UpdateSettingsInput,
+} from './user.validation';
+import {toPublicProfileResponse} from './user.mapper';
 
 export const updateProfileService = async (
     userId: string,
@@ -45,16 +32,14 @@ export const updateProfileService = async (
         });
 
         if (existingUser) {
-            throw new AppError('Username is already taken', 409);
+            throw new AppError('Username is already taken', CONFLICT);
         }
     }
 
     const user = await User.findByIdAndUpdate(userId, allowedFields, {
         new: true,
         runValidators: true,
-    }).select(
-        '-password -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires -__v',
-    );
+    }).select('-__v');
 
     if (!user) {
         throw new AppError('User not found', NOT_FOUND);
@@ -70,7 +55,7 @@ export const changePasswordService = async (
     const user = await User.findById(userId).select('+passwordHash');
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        throw new AppError('User not found', NOT_FOUND);
     }
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -126,27 +111,18 @@ export const getUserStatsService = async (userId: string) => {
 };
 
 export const getPublicProfileService = async (username: string) => {
-    console.log(username);
-
     const user = await User.findOne({
         username: username.toLowerCase(),
+        'privacy.publicProfile': true,
     });
 
-    console.log(user);
-    // const user = await User.findOne({
-    //     username: username.toLowerCase(),
-    //     'privacy.publicProfile': true,
-    // }).select(
-    //     'username displayName bio avatarUrl createdAt privacy.publicGarage',
-    // );
-
     if (!user || !user.username) {
-        throw new AppError('Profile not found', 404);
+        throw new AppError('Profile not found', NOT_FOUND);
     }
 
     const publicGarage = user.privacy?.publicGarage ?? false;
 
-    const profile = {
+    const profile = toPublicProfileResponse({
         id: user._id.toString(),
         username: user.username,
         displayName: user.displayName,
@@ -154,7 +130,7 @@ export const getPublicProfileService = async (username: string) => {
         avatarUrl: user.avatarUrl,
         createdAt: user.createdAt,
         publicGarage,
-    };
+    });
 
     if (!publicGarage) {
         return {
@@ -235,12 +211,10 @@ export const updateSettingsService = async (
             new: true,
             runValidators: true,
         },
-    ).select(
-        '-password -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires -__v',
-    );
+    ).select(' -__v');
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        throw new AppError('User not found', NOT_FOUND);
     }
 
     return user;

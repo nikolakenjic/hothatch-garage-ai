@@ -11,18 +11,25 @@ import {
 } from './user.service';
 import {getUserId} from '../../utils/getUser';
 import {toUserResponse} from './user.mapper';
-import {ChangePasswordInput} from './user.validation';
+import type {
+    ChangePasswordInput,
+    PublicProfileInput,
+    UpdateProfileInput,
+    UpdateSettingsInput,
+} from './user.validation';
 
-export const updateProfile = catchAsync(async (req: Request, res: Response) => {
-    const userId = getUserId(req);
+export const updateProfile = catchAsync(
+    async (req: Request<{}, {}, UpdateProfileInput>, res: Response) => {
+        const userId = getUserId(req);
 
-    const user = await updateProfileService(userId, req.body);
+        const user = await updateProfileService(userId, req.body);
 
-    res.status(OK).json({
-        message: 'Profile updated successfully',
-        user: toUserResponse(user),
-    });
-});
+        res.status(OK).json({
+            message: 'Profile updated successfully',
+            user: toUserResponse(user),
+        });
+    },
+);
 
 export const changePassword = catchAsync(
     async (req: Request<{}, {}, ChangePasswordInput>, res: Response) => {
@@ -74,7 +81,7 @@ export const getPublicProfile = catchAsync(
 );
 
 export const updateSettings = catchAsync(
-    async (req: Request, res: Response) => {
+    async (req: Request<{}, {}, UpdateSettingsInput>, res: Response) => {
         const userId = getUserId(req);
 
         const user = await updateSettingsService(userId, req.body);
