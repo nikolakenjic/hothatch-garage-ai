@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {passwordPolicySchema} from '../../validations/common.validation';
 
 export const updateProfileSchema = z.object({
     username: z
@@ -23,10 +24,10 @@ export const updateProfileSchema = z.object({
 });
 
 export const changePasswordSchema = z.object({
-    currentPassword: z.string().min(6, 'Current password is required'),
-    newPassword: z
-        .string()
-        .min(6, 'New password must be at least 6 characters'),
+    currentPassword: z
+        .string({error: 'Current password is required'})
+        .min(1, 'Current password is required'),
+    newPassword: passwordPolicySchema,
 });
 
 export const publicProfileSchema = z.object({
@@ -58,3 +59,5 @@ export const updateSettingsSchema = z
             message: 'At least one settings field is required',
         },
     );
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

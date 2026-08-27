@@ -11,6 +11,7 @@ import {
 } from './user.service';
 import {getUserId} from '../../utils/getUser';
 import {toUserResponse} from './user.mapper';
+import {ChangePasswordInput} from './user.validation';
 
 export const updateProfile = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
@@ -24,7 +25,7 @@ export const updateProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const changePassword = catchAsync(
-    async (req: Request, res: Response) => {
+    async (req: Request<{}, {}, ChangePasswordInput>, res: Response) => {
         const userId = getUserId(req);
 
         await changePasswordService(userId, req.body);

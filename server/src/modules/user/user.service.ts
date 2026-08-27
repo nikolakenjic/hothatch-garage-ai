@@ -6,17 +6,14 @@ import {Modification} from '../modification/modification.model';
 import {AIRecommendation} from '../ai/ai.model';
 import {Session} from '../auth/session.model';
 import {BCRYPT_SALT_ROUNDS} from '../../constants/auth.constants';
+import {NOT_FOUND, UNAUTHORIZED} from '../../constants/http';
+import type {ChangePasswordInput} from './user.validation';
 
 type UpdateProfileInput = {
     username?: string;
     displayName?: string;
     bio?: string;
     avatarUrl?: string;
-};
-
-type ChangePasswordInput = {
-    currentPassword: string;
-    newPassword: string;
 };
 
 type UpdateSettingsInput = {
@@ -60,7 +57,7 @@ export const updateProfileService = async (
     );
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        throw new AppError('User not found', NOT_FOUND);
     }
 
     return user;
@@ -82,7 +79,7 @@ export const changePasswordService = async (
     );
 
     if (!isPasswordCorrect) {
-        throw new AppError('Current password is incorrect', 401);
+        throw new AppError('Current password is incorrect', UNAUTHORIZED);
     }
 
     user.passwordHash = await bcrypt.hash(
