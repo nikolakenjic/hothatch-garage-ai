@@ -1,27 +1,45 @@
 import {z} from 'zod';
 import {passwordPolicySchema} from '../../validations/common.validation';
 
-export const updateProfileSchema = z.object({
-    username: z
-        .string()
-        .min(3, 'Username must be at least 3 characters')
-        .max(30, 'Username must be at most 30 characters')
-        .regex(
-            /^[a-zA-Z0-9_]+$/,
-            'Username can only contain letters, numbers and underscores',
-        )
-        .optional(),
+export const updateProfileSchema = z
+    .object({
+        username: z
+            .string()
+            .trim()
+            .min(3, 'Username must be at least 3 characters')
+            .max(30, 'Username must be at most 30 characters')
+            .regex(
+                /^[a-zA-Z0-9_]+$/,
+                'Username can only contain letters, numbers and underscores',
+            )
+            .optional(),
 
-    displayName: z
-        .string()
-        .min(2, 'Display name must be at least 2 characters')
-        .max(50, 'Display name must be at most 50 characters')
-        .optional(),
+        displayName: z
+            .string()
+            .trim()
+            .min(2, 'Display name must be at least 2 characters')
+            .max(50, 'Display name must be at most 50 characters')
+            .optional(),
 
-    bio: z.string().max(300, 'Bio must be at most 300 characters').optional(),
+        bio: z
+            .string()
+            .trim()
+            .min(1, 'Bio is required')
+            .max(300, 'Bio must be at most 300 characters')
+            .optional(),
 
-    avatarUrl: z.string().url('Avatar must be a valid URL').optional(),
-});
+        avatarUrl: z.string().url('Avatar must be a valid URL').optional(),
+    })
+    .refine(
+        (data) =>
+            data.username !== undefined ||
+            data.displayName !== undefined ||
+            data.bio !== undefined ||
+            data.avatarUrl !== undefined,
+        {
+            message: 'At least one profile field is required',
+        },
+    );
 
 export const changePasswordSchema = z.object({
     currentPassword: z

@@ -18,12 +18,23 @@ export const updateProfileService = async (
     userId: string,
     input: UpdateProfileInput,
 ) => {
-    const allowedFields: UpdateProfileInput = {
-        username: input.username?.toLowerCase(),
-        displayName: input.displayName,
-        bio: input.bio,
-        avatarUrl: input.avatarUrl,
-    };
+    const update: Partial<UpdateProfileInput> = {};
+
+    if (input.username !== undefined) {
+        update.username = input.username.toLowerCase();
+    }
+
+    if (input.displayName !== undefined) {
+        update.displayName = input.displayName;
+    }
+
+    if (input.bio !== undefined) {
+        update.bio = input.bio;
+    }
+
+    if (input.avatarUrl !== undefined) {
+        update.avatarUrl = input.avatarUrl;
+    }
 
     if (input.username) {
         const existingUser = await User.findOne({
@@ -36,10 +47,14 @@ export const updateProfileService = async (
         }
     }
 
-    const user = await User.findByIdAndUpdate(userId, allowedFields, {
-        new: true,
-        runValidators: true,
-    }).select('-__v');
+    const user = await User.findByIdAndUpdate(
+        userId,
+        {$set: update},
+        {
+            new: true,
+            runValidators: true,
+        },
+    ).select('-__v');
 
     if (!user) {
         throw new AppError('User not found', NOT_FOUND);
@@ -90,23 +105,29 @@ export const deleteAccountService = async (userId: string) => {
 };
 
 export const getUserStatsService = async (userId: string) => {
-    const cars = await Car.find({user: userId});
+    const cars = await Car.find({user: userId}).select('_id').lean();
 
     const carIds = cars.map((car) => car._id);
 
-    const modifications = await Modification.find({
-        car: {$in: carIds},
-    });
-
-    const totalMoneySpent = modifications.reduce(
-        (sum, mod) => sum + (mod.cost || 0),
-        0,
-    );
+    const [modificationStats] = await Modification.aggregate([
+        {
+            $match: {
+                car: {$in: carIds},
+            },
+        },
+        {
+            $group: {
+                _id: null,
+                totalModifications: {$sum: 1},
+                totalMoneySpent: {$sum: {$ifNull: ['$cost', 0]}},
+            },
+        },
+    ]);
 
     return {
         totalCars: cars.length,
-        totalModifications: modifications.length,
-        totalMoneySpent,
+        totalModifications: modificationStats?.totalModifications ?? 0,
+        totalMoneySpent: modificationStats?.totalMoneySpent ?? 0,
     };
 };
 
@@ -149,21 +170,27 @@ export const getPublicProfileService = async (username: string) => {
 
     const carIds = cars.map((car) => car._id);
 
-    const modifications = await Modification.find({
-        car: {$in: carIds},
-    }).select('car cost');
-
-    const totalMoneySpent = modifications.reduce(
-        (sum, modification) => sum + (modification.cost ?? 0),
-        0,
-    );
+    const [modificationStats] = await Modification.aggregate([
+        {
+            $match: {
+                car: {$in: carIds},
+            },
+        },
+        {
+            $group: {
+                _id: null,
+                totalModifications: {$sum: 1},
+                totalMoneySpent: {$sum: {$ifNull: ['$cost', 0]}},
+            },
+        },
+    ]);
 
     return {
         profile,
         stats: {
             totalCars: cars.length,
-            totalModifications: modifications.length,
-            totalMoneySpent,
+            totalModifications: modificationStats?.totalModifications ?? 0,
+            totalMoneySpent: modificationStats?.totalMoneySpent ?? 0,
         },
         cars: cars.map((car) => ({
             id: car._id.toString(),
