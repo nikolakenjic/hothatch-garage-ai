@@ -67,14 +67,6 @@ const carSchema = new Schema<ICar>(
             type: String,
             enum: ['fwd', 'rwd', 'awd'],
         },
-        createdAt: {
-            type: Date,
-            default: Date.now,
-        },
-        updatedAt: {
-            type: Date,
-            default: Date.now,
-        },
     },
     {
         timestamps: true,

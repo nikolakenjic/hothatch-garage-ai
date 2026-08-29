@@ -39,6 +39,6 @@ export const updateCarSchema = z
         drivetrain: carBaseSchema.drivetrain,
     })
     .refine(
-        (data) => data.brand || data.model || data.year !== undefined,
+        (data) => Object.values(data).some((value) => value !== undefined),
         'At least one field must be provided',
     );

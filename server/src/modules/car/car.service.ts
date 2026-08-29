@@ -1,4 +1,6 @@
+import {NOT_FOUND} from '../../constants/http';
 import {AppError} from '../../utils/AppError';
+import {Modification} from '../modification/modification.model';
 import {Car} from './car.model';
 
 type CreateCarInput = {
@@ -75,14 +77,13 @@ export const getMyCarsService = async (
 };
 
 export const findOwnedCarOrFail = async (carId: string, userId: string) => {
-    const car = await Car.findById(carId);
+    const car = await Car.findOne({
+        _id: carId,
+        user: userId,
+    });
 
     if (!car) {
-        throw new AppError('Car not found', 404);
-    }
-
-    if (car.user.toString() !== userId) {
-        throw new AppError('Not authorized', 403);
+        throw new AppError('Car not found', NOT_FOUND);
     }
 
     return car;
@@ -113,6 +114,7 @@ export const getCarDetailsService = async (carId: string, userId: string) => {
 export const deleteCarService = async (carId: string, userId: string) => {
     const car = await findOwnedCarOrFail(carId, userId);
 
+    await Modification.deleteMany({car: car._id});
     await car.deleteOne();
 };
 
