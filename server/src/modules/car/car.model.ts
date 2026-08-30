@@ -25,6 +25,7 @@ const carSchema = new Schema<ICar>(
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
+            index: true,
         },
         brand: {
             type: String,

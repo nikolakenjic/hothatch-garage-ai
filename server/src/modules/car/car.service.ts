@@ -4,6 +4,9 @@ import {Modification} from '../modification/modification.model';
 import {Car} from './car.model';
 import {CreateCarInput, GetMyCarsQuery, UpdateCarInput} from './car.validation';
 
+const escapeRegex = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export const createCarService = async (
     userId: string,
     data: CreateCarInput,
@@ -26,10 +29,12 @@ export const getMyCarsService = async (
     };
 
     if (query.search) {
+        const search = escapeRegex(query.search);
+
         filter.$or = [
-            {brand: {$regex: query.search, $options: 'i'}},
-            {model: {$regex: query.search, $options: 'i'}},
-            {nickname: {$regex: query.search, $options: 'i'}},
+            {brand: {$regex: search, $options: 'i'}},
+            {model: {$regex: search, $options: 'i'}},
+            {nickname: {$regex: search, $options: 'i'}},
         ];
     }
 
