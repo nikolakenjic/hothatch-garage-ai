@@ -20,23 +20,26 @@ const modificationStatusSchema = z.enum([
 ]);
 
 export const createModificationSchema = z.object({
-    title: z.string().min(1, 'Title is required').max(120),
-    description: z.string().max(1000).optional(),
+    title: z.string().trim().min(1, 'Title is required').max(120),
+    description: z.string().trim().max(1000).optional(),
     category: modificationCategorySchema,
     status: modificationStatusSchema.optional(),
     cost: z.number().min(0, 'Cost must be positive').optional(),
     installedAt: z.coerce.date().optional(),
-    brand: z.string().max(80).optional(),
-    partNumber: z.string().max(80).optional(),
+    brand: z.string().trim().max(80).optional(),
+    partNumber: z.string().trim().max(80).optional(),
     mileage: z.number().min(0).optional(),
-    notes: z.string().max(1000).optional(),
+    notes: z.string().trim().max(1000).optional(),
 });
 
 export const updateModificationSchema = createModificationSchema
     .partial()
-    .refine((data) => Object.keys(data).length > 0, {
-        message: 'At least one field must be provided',
-    });
+    .refine(
+        (data) => Object.values(data).some((value) => value !== undefined),
+        {
+            message: 'At least one field must be provided',
+        },
+    );
 
 export const modificationIdParamsSchema = z.object({
     id: objectIdSchema,
@@ -45,3 +48,7 @@ export const modificationIdParamsSchema = z.object({
 export const carIdParamsSchema = z.object({
     carId: objectIdSchema,
 });
+
+export type CreateModificationInput = z.infer<typeof createModificationSchema>;
+
+export type UpdateModificationInput = z.infer<typeof updateModificationSchema>;
