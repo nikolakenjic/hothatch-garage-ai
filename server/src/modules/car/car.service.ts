@@ -2,29 +2,7 @@ import {NOT_FOUND} from '../../constants/http';
 import {AppError} from '../../utils/AppError';
 import {Modification} from '../modification/modification.model';
 import {Car} from './car.model';
-
-type CreateCarInput = {
-    brand: string;
-    model: string;
-    year: number;
-    nickname?: string;
-    fuelType?: 'petrol' | 'diesel' | 'hybrid' | 'electric';
-    horsepower?: number;
-    torque?: number;
-    transmission?: 'manual' | 'automatic' | 'dsg';
-    drivetrain?: 'fwd' | 'rwd' | 'awd';
-};
-
-type UpdateCarInput = Partial<CreateCarInput>;
-
-type GetMyCarsQuery = {
-    search?: string;
-    fuelType?: string;
-    transmission?: string;
-    drivetrain?: string;
-    page?: string;
-    limit?: string;
-};
+import {CreateCarInput, GetMyCarsQuery, UpdateCarInput} from './car.validation';
 
 export const createCarService = async (
     userId: string,
@@ -40,8 +18,7 @@ export const getMyCarsService = async (
     userId: string,
     query: GetMyCarsQuery,
 ) => {
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
+    const {page, limit} = query;
     const skip = (page - 1) * limit;
 
     const filter: Record<string, unknown> = {

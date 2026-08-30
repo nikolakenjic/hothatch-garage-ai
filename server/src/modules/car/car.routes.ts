@@ -12,13 +12,14 @@ import {validate} from '../../middlewares/validate';
 import {
     carIdParamsSchema,
     createCarSchema,
+    getMyCarsQuerySchema,
     updateCarSchema,
 } from './car.validation';
 
 const router = Router();
 
 router.post('/', protect, validate(createCarSchema), createCar);
-router.get('/', protect, getMyCars);
+router.get('/', protect, validate(getMyCarsQuerySchema, 'query'), getMyCars);
 router.get('/summary', protect, getGarageSummary);
 router.get('/:id', protect, validate(carIdParamsSchema, 'params'), getCarById);
 
