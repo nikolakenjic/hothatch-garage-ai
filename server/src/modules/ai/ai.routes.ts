@@ -17,6 +17,7 @@ import {
     buildReviewSchema,
     costAnalysisSchema,
     nextUpgradeSchema,
+    recommendationsQuerySchema,
     recommendCarSchema,
 } from './ai.validation';
 
@@ -29,7 +30,12 @@ router.post(
     validate(aiCarParamsSchema, 'params'),
     recommendUpgrade,
 );
-router.get('/recommendations', protect, getRecommendations);
+router.get(
+    '/recommendations',
+    protect,
+    validate(recommendationsQuerySchema, 'query'),
+    getRecommendations,
+);
 router.get(
     '/recommendations/car/:carId',
     protect,

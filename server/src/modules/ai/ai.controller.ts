@@ -12,6 +12,7 @@ import {
 } from './ai.service';
 import {OK} from '../../constants/http';
 import {getUserId} from '../../utils/getUser';
+import type {RecommendationsQuery} from './ai.validation';
 
 export const recommendCar = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
@@ -43,9 +44,12 @@ export const recommendUpgrade = catchAsync(
 export const getRecommendations = catchAsync(
     async (req: Request, res: Response) => {
         const userId = getUserId(req);
-        const type = req.query.type as string | undefined;
+        const query = req.query as unknown as RecommendationsQuery;
 
-        const recommendations = await getRecommendationsService(userId, type);
+        const recommendations = await getRecommendationsService(
+            userId,
+            query.type,
+        );
 
         res.status(OK).json({
             message: 'Recommendations fetched successfully',

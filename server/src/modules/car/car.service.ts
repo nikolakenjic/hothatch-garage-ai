@@ -3,6 +3,7 @@ import {AppError} from '../../utils/AppError';
 import {Modification} from '../modification/modification.model';
 import {Car} from './car.model';
 import {CreateCarInput, GetMyCarsQuery, UpdateCarInput} from './car.validation';
+import {AIRecommendation} from '../ai/ai.model';
 
 const escapeRegex = (value: string) =>
     value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -96,7 +97,11 @@ export const getCarDetailsService = async (carId: string, userId: string) => {
 export const deleteCarService = async (carId: string, userId: string) => {
     const car = await findOwnedCarOrFail(carId, userId);
 
-    await Modification.deleteMany({car: car._id});
+    await Promise.all([
+        Modification.deleteMany({car: car._id}),
+        AIRecommendation.deleteMany({car: car._id}),
+    ]);
+
     await car.deleteOne();
 };
 

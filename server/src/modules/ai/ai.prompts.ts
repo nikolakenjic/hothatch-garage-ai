@@ -1,13 +1,15 @@
 import {
+    CarPromptInput,
+    ModificationPromptInput,
+    PreviousRecommendationPromptInput,
+} from './ai.types';
+import {
     BuildPlanInput,
     BuildReviewInput,
-    CarPromptInput,
     CostAnalysisInput,
-    ModificationPromptInput,
     NextUpgradeInput,
-    PreviousRecommendationPromptInput,
     RecommendCarInput,
-} from './ai.types';
+} from './ai.validation';
 
 const formatModsList = (modifications: ModificationPromptInput[]) => {
     if (modifications.length === 0) {

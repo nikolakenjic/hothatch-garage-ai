@@ -1,8 +1,9 @@
 import {z} from 'zod';
 import {objectIdSchema} from '../../validations/common.validation';
+import {AIRecommendationType} from './ai.types';
 
-const requiredString = (message: string) =>
-    z.string({error: message}).min(1, message);
+const requiredString = (message: string, maxLength = 500) =>
+    z.string({error: message}).trim().min(1, message).max(maxLength);
 
 export const recommendCarSchema = z.object({
     budget: requiredString('Budget is required'),
@@ -32,3 +33,15 @@ export const costAnalysisSchema = z.object({
     budget: requiredString('Budget is required'),
     goal: requiredString('Goal is required'),
 });
+
+export const recommendationsQuerySchema = z.object({
+    type: z.nativeEnum(AIRecommendationType).optional(),
+});
+
+export type RecommendCarInput = z.infer<typeof recommendCarSchema>;
+export type BuildPlanInput = z.infer<typeof buildPlanSchema>;
+export type NextUpgradeInput = z.infer<typeof nextUpgradeSchema>;
+export type BuildReviewInput = z.infer<typeof buildReviewSchema>;
+export type CostAnalysisInput = z.infer<typeof costAnalysisSchema>;
+
+export type RecommendationsQuery = z.infer<typeof recommendationsQuerySchema>;
