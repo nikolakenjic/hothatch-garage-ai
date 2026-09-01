@@ -20,7 +20,7 @@ const carBaseSchema = {
     fuelType: z.enum(['petrol', 'diesel', 'hybrid', 'electric']).optional(),
     horsepower: z.number().int().min(1).max(2000).optional(),
     torque: z.number().int().min(1).max(3000).optional(),
-    transmission: z.enum(['manual', 'automatic', 'dsg']).optional(),
+    transmission: z.enum(['manual', 'automatic']).optional(),
     drivetrain: z.enum(['fwd', 'rwd', 'awd']).optional(),
 };
 
@@ -48,7 +48,7 @@ export const getMyCarsQuerySchema = z.object({
 
     fuelType: z.enum(['petrol', 'diesel', 'hybrid', 'electric']).optional(),
 
-    transmission: z.enum(['manual', 'automatic', 'dsg']).optional(),
+    transmission: z.enum(['manual', 'automatic']).optional(),
 
     drivetrain: z.enum(['fwd', 'rwd', 'awd']).optional(),
 

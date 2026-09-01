@@ -62,7 +62,7 @@ const carSchema = new Schema<ICar>(
         },
         transmission: {
             type: String,
-            enum: ['manual', 'automatic', 'dsg'],
+            enum: ['manual', 'automatic'],
         },
         drivetrain: {
             type: String,
