@@ -97,10 +97,13 @@ export const deleteAccountService = async (userId: string) => {
 
     const carIds = cars.map((car) => car._id);
 
-    await Modification.deleteMany({car: {$in: carIds}});
-    await AIRecommendation.deleteMany({user: userId});
-    await Session.deleteMany({user: userId});
-    await Car.deleteMany({user: userId});
+    await Promise.all([
+        Modification.deleteMany({car: {$in: carIds}}),
+        AIRecommendation.deleteMany({user: userId}),
+        Session.deleteMany({user: userId}),
+        Car.deleteMany({user: userId}),
+    ]);
+
     await User.findByIdAndDelete(userId);
 };
 

@@ -10,7 +10,7 @@ import aiRoutes from './modules/ai/ai.routes';
 
 import {errorHandler} from './middlewares/errorHandler';
 import {AppError} from './utils/AppError';
-import {NOT_FOUND} from './constants/http';
+import {NOT_FOUND, OK} from './constants/http';
 
 import userRoutes from './modules/user/user.routes';
 
@@ -23,7 +23,7 @@ app.use(
     }),
 );
 
-app.use(express.json());
+app.use(express.json({limit: '100kb'}));
 app.use(cookieParser());
 
 app.use('/api/v1/auth', authRoutes);
@@ -34,7 +34,7 @@ app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/users', userRoutes);
 
 app.get('/api/v1/health', (_req, res) => {
-    res.status(200).json({
+    res.status(OK).json({
         message: 'HotHatch Garage AI API is running',
     });
 });
