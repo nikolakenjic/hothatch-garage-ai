@@ -1,20 +1,21 @@
 import {Bot, CalendarDays, CarFront} from 'lucide-react';
 
 import GlassPanel from '@/components/shared/GlassPanel';
-import {Recommendation} from '@/types/ai';
+import {RecommendationHistoryItem} from '@/types/ai';
 
 type RecommendationHistoryListProps = {
-    recommendations: Recommendation[];
+    recommendations: RecommendationHistoryItem[];
 };
 
-const recommendationLabels: Record<Recommendation['type'], string> = {
-    'next-upgrade': 'Next upgrade',
-    'next-upgrade-advisor': 'Next upgrade advisor',
-    'build-review': 'Build review',
-    'cost-analysis': 'Cost analysis',
-    'car-recommendation': 'Car recommendation',
-    'build-plan': 'Build plan',
-};
+const recommendationLabels: Record<RecommendationHistoryItem['type'], string> =
+    {
+        'next-upgrade': 'Next upgrade',
+        'next-upgrade-advisor': 'Next upgrade advisor',
+        'build-review': 'Build review',
+        'cost-analysis': 'Cost analysis',
+        'car-recommendation': 'Car recommendation',
+        'build-plan': 'Build plan',
+    };
 
 const dateFormatter = new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
@@ -51,7 +52,7 @@ export default function RecommendationHistoryList({
         <section aria-label="AI recommendation history" className="space-y-4">
             {recommendations.map((recommendation) => (
                 <GlassPanel
-                    key={recommendation.id}
+                    key={recommendation._id}
                     variant="solid"
                     className="overflow-hidden"
                 >

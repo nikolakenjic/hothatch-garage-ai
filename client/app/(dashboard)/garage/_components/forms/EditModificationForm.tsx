@@ -1,53 +1,77 @@
 'use client';
 
-import {useForm} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
 import {z} from 'zod';
+
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import ModificationService from '@/services/modification.service';
-import {useRouter} from 'next/navigation';
-import {Modification} from '@/types/modification';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {getErrorMessage} from '@/lib/errors';
+import ModificationService from '@/services/modification.service';
+import {Modification} from '@/types/modification';
 
-const editModSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    category: z.string().min(1, 'Category is required'),
-    price: z.coerce.number().optional(),
+import {modificationCategories} from './AddModificationForm';
+
+const editModificationSchema = z.object({
+    title: z.string().trim().min(1, 'Title is required').max(120),
+    category: z.enum(modificationCategories),
+    cost: z.preprocess((value) => {
+        if (value === '' || value === null || value === undefined) {
+            return undefined;
+        }
+
+        return Number(value);
+    }, z.number().min(0, 'Cost cannot be negative').optional()),
 });
 
-// type EditModInput = z.infer<typeof editModSchema>;
-type AddEditModFormInput = z.input<typeof editModSchema>;
-type AddEditModFormOutput = z.output<typeof editModSchema>;
+type EditModificationFormInput = z.input<typeof editModificationSchema>;
+type EditModificationFormOutput = z.output<typeof editModificationSchema>;
 
-type Props = {
+type EditModificationFormProps = {
     mod: Modification;
     onSuccess?: () => void;
 };
 
-export default function EditModificationForm({mod, onSuccess}: Props) {
+export default function EditModificationForm({
+    mod,
+    onSuccess,
+}: EditModificationFormProps) {
     const router = useRouter();
 
     const {
         register,
+        control,
         handleSubmit,
+        reset,
         formState: {errors, isSubmitting},
-    } = useForm<AddEditModFormInput, unknown, AddEditModFormOutput>({
-        resolver: zodResolver(editModSchema),
-        defaultValues: {
-            name: mod.name,
-            category: mod.category,
-            price: mod.price,
+    } = useForm<EditModificationFormInput, unknown, EditModificationFormOutput>(
+        {
+            resolver: zodResolver(editModificationSchema),
+            defaultValues: {
+                title: mod.title,
+                category: mod.category,
+                cost: mod.cost,
+            },
         },
-    });
+    );
 
-    const onSubmit = async (data: AddEditModFormOutput) => {
+    const onSubmit = async (data: EditModificationFormOutput) => {
         try {
             await ModificationService.updateModification(mod._id, data);
 
-            toast.success('Modification updated! 🔧');
+            toast.success('Modification updated successfully');
+
+            reset(data);
             router.refresh();
             onSuccess?.();
         } catch (error) {
@@ -56,49 +80,155 @@ export default function EditModificationForm({mod, onSuccess}: Props) {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5"
+            noValidate
+        >
+            <FormField
+                id="modification-title"
+                label="Title"
+                error={errors.title?.message}
+            >
                 <Input
-                    id="name"
-                    {...register('name')}
-                    className="border-zinc-200 bg-white text-zinc-950 transition-all hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                    id="modification-title"
+                    placeholder="Performance intake"
+                    aria-invalid={Boolean(errors.title)}
+                    aria-describedby={
+                        errors.title ? 'modification-title-error' : undefined
+                    }
+                    {...register('title')}
+                    className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
                 />
-                {errors.name && (
-                    <p className="text-sm text-red-500">
-                        {errors.name.message}
-                    </p>
-                )}
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Input
-                    id="category"
-                    {...register('category')}
-                    className="border-zinc-200 bg-white text-zinc-950 transition-all hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+            </FormField>
+
+            <FormField
+                id="modification-category"
+                label="Category"
+                error={errors.category?.message}
+            >
+                <Controller
+                    name="category"
+                    control={control}
+                    render={({field}) => (
+                        <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                        >
+                            <SelectTrigger
+                                id="modification-category"
+                                aria-invalid={Boolean(errors.category)}
+                                aria-describedby={
+                                    errors.category
+                                        ? 'modification-category-error'
+                                        : undefined
+                                }
+                                className="h-11 w-full border-border-subtle bg-background/70"
+                            >
+                                <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="performance">
+                                    Performance
+                                </SelectItem>
+                                <SelectItem value="suspension">
+                                    Suspension
+                                </SelectItem>
+                                <SelectItem value="brakes">Brakes</SelectItem>
+                                <SelectItem value="wheels">Wheels</SelectItem>
+                                <SelectItem value="exterior">
+                                    Exterior
+                                </SelectItem>
+                                <SelectItem value="interior">
+                                    Interior
+                                </SelectItem>
+                                <SelectItem value="maintenance">
+                                    Maintenance
+                                </SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
                 />
-                {errors.category && (
-                    <p className="text-sm text-red-500">
-                        {errors.category.message}
-                    </p>
-                )}
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="price">Price (optional)</Label>
+            </FormField>
+
+            <FormField
+                id="modification-cost"
+                label="Cost"
+                description="Optional"
+                error={errors.cost?.message}
+            >
                 <Input
-                    id="price"
+                    id="modification-cost"
                     type="number"
-                    {...register('price')}
-                    className="border-zinc-200 bg-white text-zinc-950 transition-all hover:border-red-300 focus-visible:ring-2 focus-visible:ring-red-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                    min={0}
+                    step="0.01"
+                    inputMode="decimal"
+                    placeholder="350"
+                    aria-invalid={Boolean(errors.cost)}
+                    aria-describedby={
+                        errors.cost
+                            ? 'modification-cost-error'
+                            : 'modification-cost-description'
+                    }
+                    {...register('cost')}
+                    className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
                 />
-            </div>
+            </FormField>
+
             <Button
                 type="submit"
+                size="lg"
                 disabled={isSubmitting}
-                className="h-11 w-full rounded-xl bg-red-600 font-bold text-white hover:bg-red-500"
+                className="w-full font-semibold"
             >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? 'Saving changes...' : 'Save changes'}
             </Button>
         </form>
+    );
+}
+
+type FormFieldProps = {
+    id: string;
+    label: string;
+    description?: string;
+    error?: string;
+    children: React.ReactNode;
+};
+
+function FormField({id, label, description, error, children}: FormFieldProps) {
+    return (
+        <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+                <Label
+                    htmlFor={id}
+                    className="text-sm font-medium text-foreground"
+                >
+                    {label}
+                </Label>
+
+                {description ? (
+                    <span
+                        id={`${id}-description`}
+                        className="text-xs text-muted-foreground"
+                    >
+                        {description}
+                    </span>
+                ) : null}
+            </div>
+
+            {children}
+
+            {error ? (
+                <p
+                    id={`${id}-error`}
+                    role="alert"
+                    className="text-sm text-destructive"
+                >
+                    {error}
+                </p>
+            ) : null}
+        </div>
     );
 }

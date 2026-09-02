@@ -12,7 +12,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 
-import {NextUpgradeInput, Recommendation} from '@/types/ai';
+import {GeneratedRecommendation, NextUpgradeInput} from '@/types/ai';
 import AiService from '@/services/ai.service';
 
 const nextUpgradeSchema = z.object({
@@ -25,9 +25,8 @@ type NextUpgradeFormProps = {
 };
 
 export default function NextUpgradeForm({carId}: NextUpgradeFormProps) {
-    const [recommendation, setRecommendation] = useState<Recommendation | null>(
-        null,
-    );
+    const [recommendation, setRecommendation] =
+        useState<GeneratedRecommendation | null>(null);
 
     const {
         register,

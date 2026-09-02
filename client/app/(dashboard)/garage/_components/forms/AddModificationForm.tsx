@@ -2,7 +2,7 @@
 
 import {useRouter} from 'next/navigation';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import {toast} from 'sonner';
 import {z} from 'zod';
 
@@ -11,17 +11,35 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 import ModificationService from '@/services/modification.service';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+
+export const modificationCategories = [
+    'performance',
+    'suspension',
+    'brakes',
+    'wheels',
+    'exterior',
+    'interior',
+    'maintenance',
+    'other',
+] as const;
 
 const addModificationSchema = z.object({
-    name: z.string().trim().min(1, 'Name is required'),
-    category: z.string().trim().min(1, 'Category is required'),
-    price: z.preprocess((value) => {
+    title: z.string().trim().min(1, 'Title is required').max(120),
+    category: z.enum(modificationCategories),
+    cost: z.preprocess((value) => {
         if (value === '' || value === null || value === undefined) {
             return undefined;
         }
 
         return Number(value);
-    }, z.number().min(0, 'Price cannot be negative').optional()),
+    }, z.number().min(0, 'Cost cannot be negative').optional()),
 });
 
 type AddModificationFormInput = z.input<typeof addModificationSchema>;
@@ -36,15 +54,16 @@ export default function AddModificationForm({carId}: AddModificationFormProps) {
 
     const {
         register,
+        control,
         handleSubmit,
         reset,
         formState: {errors, isSubmitting},
     } = useForm<AddModificationFormInput, unknown, AddModificationFormOutput>({
         resolver: zodResolver(addModificationSchema),
         defaultValues: {
-            name: '',
-            category: '',
-            price: undefined,
+            title: '',
+            category: 'performance',
+            cost: undefined,
         },
     });
 
@@ -67,18 +86,18 @@ export default function AddModificationForm({carId}: AddModificationFormProps) {
             noValidate
         >
             <FormField
-                id="modification-name"
-                label="Name"
-                error={errors.name?.message}
+                id="modification-title"
+                label="Title"
+                error={errors.title?.message}
             >
                 <Input
-                    id="modification-name"
+                    id="modification-title"
                     placeholder="Performance intake"
-                    aria-invalid={Boolean(errors.name)}
+                    aria-invalid={Boolean(errors.title)}
                     aria-describedby={
-                        errors.name ? 'modification-name-error' : undefined
+                        errors.title ? 'modification-title-error' : undefined
                     }
-                    {...register('name')}
+                    {...register('title')}
                     className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
                 />
             </FormField>
@@ -88,40 +107,72 @@ export default function AddModificationForm({carId}: AddModificationFormProps) {
                 label="Category"
                 error={errors.category?.message}
             >
-                <Input
-                    id="modification-category"
-                    placeholder="Engine"
-                    aria-invalid={Boolean(errors.category)}
-                    aria-describedby={
-                        errors.category
-                            ? 'modification-category-error'
-                            : undefined
-                    }
-                    {...register('category')}
-                    className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
+                <Controller
+                    name="category"
+                    control={control}
+                    render={({field}) => (
+                        <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                        >
+                            <SelectTrigger
+                                id="modification-category"
+                                aria-invalid={Boolean(errors.category)}
+                                aria-describedby={
+                                    errors.category
+                                        ? 'modification-category-error'
+                                        : undefined
+                                }
+                                className="h-11 w-full border-border-subtle bg-background/70"
+                            >
+                                <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="performance">
+                                    Performance
+                                </SelectItem>
+                                <SelectItem value="suspension">
+                                    Suspension
+                                </SelectItem>
+                                <SelectItem value="brakes">Brakes</SelectItem>
+                                <SelectItem value="wheels">Wheels</SelectItem>
+                                <SelectItem value="exterior">
+                                    Exterior
+                                </SelectItem>
+                                <SelectItem value="interior">
+                                    Interior
+                                </SelectItem>
+                                <SelectItem value="maintenance">
+                                    Maintenance
+                                </SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
                 />
             </FormField>
 
             <FormField
-                id="modification-price"
-                label="Price"
+                id="modification-cost"
+                label="Cost"
                 description="Optional"
-                error={errors.price?.message}
+                error={errors.cost?.message}
             >
                 <Input
-                    id="modification-price"
+                    id="modification-cost"
                     type="number"
                     min={0}
                     step="0.01"
                     inputMode="decimal"
                     placeholder="350"
-                    aria-invalid={Boolean(errors.price)}
+                    aria-invalid={Boolean(errors.cost)}
                     aria-describedby={
-                        errors.price
-                            ? 'modification-price-error'
-                            : 'modification-price-description'
+                        errors.cost
+                            ? 'modification-cost-error'
+                            : 'modification-cost-description'
                     }
-                    {...register('price')}
+                    {...register('cost')}
                     className="h-11 border-border-subtle bg-background/70 px-3.5 shadow-xs transition-[border-color,box-shadow,background-color] placeholder:text-muted-foreground/70 hover:border-border-strong focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/15"
                 />
             </FormField>

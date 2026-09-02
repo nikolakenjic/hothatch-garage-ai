@@ -17,7 +17,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 import AiService from '@/services/ai.service';
-import {CostAnalysisInput, Recommendation} from '@/types/ai';
+import {CostAnalysisInput, GeneratedRecommendation} from '@/types/ai';
 
 const costAnalysisSchema = z.object({
     budget: z.string().trim().min(1, 'Budget is required'),
@@ -29,9 +29,8 @@ type CostAnalysisFormProps = {
 };
 
 export default function CostAnalysisForm({carId}: CostAnalysisFormProps) {
-    const [recommendation, setRecommendation] = useState<Recommendation | null>(
-        null,
-    );
+    const [recommendation, setRecommendation] =
+        useState<GeneratedRecommendation | null>(null);
 
     const {
         register,

@@ -1,10 +1,10 @@
 import {History, Sparkles} from 'lucide-react';
 
 import GlassPanel from '@/components/shared/GlassPanel';
-import {Recommendation} from '@/types/ai';
+import {RecommendationHistoryItem} from '@/types/ai';
 
 type RecentRecommendationProps = {
-    recommendation?: Recommendation;
+    recommendation?: RecommendationHistoryItem;
 };
 
 export default function RecentRecommendation({
