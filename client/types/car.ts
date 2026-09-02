@@ -29,3 +29,5 @@ export type CreateCarInput = {
     transmission?: Transmission;
     drivetrain?: Drivetrain;
 };
+
+export type UpdateCarInput = Partial<CreateCarInput>;
