@@ -1,6 +1,4 @@
-import {cookies} from 'next/headers';
 import Link from 'next/link';
-import {redirect} from 'next/navigation';
 import {ArrowLeft, Plus, Settings2} from 'lucide-react';
 
 import AddModificationForm from '@/app/(dashboard)/garage/_components/forms/AddModificationForm';
@@ -10,6 +8,7 @@ import GlassPanel from '@/components/shared/GlassPanel';
 import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
 import ModificationService from '@/services/modification.service';
+import {getServerCookieHeader} from '@/lib/auth/server-auth';
 
 import CarHeader from './_components/CarHeader';
 import ModificationList from './_components/ModificationList';
@@ -20,18 +19,7 @@ type Props = {
 
 export default async function CarDetailPage({params}: Props) {
     const {id} = await params;
-    const cookieStore = await cookies();
-
-    const accessToken = cookieStore.get('accessToken')?.value;
-
-    if (!accessToken) {
-        redirect('/login');
-    }
-
-    const cookieHeader = cookieStore
-        .getAll()
-        .map(({name, value}) => `${name}=${value}`)
-        .join('; ');
+    const cookieHeader = await getServerCookieHeader();
 
     const requestConfig = {
         headers: {

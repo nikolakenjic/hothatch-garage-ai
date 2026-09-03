@@ -1,5 +1,5 @@
 import {CarFront, History, Sparkles} from 'lucide-react';
-import {cookies} from 'next/headers';
+import {getServerCookieHeader} from '@/lib/auth/server-auth';
 import AiService from '@/services/ai.service';
 
 import {PageContainer} from '@/components/layout';
@@ -36,12 +36,7 @@ const aiFeatures = [
     },
 ];
 export default async function AIPage() {
-    const cookieStore = await cookies();
-
-    const cookieHeader = cookieStore
-        .getAll()
-        .map(({name, value}) => `${name}=${value}`)
-        .join('; ');
+    const cookieHeader = await getServerCookieHeader();
 
     const recommendations = await AiService.getRecommendations(
         'car-recommendation',

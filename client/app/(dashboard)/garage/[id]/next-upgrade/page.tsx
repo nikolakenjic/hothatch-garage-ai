@@ -1,7 +1,6 @@
 import {ReactNode} from 'react';
-import {cookies} from 'next/headers';
 import Link from 'next/link';
-import {redirect} from 'next/navigation';
+import {getServerCookieHeader} from '@/lib/auth/server-auth';
 import {
     ArrowLeft,
     BrainCircuit,
@@ -23,17 +22,8 @@ type NextUpgradePageProps = {
 
 export default async function NextUpgradePage({params}: NextUpgradePageProps) {
     const {id} = await params;
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('accessToken')?.value;
 
-    if (!accessToken) {
-        redirect('/login');
-    }
-
-    const cookieHeader = cookieStore
-        .getAll()
-        .map(({name, value}) => `${name}=${value}`)
-        .join('; ');
+    const cookieHeader = await getServerCookieHeader();
 
     const car = await CarService.getCarById(id, {
         headers: {
