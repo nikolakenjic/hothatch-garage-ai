@@ -1,7 +1,7 @@
 import type {AxiosRequestConfig} from 'axios';
 
 import BaseService from '@/lib/api/base.service';
-import {Car, CreateCarInput} from '@/types/car';
+import {Car, CreateCarInput, UpdateCarInput} from '@/types/car';
 
 type CarsResponse = {
     message: string;
@@ -68,7 +68,7 @@ export default class CarService {
 
     static async updateCar(
         carId: string,
-        body: Partial<CreateCarInput>,
+        body: UpdateCarInput,
         config?: AxiosRequestConfig,
     ): Promise<Car> {
         const response = await BaseService.update<UpdateCarResponse>(

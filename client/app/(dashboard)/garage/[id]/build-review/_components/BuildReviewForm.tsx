@@ -11,7 +11,7 @@ import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 import AiService from '@/services/ai.service';
-import {BuildReviewInput, Recommendation} from '@/types/ai';
+import {BuildReviewInput, GeneratedRecommendation} from '@/types/ai';
 
 const buildReviewSchema = z.object({
     goal: z.string().trim().min(1, 'Goal is required'),
@@ -22,9 +22,8 @@ type BuildReviewFormProps = {
 };
 
 export default function BuildReviewForm({carId}: BuildReviewFormProps) {
-    const [recommendation, setRecommendation] = useState<Recommendation | null>(
-        null,
-    );
+    const [recommendation, setRecommendation] =
+        useState<GeneratedRecommendation | null>(null);
 
     const {
         register,

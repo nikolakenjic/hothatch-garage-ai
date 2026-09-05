@@ -12,7 +12,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 import AiService from '@/services/ai.service';
-import {Recommendation, RecommendCarInput} from '@/types/ai';
+import {GeneratedRecommendation, RecommendCarInput} from '@/types/ai';
 
 const recommendCarSchema = z.object({
     budget: z.string().trim().min(1, 'Budget is required'),
@@ -21,9 +21,8 @@ const recommendCarSchema = z.object({
 });
 
 export default function RecommendCarForm() {
-    const [recommendation, setRecommendation] = useState<Recommendation | null>(
-        null,
-    );
+    const [recommendation, setRecommendation] =
+        useState<GeneratedRecommendation | null>(null);
 
     const {
         register,

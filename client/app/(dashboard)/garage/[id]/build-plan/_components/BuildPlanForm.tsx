@@ -12,7 +12,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 import AiService from '@/services/ai.service';
-import {Recommendation} from '@/types/ai';
+import {GeneratedRecommendation} from '@/types/ai';
 
 const buildPlanSchema = z.object({
     budget: z.string().trim().min(1, 'Budget is required'),
@@ -26,9 +26,8 @@ type BuildPlanFormProps = {
 };
 
 export default function BuildPlanForm({carId}: BuildPlanFormProps) {
-    const [recommendation, setRecommendation] = useState<Recommendation | null>(
-        null,
-    );
+    const [recommendation, setRecommendation] =
+        useState<GeneratedRecommendation | null>(null);
 
     const {
         register,

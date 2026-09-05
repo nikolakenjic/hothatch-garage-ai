@@ -8,10 +8,12 @@ import {
     BuildReviewResponse,
     CostAnalysisInput,
     CostAnalysisResponse,
+    GeneratedRecommendation,
     NextUpgradeInput,
     NextUpgradeResponse,
-    Recommendation,
+    RecommendationHistoryItem,
     RecommendationsResponse,
+    RecommendationType,
     RecommendCarInput,
     RecommendCarResponse,
 } from '@/types/ai';
@@ -20,9 +22,9 @@ export default class AiService {
     static readonly ENDPOINT = '/ai';
 
     static async getRecommendations(
-        type?: string,
+        type?: RecommendationType,
         config?: AxiosRequestConfig,
-    ): Promise<Recommendation[]> {
+    ): Promise<RecommendationHistoryItem[]> {
         const query = type ? `?type=${encodeURIComponent(type)}` : '';
 
         const response = await BaseService.get<RecommendationsResponse>(
@@ -36,7 +38,7 @@ export default class AiService {
     static async recommendCar(
         data: RecommendCarInput,
         config?: AxiosRequestConfig,
-    ): Promise<Recommendation> {
+    ): Promise<GeneratedRecommendation> {
         const response = await BaseService.create<RecommendCarResponse>(
             `${this.ENDPOINT}/recommend`,
             data,
@@ -50,7 +52,7 @@ export default class AiService {
         carId: string,
         data: BuildPlanInput,
         config?: AxiosRequestConfig,
-    ): Promise<Recommendation> {
+    ): Promise<GeneratedRecommendation> {
         const response = await BaseService.create<BuildPlanResponse>(
             `${this.ENDPOINT}/build-plan/${carId}`,
             data,
@@ -64,7 +66,7 @@ export default class AiService {
         carId: string,
         data: BuildReviewInput,
         config?: AxiosRequestConfig,
-    ): Promise<Recommendation> {
+    ): Promise<GeneratedRecommendation> {
         const response = await BaseService.create<BuildReviewResponse>(
             `${this.ENDPOINT}/build-review/${carId}`,
             data,
@@ -78,7 +80,7 @@ export default class AiService {
         carId: string,
         data: CostAnalysisInput,
         config?: AxiosRequestConfig,
-    ): Promise<Recommendation> {
+    ): Promise<GeneratedRecommendation> {
         const response = await BaseService.create<CostAnalysisResponse>(
             `${this.ENDPOINT}/cost-analysis/${carId}`,
             data,
@@ -92,7 +94,7 @@ export default class AiService {
         carId: string,
         data: NextUpgradeInput,
         config?: AxiosRequestConfig,
-    ): Promise<Recommendation> {
+    ): Promise<GeneratedRecommendation> {
         const response = await BaseService.create<NextUpgradeResponse>(
             `${this.ENDPOINT}/next-upgrade/${carId}`,
             data,

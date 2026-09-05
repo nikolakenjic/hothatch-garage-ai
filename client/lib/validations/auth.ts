@@ -41,5 +41,21 @@ export const registerSchema = z.object({
     password: passwordPolicySchema,
 });
 
+export const forgotPasswordSchema = z.object({
+    email: emailField,
+});
+
+export const resendVerificationSchema = z.object({
+    email: emailField,
+});
+
+export const resetPasswordSchema = z.object({
+    password: passwordPolicySchema,
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

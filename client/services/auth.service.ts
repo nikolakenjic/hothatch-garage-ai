@@ -1,6 +1,12 @@
 import BaseService from '@/lib/api/base.service';
 import type {AxiosRequestConfig} from 'axios';
-import {LoginInput, RegisterInput} from '@/lib/validations/auth';
+import {
+    ForgotPasswordInput,
+    LoginInput,
+    RegisterInput,
+    ResendVerificationInput,
+    ResetPasswordInput,
+} from '@/lib/validations/auth';
 import {
     LoginResponse,
     LogoutResponse,
@@ -8,6 +14,10 @@ import {
     RegisterResponse,
     VerifyEmailResponse,
 } from '@/types/auth';
+
+type AuthMessageResponse = {
+    message: string;
+};
 
 export default class AuthService {
     static readonly ENDPOINT = '/auth';
@@ -41,6 +51,37 @@ export default class AuthService {
         return BaseService.create<VerifyEmailResponse>(
             `${this.ENDPOINT}/verify-email`,
             {token},
+        );
+    }
+
+    static async resendVerification(
+        data: ResendVerificationInput,
+    ): Promise<AuthMessageResponse> {
+        return BaseService.create<AuthMessageResponse>(
+            `${this.ENDPOINT}/resend-verification`,
+            data,
+        );
+    }
+
+    static async forgotPassword(
+        data: ForgotPasswordInput,
+    ): Promise<AuthMessageResponse> {
+        return BaseService.create<AuthMessageResponse>(
+            `${this.ENDPOINT}/forgot-password`,
+            data,
+        );
+    }
+
+    static async resetPassword(
+        token: string,
+        data: ResetPasswordInput,
+    ): Promise<AuthMessageResponse> {
+        return BaseService.create<AuthMessageResponse>(
+            `${this.ENDPOINT}/reset-password`,
+            {
+                token,
+                password: data.password,
+            },
         );
     }
 }

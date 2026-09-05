@@ -103,7 +103,7 @@ function ModificationCard({modification}: ModificationCardProps) {
             <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate text-sm font-semibold text-foreground">
-                        {modification.name}
+                        {modification.title}
                     </p>
 
                     <span className="inline-flex rounded-full border border-border bg-muted/50 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
@@ -112,9 +112,9 @@ function ModificationCard({modification}: ModificationCardProps) {
                 </div>
 
                 <p className="mt-2 text-sm text-muted-foreground">
-                    {modification.price !== undefined
-                        ? currencyFormatter.format(modification.price)
-                        : 'Price not recorded'}
+                    {modification.cost !== undefined
+                        ? currencyFormatter.format(modification.cost)
+                        : 'Cost not recorded'}
                 </p>
             </div>
 

@@ -6,6 +6,23 @@ export type RecommendationType =
     | 'car-recommendation'
     | 'build-plan';
 
+export type GeneratedRecommendation = {
+    id: string;
+    content: string;
+};
+
+export type RecommendationHistoryItem = {
+    _id: string;
+    user: string;
+    car?: string;
+    type: RecommendationType;
+    prompt: string;
+    input?: Record<string, unknown>;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
 export type Recommendation = {
     id: string;
     type: RecommendationType;
@@ -18,7 +35,7 @@ export type Recommendation = {
 export type RecommendationsResponse = {
     message: string;
     count: number;
-    recommendations: Recommendation[];
+    recommendations: RecommendationHistoryItem[];
 };
 
 export type RecommendCarInput = {
@@ -29,7 +46,7 @@ export type RecommendCarInput = {
 
 export type RecommendCarResponse = {
     message: string;
-    recommendation: Recommendation;
+    recommendation: GeneratedRecommendation;
 };
 
 export type BuildPlanInput = {
@@ -39,7 +56,7 @@ export type BuildPlanInput = {
 
 export type BuildPlanResponse = {
     message: string;
-    recommendation: Recommendation;
+    recommendation: GeneratedRecommendation;
 };
 
 export type BuildReviewInput = {
@@ -48,7 +65,7 @@ export type BuildReviewInput = {
 
 export type BuildReviewResponse = {
     message: string;
-    recommendation: Recommendation;
+    recommendation: GeneratedRecommendation;
 };
 
 export type CostAnalysisInput = {
@@ -58,7 +75,7 @@ export type CostAnalysisInput = {
 
 export type CostAnalysisResponse = {
     message: string;
-    recommendation: Recommendation;
+    recommendation: GeneratedRecommendation;
 };
 
 export type NextUpgradeInput = {
@@ -68,5 +85,5 @@ export type NextUpgradeInput = {
 
 export type NextUpgradeResponse = {
     message: string;
-    recommendation: Recommendation;
+    recommendation: GeneratedRecommendation;
 };

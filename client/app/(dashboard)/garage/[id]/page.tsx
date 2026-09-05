@@ -1,6 +1,4 @@
-import {cookies} from 'next/headers';
 import Link from 'next/link';
-import {redirect} from 'next/navigation';
 import {ArrowLeft, Plus, Settings2} from 'lucide-react';
 
 import AddModificationForm from '@/app/(dashboard)/garage/_components/forms/AddModificationForm';
@@ -10,6 +8,7 @@ import GlassPanel from '@/components/shared/GlassPanel';
 import {Button} from '@/components/ui/button';
 import CarService from '@/services/car.service';
 import ModificationService from '@/services/modification.service';
+import {getServerCookieHeader} from '@/lib/auth/server-auth';
 
 import CarHeader from './_components/CarHeader';
 import ModificationList from './_components/ModificationList';
@@ -20,18 +19,7 @@ type Props = {
 
 export default async function CarDetailPage({params}: Props) {
     const {id} = await params;
-    const cookieStore = await cookies();
-
-    const accessToken = cookieStore.get('accessToken')?.value;
-
-    if (!accessToken) {
-        redirect('/login');
-    }
-
-    const cookieHeader = cookieStore
-        .getAll()
-        .map(({name, value}) => `${name}=${value}`)
-        .join('; ');
+    const cookieHeader = await getServerCookieHeader();
 
     const requestConfig = {
         headers: {
@@ -45,7 +33,7 @@ export default async function CarDetailPage({params}: Props) {
     ]);
 
     const totalSpent = modifications.reduce(
-        (sum, modification) => sum + (modification.price ?? 0),
+        (sum, modification) => sum + (modification.cost ?? 0),
         0,
     );
 
@@ -59,7 +47,7 @@ export default async function CarDetailPage({params}: Props) {
                     className="-ml-3 w-fit text-muted-foreground hover:text-foreground"
                 >
                     <Link href="/garage">
-                        <ArrowLeft className="size-4" />
+                        <ArrowLeft className="size-4" aria-hidden="true" />
                         Back to garage
                     </Link>
                 </Button>
@@ -81,7 +69,10 @@ export default async function CarDetailPage({params}: Props) {
                         <GlassPanel className="p-6 md:p-8">
                             <div className="mb-6 flex items-start gap-3">
                                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50">
-                                    <Plus className="size-5 text-muted-foreground" />
+                                    <Plus
+                                        className="size-5 text-muted-foreground"
+                                        aria-hidden="true"
+                                    />
                                 </div>
 
                                 <div>
@@ -104,7 +95,10 @@ export default async function CarDetailPage({params}: Props) {
                         <GlassPanel className="p-6 md:p-8">
                             <div className="mb-6 flex items-start gap-3">
                                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50">
-                                    <Settings2 className="size-5 text-muted-foreground" />
+                                    <Settings2
+                                        className="size-5 text-muted-foreground"
+                                        aria-hidden="true"
+                                    />
                                 </div>
 
                                 <div>

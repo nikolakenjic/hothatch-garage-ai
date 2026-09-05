@@ -1,7 +1,6 @@
 import {ReactNode} from 'react';
-import {cookies} from 'next/headers';
 import Link from 'next/link';
-import {redirect} from 'next/navigation';
+import {getServerCookieHeader} from '@/lib/auth/server-auth';
 import {ArrowLeft, SearchCheck, ShieldCheck, Target} from 'lucide-react';
 
 import {PageContainer} from '@/components/layout';
@@ -17,17 +16,8 @@ type BuildReviewPageProps = {
 
 export default async function BuildReviewPage({params}: BuildReviewPageProps) {
     const {id} = await params;
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('accessToken')?.value;
 
-    if (!accessToken) {
-        redirect('/login');
-    }
-
-    const cookieHeader = cookieStore
-        .getAll()
-        .map(({name, value}) => `${name}=${value}`)
-        .join('; ');
+    const cookieHeader = await getServerCookieHeader();
 
     const car = await CarService.getCarById(id, {
         headers: {
