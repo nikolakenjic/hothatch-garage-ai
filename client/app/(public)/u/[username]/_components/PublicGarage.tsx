@@ -56,7 +56,9 @@ export default function PublicGarage({publicGarage, cars}: PublicGarageProps) {
 
                             <span>Power</span>
                             <span>
-                                {car.horsepower ? `${car.horsepower} HP` : '-'}
+                                {car.horsepower !== undefined
+                                    ? `${car.horsepower} HP`
+                                    : '-'}
                             </span>
 
                             <span>Transmission</span>

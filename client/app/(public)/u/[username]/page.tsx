@@ -1,6 +1,7 @@
 import {notFound} from 'next/navigation';
 
 import {PageContainer} from '@/components/layout';
+import {isNotFoundError} from '@/lib/errors';
 import UserService from '@/services/user.service';
 
 import PublicGarage from './_components/PublicGarage';
@@ -16,19 +17,16 @@ type Props = {
 export default async function PublicProfilePage({params}: Props) {
     const {username} = await params;
 
-    const data = await UserService.getPublicProfile(username).catch((error) => {
-        console.error(
-            'PUBLIC PROFILE ERROR:',
-            error?.response?.status,
-            error?.response?.data,
-            error,
-        );
+    let data;
 
-        return null;
-    });
+    try {
+        data = await UserService.getPublicProfile(username);
+    } catch (error) {
+        if (isNotFoundError(error)) {
+            notFound();
+        }
 
-    if (!data) {
-        notFound();
+        throw error;
     }
 
     const {profile, stats, cars} = data;
@@ -37,9 +35,7 @@ export default async function PublicProfilePage({params}: Props) {
         <main className="page-shell">
             <PageContainer className="space-y-8 py-8 md:py-10">
                 <PublicProfileHeader profile={profile} />
-
                 <PublicProfileStats stats={stats} />
-
                 <PublicGarage publicGarage={profile.publicGarage} cars={cars} />
             </PageContainer>
         </main>

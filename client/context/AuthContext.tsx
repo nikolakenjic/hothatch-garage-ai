@@ -3,7 +3,7 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
-import {isAxiosError} from 'axios';
+import {isUnauthorizedError} from '@/lib/errors';
 
 import {AuthUser} from '@/types/auth';
 import {LoginInput, RegisterInput} from '@/lib/validations/auth';
@@ -32,7 +32,7 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
                 const response = await AuthService.getMe();
                 setUser(response.user);
             } catch (error) {
-                if (isAxiosError(error) && error.response?.status === 401) {
+                if (isUnauthorizedError(error)) {
                     setUser(null);
                     return;
                 }

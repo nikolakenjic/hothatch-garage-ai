@@ -47,7 +47,7 @@ export default async function CarDetailPage({params}: Props) {
                     className="-ml-3 w-fit text-muted-foreground hover:text-foreground"
                 >
                     <Link href="/garage">
-                        <ArrowLeft className="size-4" />
+                        <ArrowLeft className="size-4" aria-hidden="true" />
                         Back to garage
                     </Link>
                 </Button>
@@ -69,7 +69,10 @@ export default async function CarDetailPage({params}: Props) {
                         <GlassPanel className="p-6 md:p-8">
                             <div className="mb-6 flex items-start gap-3">
                                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50">
-                                    <Plus className="size-5 text-muted-foreground" />
+                                    <Plus
+                                        className="size-5 text-muted-foreground"
+                                        aria-hidden="true"
+                                    />
                                 </div>
 
                                 <div>
@@ -92,7 +95,10 @@ export default async function CarDetailPage({params}: Props) {
                         <GlassPanel className="p-6 md:p-8">
                             <div className="mb-6 flex items-start gap-3">
                                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/50">
-                                    <Settings2 className="size-5 text-muted-foreground" />
+                                    <Settings2
+                                        className="size-5 text-muted-foreground"
+                                        aria-hidden="true"
+                                    />
                                 </div>
 
                                 <div>

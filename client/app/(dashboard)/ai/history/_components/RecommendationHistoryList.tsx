@@ -39,9 +39,8 @@ export default function RecommendationHistoryList({
                     </h2>
 
                     <p className="body-text mt-2 max-w-md">
-                        Generate a car recommendation or use one of the
-                        vehicle-specific AI tools to begin building your
-                        history.
+                        Generate your first car recommendation to begin building
+                        your recommendation history.
                     </p>
                 </div>
             </GlassPanel>

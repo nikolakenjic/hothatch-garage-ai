@@ -30,7 +30,7 @@ export default function DangerZone() {
 
             toast.success('Account deleted successfully');
             router.replace('/register');
-            router.refresh();
+            router.replace('/register');
         } catch (error) {
             toast.error(getErrorMessage(error));
         } finally {
