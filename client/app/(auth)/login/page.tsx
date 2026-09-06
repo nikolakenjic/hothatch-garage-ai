@@ -2,15 +2,15 @@
 
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
 import {loginSchema, LoginInput} from '@/lib/validations/auth';
 import {useAuth} from '@/context/AuthContext';
 import AuthForm, {Field} from '@/components/auth/AuthForm';
 import AuthLayout from '@/components/auth/AuthLayout';
 import {getErrorMessage} from '@/lib/errors';
+import Link from 'next/link';
 
-const loginFields: Field[] = [
+const loginFields: Field<LoginInput>[] = [
     {
         name: 'email',
         label: 'Email',
@@ -26,7 +26,6 @@ const loginFields: Field[] = [
 ];
 
 export default function LoginPage() {
-    const router = useRouter();
     const {login} = useAuth();
 
     const form = useForm<LoginInput>({
@@ -45,19 +44,30 @@ export default function LoginPage() {
         <AuthLayout
             hero={{
                 title: 'Welcome back.',
-                highlight: 'Your garage is waiting.',
+                highlight: 'Your garage is ready.',
                 description:
-                    'Continue managing your hot hatches, tracking modifications, and getting AI-powered upgrade ideas.',
+                    'Continue managing your cars, reviewing modifications, and planning the next stage of your build.',
                 features: [
-                    {title: 'Garage', description: 'Your cars'},
-                    {title: 'Mods', description: 'Track builds'},
-                    {title: 'AI', description: 'Smart help'},
+                    {
+                        title: 'Complete garage',
+                        description: 'Access every vehicle and build detail.',
+                    },
+                    {
+                        title: 'Modification history',
+                        description: 'Continue tracking upgrades and costs.',
+                    },
+                    {
+                        title: 'AI recommendations',
+                        description:
+                            'Plan your next move with vehicle-aware advice.',
+                    },
                 ],
             }}
             card={{
-                eyebrow: 'Sign in',
-                title: 'Welcome back',
-                description: 'Login and continue building your garage.',
+                eyebrow: 'Member access',
+                title: 'Sign in to your garage',
+                description:
+                    'Enter your account details to continue where you left off.',
             }}
         >
             <AuthForm
@@ -67,16 +77,24 @@ export default function LoginPage() {
                 submitLoadingText="Opening garage..."
                 fields={loginFields}
                 secondaryAction={
-                    <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-                        Don&apos;t have an account?{' '}
-                        <button
-                            type="button"
-                            onClick={() => router.push('/register')}
-                            className="font-semibold text-red-600 transition-colors hover:text-red-500 dark:text-red-500 dark:hover:text-red-400"
+                    <div className="space-y-3 text-center text-sm">
+                        <Link
+                            href="/forgot-password"
+                            className="font-semibold text-primary transition-colors hover:text-primary/80"
                         >
-                            Create account
-                        </button>
-                    </p>
+                            Forgot password?
+                        </Link>
+
+                        <p className="text-muted-foreground">
+                            Don&apos;t have an account?{' '}
+                            <Link
+                                href="/register"
+                                className="font-semibold text-primary transition-colors hover:text-primary/80"
+                            >
+                                Create account
+                            </Link>
+                        </p>
+                    </div>
                 }
             />
         </AuthLayout>

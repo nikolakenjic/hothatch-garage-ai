@@ -1,17 +1,48 @@
 import {cn} from '@/lib/utils';
 import {HTMLAttributes} from 'react';
 
-type GlassPanelProps = HTMLAttributes<HTMLDivElement>;
+type GlassPanelVariant = 'glass' | 'solid' | 'elevated';
+type GlassPanelPadding = 'none' | 'sm' | 'md' | 'lg';
+
+type GlassPanelProps = HTMLAttributes<HTMLDivElement> & {
+    variant?: GlassPanelVariant;
+    padding?: GlassPanelPadding;
+};
+
+const variantClasses: Record<GlassPanelVariant, string> = {
+    glass: [
+        'border border-border-subtle',
+        'bg-background/70 backdrop-blur-xl',
+        'shadow-sm',
+    ].join(' '),
+    solid: ['border border-border-subtle', 'bg-surface'].join(' '),
+    elevated: [
+        'border border-border-subtle',
+        'bg-surface-elevated',
+        'shadow-md',
+    ].join(' '),
+};
+
+const paddingClasses: Record<GlassPanelPadding, string> = {
+    none: '',
+    sm: 'p-4',
+    md: 'p-6',
+    lg: 'p-6 md:p-8',
+};
 
 export default function GlassPanel({
     className,
     children,
+    variant = 'glass',
+    padding = 'md',
     ...props
 }: GlassPanelProps) {
     return (
         <div
             className={cn(
-                'rounded-[2rem] border border-zinc-200 bg-white/75 p-6 shadow-xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-zinc-950/70',
+                'rounded-2xl',
+                variantClasses[variant],
+                paddingClasses[padding],
                 className,
             )}
             {...props}

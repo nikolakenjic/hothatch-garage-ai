@@ -1,119 +1,184 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import {env} from '../../config/env';
+
 import {AppError} from '../../utils/AppError';
-import {User} from './user.model';
+import {IUser, User} from './user.model';
 import {Session} from './session.model';
 import {
+    generateToken,
+    hashToken,
     signAccessToken,
     signRefreshToken,
     verifyRefreshToken,
 } from '../../utils/token';
-import crypto from 'crypto';
+import {
+    sendPasswordResetEmail,
+    sendVerificationEmail,
+} from '../../utils/email/email.service';
+import {RegisterInput} from './auth.validation';
+import {appAssert} from '../../utils/appAssert';
+import {
+    BAD_REQUEST,
+    CONFLICT,
+    NOT_FOUND,
+    UNAUTHORIZED,
+    FORBIDDEN,
+} from '../../constants/http';
+import {
+    BCRYPT_SALT_ROUNDS,
+    EMAIL_VERIFICATION_TOKEN_TTL_MS,
+    PASSWORD_RESET_TOKEN_TTL_MS,
+    REFRESH_TOKEN_TTL_SECONDS,
+} from '../../constants/auth.constants';
+import {HydratedDocument} from 'mongoose';
 
-export const registerService = async (email: string, password: string) => {
-    const existingUser = await User.findOne({email});
+type RegisterServiceResult = {
+    user: HydratedDocument<IUser>;
+    verificationEmailSent: boolean;
+};
 
-    if (existingUser) {
-        throw new AppError('User already exists', 400);
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
+export const registerService = async ({
+    email,
+    password,
+}: RegisterInput): Promise<RegisterServiceResult> => {
+    const existingUser = await User.exists({email});
 
-    const verificationToken = crypto.randomUUID();
+    appAssert(
+        !existingUser,
+        CONFLICT,
+        'An account with this email already exists',
+    );
+
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+
+    const verificationToken = generateToken();
+    const verificationTokenHash = hashToken(verificationToken);
 
     const user = await User.create({
         email,
-        password: hashedPassword,
-        isEmailVerified: false,
-        emailVerificationToken: verificationToken,
-        emailVerificationExpires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h
+        passwordHash,
+        emailVerificationTokenHash: verificationTokenHash,
+        emailVerificationExpires: new Date(
+            Date.now() + EMAIL_VERIFICATION_TOKEN_TTL_MS,
+        ),
     });
+
+    let verificationEmailSent = true;
+
+    try {
+        await sendVerificationEmail(user.email, verificationToken);
+    } catch (error) {
+        verificationEmailSent = false;
+        console.error('Failed to send verification email:', error);
+    }
 
     return {
         user,
-        verificationToken,
+        verificationEmailSent,
     };
 };
 
+// Pre-generated bcrypt hash of a random value — never a real user's hash.
+// Used so bcrypt.compare() always runs the same expensive work, whether
+// or not the account exists, so response time can't leak account existence.
+const DUMMY_PASSWORD_HASH =
+    '$2a$12$CwTycUXWue0Thq9StjUM0uJ8qDJnQxdT5' + 'Y2A/1a1zM9GJdN2q5F3S';
+
 export const loginService = async (email: string, password: string) => {
-    const user = await User.findOne({email});
+    const user = await User.findOne({email}).select('+passwordHash');
 
-    if (!user) {
-        throw new AppError('Invalid credentials', 400);
+    const isPasswordCorrect = await bcrypt.compare(
+        password,
+        user?.passwordHash ?? DUMMY_PASSWORD_HASH,
+    );
+
+    if (!user || !isPasswordCorrect) {
+        throw new AppError('Invalid credentials', UNAUTHORIZED);
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordCorrect) {
-        throw new AppError('Invalid credentials', 400);
+    if (!user.isEmailVerified) {
+        throw new AppError('Email verification required', FORBIDDEN);
     }
-
-    // const token = jwt.sign(
-    //     {userId: user._id, email: user.email},
-    //     env.JWT_SECRET,
-    //     {expiresIn: '1d'},
-    // );
 
     const accessToken = signAccessToken(user._id.toString());
     const refreshToken = signRefreshToken(user._id.toString());
 
     await Session.create({
         user: user._id,
-        refreshToken,
+        refreshTokenHash: hashToken(refreshToken),
+        expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000),
     });
 
     return {user, accessToken, refreshToken};
 };
 
 export const getCurrentUserService = async (userId: string) => {
-    const user = await User.findById(userId).select(
-        '-password -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires',
-    );
+    const user = await User.findById(userId);
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        throw new AppError('User not found', NOT_FOUND);
     }
 
     return user;
 };
 
 export const refreshAccessTokenService = async (refreshToken: string) => {
-    // verify Refresh token.
     const decoded = verifyRefreshToken(refreshToken);
-    // find session
-    const session = await Session.findOne({refreshToken});
+
+    const refreshTokenHash = hashToken(refreshToken);
+
+    const session = await Session.findOne({
+        refreshTokenHash,
+        user: decoded.userId,
+    });
+
     if (!session) {
-        throw new AppError('Session not found', 401);
+        throw new AppError('Invalid session', UNAUTHORIZED);
     }
-    // find User
+
+    if (session.expiresAt <= new Date()) {
+        await Session.deleteOne({_id: session._id});
+
+        throw new AppError('Session expired', UNAUTHORIZED);
+    }
+
     const user = await User.findById(decoded.userId);
+
     if (!user) {
-        throw new AppError('User not found', 404);
+        await Session.deleteOne({_id: session._id});
+
+        throw new AppError('Invalid session', UNAUTHORIZED);
     }
-    // create new access token
-    const accessToken = signAccessToken(user._id.toString());
-    // return access token
-    return accessToken;
+
+    return signAccessToken(user._id.toString());
 };
 
 export const logoutService = async (refreshToken?: string) => {
-    if (refreshToken) {
-        await Session.deleteOne({refreshToken});
+    if (!refreshToken) {
+        return;
     }
+
+    const refreshTokenHash = hashToken(refreshToken);
+
+    await Session.deleteOne({refreshTokenHash});
 };
 
 export const verifyEmailService = async (token: string) => {
+    const hashedToken = hashToken(token);
+
     const user = await User.findOne({
-        emailVerificationToken: token,
+        emailVerificationTokenHash: hashedToken,
         emailVerificationExpires: {$gt: new Date()},
     });
 
     if (!user) {
-        throw new AppError('Invalid or expired verification token', 400);
+        throw new AppError(
+            'Invalid or expired verification token',
+            BAD_REQUEST,
+        );
     }
 
     user.isEmailVerified = true;
-    user.emailVerificationToken = undefined;
+    user.emailVerificationTokenHash = undefined;
     user.emailVerificationExpires = undefined;
 
     await user.save();
@@ -125,58 +190,66 @@ export const resendVerificationService = async (email: string) => {
     const user = await User.findOne({email});
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        return;
     }
 
     if (user.isEmailVerified) {
-        throw new AppError('Email is already verified', 400);
+        return;
     }
 
-    const verificationToken = crypto.randomUUID();
-
-    user.emailVerificationToken = verificationToken;
-    user.emailVerificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
-
+    const verificationToken = generateToken();
+    user.emailVerificationTokenHash = hashToken(verificationToken);
+    user.emailVerificationExpires = new Date(
+        Date.now() + EMAIL_VERIFICATION_TOKEN_TTL_MS,
+    );
     await user.save();
 
-    return verificationToken;
+    await sendVerificationEmail(user.email, verificationToken);
 };
 
 export const forgotPasswordService = async (email: string) => {
     const user = await User.findOne({email});
 
     if (!user) {
-        throw new AppError('User not found', 404);
+        return;
     }
 
-    const resetToken = crypto.randomUUID();
+    const resetToken = generateToken();
+    const hashResetToken = hashToken(resetToken);
 
-    user.passwordResetToken = resetToken;
-    user.passwordResetExpires = new Date(Date.now() + 1000 * 60 * 15);
+    user.passwordResetTokenHash = hashResetToken;
+    user.passwordResetExpires = new Date(
+        Date.now() + PASSWORD_RESET_TOKEN_TTL_MS,
+    );
 
     await user.save();
 
-    return resetToken;
+    try {
+        await sendPasswordResetEmail(user.email, resetToken);
+    } catch (error) {
+        console.error('Failed to send password reset email:', error);
+    }
 };
 
 export const resetPasswordService = async (
     token: string,
     newPassword: string,
 ) => {
+    const hashedToken = hashToken(token);
     const user = await User.findOne({
-        passwordResetToken: token,
+        passwordResetTokenHash: hashedToken,
         passwordResetExpires: {$gt: new Date()},
     });
 
     if (!user) {
-        throw new AppError('Invalid or expired reset token', 400);
+        throw new AppError('Invalid or expired reset token', BAD_REQUEST);
     }
 
-    user.password = await bcrypt.hash(newPassword, 10);
-    user.passwordResetToken = undefined;
+    user.passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+    user.passwordResetTokenHash = undefined;
     user.passwordResetExpires = undefined;
 
     await user.save();
 
-    return user;
+    await Session.deleteMany({user: user._id});
 };

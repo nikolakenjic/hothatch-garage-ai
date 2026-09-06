@@ -2,9 +2,8 @@ import type {Metadata} from 'next';
 import {Geist, Space_Grotesk} from 'next/font/google';
 import './globals.css';
 
-import Navbar from '@/components/shared/Navbar';
-import ThemeProvider from '@/components/shared/ThemeProvider';
-import {AuthProvider} from '@/context/AuthContext';
+import AppProviders from '@/components/providers/AppProviders';
+
 import {Toaster} from '@/components/ui/sonner';
 
 const geist = Geist({
@@ -37,13 +36,10 @@ export default function RootLayout({
                 suppressHydrationWarning
                 className="flex min-h-full flex-col font-sans"
             >
-                <ThemeProvider>
-                    <AuthProvider>
-                        <Navbar />
-                        {children}
-                        <Toaster />
-                    </AuthProvider>
-                </ThemeProvider>
+                <AppProviders>
+                    {children}
+                    <Toaster />
+                </AppProviders>
             </body>
         </html>
     );

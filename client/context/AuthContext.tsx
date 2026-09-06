@@ -3,6 +3,7 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
+import {isUnauthorizedError} from '@/lib/errors';
 
 import {AuthUser} from '@/types/auth';
 import {LoginInput, RegisterInput} from '@/lib/validations/auth';
@@ -14,15 +15,10 @@ type AuthContextType = {
     login: (data: LoginInput) => Promise<void>;
     register: (data: RegisterInput) => Promise<void>;
     logout: () => Promise<void>;
+    updateUser: (user: AuthUser) => void;
 };
 
-const AuthContext = createContext<AuthContextType>({
-    user: null,
-    isLoading: true,
-    login: async () => {},
-    register: async () => {},
-    logout: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({children}: {children: React.ReactNode}) {
     const router = useRouter();
@@ -34,8 +30,13 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         const restoreUser = async () => {
             try {
                 const response = await AuthService.getMe();
-                setUser(response.data.user);
+                setUser(response.user);
             } catch (error) {
+                if (isUnauthorizedError(error)) {
+                    setUser(null);
+                    return;
+                }
+
                 console.error('Failed to restore authenticated user:', error);
                 setUser(null);
             } finally {
@@ -46,6 +47,22 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         void restoreUser();
     }, []);
 
+    const register = async (data: RegisterInput) => {
+        const response = await AuthService.register(data);
+
+        if (response.verificationEmailSent) {
+            toast.success(
+                'Account created. Check your email to verify your account.',
+            );
+        } else {
+            toast.warning(
+                'Account created, but the verification email could not be sent. You can request a new one.',
+            );
+        }
+
+        router.replace('/login');
+    };
+
     const login = async (data: LoginInput) => {
         const response = await AuthService.login(data);
 
@@ -54,10 +71,8 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         router.replace('/garage');
     };
 
-    const register = async (data: RegisterInput) => {
-        await AuthService.register(data);
-        toast.success('Account created. Please log in.');
-        router.replace('/login');
+    const updateUser = (updatedUser: AuthUser) => {
+        setUser(updatedUser);
     };
 
     const logout = async () => {
@@ -71,11 +86,19 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
 
     return (
         <AuthContext.Provider
-            value={{user, isLoading, login, register, logout}}
+            value={{user, isLoading, login, register, updateUser, logout}}
         >
             {children}
         </AuthContext.Provider>
     );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth(): AuthContextType {
+    const context = useContext(AuthContext);
+
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+
+    return context;
+}

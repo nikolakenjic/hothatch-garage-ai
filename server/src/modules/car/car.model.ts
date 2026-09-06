@@ -15,6 +15,8 @@ export interface ICar {
     torque?: number;
     transmission?: Transmission;
     drivetrain?: Drivetrain;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const carSchema = new Schema<ICar>(
@@ -23,6 +25,7 @@ const carSchema = new Schema<ICar>(
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
+            index: true,
         },
         brand: {
             type: String,
@@ -59,7 +62,7 @@ const carSchema = new Schema<ICar>(
         },
         transmission: {
             type: String,
-            enum: ['manual', 'automatic', 'dsg'],
+            enum: ['manual', 'automatic'],
         },
         drivetrain: {
             type: String,

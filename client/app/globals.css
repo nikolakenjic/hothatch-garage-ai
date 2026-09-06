@@ -46,6 +46,12 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --color-surface: var(--surface);
+    --color-surface-foreground: var(--surface-foreground);
+    --color-surface-muted: var(--surface-muted);
+    --color-surface-elevated: var(--surface-elevated);
+    --color-border-subtle: var(--border-subtle);
+    --color-border-strong: var(--border-strong);
 }
 
 :root {
@@ -55,8 +61,8 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.54 0.15 255);
+    --primary-foreground: oklch(0.985 0.002 247);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
@@ -66,7 +72,7 @@
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --ring: oklch(0.54 0.15 255);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -81,6 +87,12 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+    --surface: oklch(0.985 0.002 247);
+    --surface-foreground: oklch(0.18 0.01 250);
+    --surface-muted: oklch(0.965 0.004 247);
+    --surface-elevated: oklch(1 0 0);
+    --border-subtle: oklch(0.91 0.006 247);
+    --border-strong: oklch(0.82 0.01 247);
 }
 
 .dark {
@@ -90,8 +102,8 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
+    --primary: oklch(0.68 0.14 250);
+    --primary-foreground: oklch(0.16 0.01 250);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
     --muted: oklch(0.269 0 0);
@@ -101,7 +113,7 @@
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
+    --ring: oklch(0.68 0.14 250);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -115,6 +127,12 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+    --surface: oklch(0.19 0.008 250);
+    --surface-foreground: oklch(0.96 0.004 247);
+    --surface-muted: oklch(0.23 0.008 250);
+    --surface-elevated: oklch(0.26 0.01 250);
+    --border-subtle: oklch(1 0 0 / 8%);
+    --border-strong: oklch(1 0 0 / 16%);
 }
 
 @layer base {
@@ -134,5 +152,79 @@
     h5,
     h6 {
         @apply font-heading;
+    }
+}
+
+@layer utilities {
+    .page-shell {
+        @apply min-h-screen bg-background text-foreground;
+    }
+
+    .page-container {
+        @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+
+    .page-content {
+        @apply py-8 sm:py-10 lg:py-12;
+    }
+
+    .page-section {
+        @apply py-12 sm:py-16 lg:py-20;
+    }
+
+    .content-stack {
+        @apply flex flex-col gap-6 sm:gap-8;
+    }
+
+    .section-stack {
+        @apply flex flex-col gap-4 sm:gap-6;
+    }
+
+    .dashboard-grid {
+        @apply grid gap-4 sm:gap-6;
+    }
+
+    .dashboard-grid-2 {
+        @apply grid gap-4 sm:grid-cols-2 sm:gap-6;
+    }
+
+    .dashboard-grid-3 {
+        @apply grid gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3;
+    }
+
+    .dashboard-grid-4 {
+        @apply grid gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4;
+    }
+
+    .hero-title {
+        @apply font-heading text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl;
+    }
+
+    .page-title {
+        @apply font-heading text-3xl font-semibold tracking-tight sm:text-4xl;
+    }
+
+    .section-title {
+        @apply font-heading text-xl font-semibold tracking-tight sm:text-2xl;
+    }
+
+    .card-title {
+        @apply font-heading text-lg font-semibold tracking-tight;
+    }
+
+    .body-large {
+        @apply text-base leading-7 text-muted-foreground sm:text-lg;
+    }
+
+    .body-text {
+        @apply text-sm leading-6 text-muted-foreground sm:text-base;
+    }
+
+    .caption {
+        @apply text-xs leading-5 text-muted-foreground;
+    }
+
+    .eyebrow {
+        @apply text-xs font-semibold uppercase tracking-[0.2em] text-primary;
     }
 }

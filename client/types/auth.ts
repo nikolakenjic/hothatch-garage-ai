@@ -1,20 +1,28 @@
-export type AuthUser = {
-    _id: string;
-    email: string;
-};
+import {User} from '@/types/user';
+
+export type AuthUser = User;
 
 export type LoginResponse = {
     message: string;
     user: AuthUser;
 };
 
+export type RegisterResponse = {
+    message: string;
+    verificationEmailSent: boolean;
+    user: AuthUser;
+};
+
 export type MeResponse = {
-    status: string;
-    data: {
-        user: AuthUser;
-    };
+    message: string;
+    user: AuthUser;
 };
 
 export type LogoutResponse = {
     message: string;
+};
+
+export type VerifyEmailResponse = {
+    message: string;
+    user: AuthUser;
 };

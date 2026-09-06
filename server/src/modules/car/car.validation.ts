@@ -20,7 +20,7 @@ const carBaseSchema = {
     fuelType: z.enum(['petrol', 'diesel', 'hybrid', 'electric']).optional(),
     horsepower: z.number().int().min(1).max(2000).optional(),
     torque: z.number().int().min(1).max(3000).optional(),
-    transmission: z.enum(['manual', 'automatic', 'dsg']).optional(),
+    transmission: z.enum(['manual', 'automatic']).optional(),
     drivetrain: z.enum(['fwd', 'rwd', 'awd']).optional(),
 };
 
@@ -39,6 +39,25 @@ export const updateCarSchema = z
         drivetrain: carBaseSchema.drivetrain,
     })
     .refine(
-        (data) => data.brand || data.model || data.year !== undefined,
+        (data) => Object.values(data).some((value) => value !== undefined),
         'At least one field must be provided',
     );
+
+export const getMyCarsQuerySchema = z.object({
+    search: z.string().trim().max(100).optional(),
+
+    fuelType: z.enum(['petrol', 'diesel', 'hybrid', 'electric']).optional(),
+
+    transmission: z.enum(['manual', 'automatic']).optional(),
+
+    drivetrain: z.enum(['fwd', 'rwd', 'awd']).optional(),
+
+    page: z.coerce.number().int().min(1).default(1),
+
+    limit: z.coerce.number().int().min(1).max(50).default(10),
+});
+
+export type CreateCarInput = z.infer<typeof createCarSchema>;
+export type UpdateCarInput = z.infer<typeof updateCarSchema>;
+
+export type GetMyCarsQuery = z.infer<typeof getMyCarsQuerySchema>;

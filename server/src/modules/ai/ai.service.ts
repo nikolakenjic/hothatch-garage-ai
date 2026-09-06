@@ -9,23 +9,23 @@ import {
     buildUpgradeRecommendationPrompt,
     buildCostAnalysisPrompt,
 } from './ai.prompts';
-import {
-    AIRecommendationType,
-    BuildPlanInput,
-    BuildReviewInput,
-    NextUpgradeInput,
-    CostAnalysisInput,
-    RecommendCarInput,
-} from './ai.types';
+import {AIRecommendationType} from './ai.types';
 import {
     createAIRecommendation,
     findRecentRecommendationsByCar,
 } from './ai.repository';
 import {AI_MODELS} from './ai.constants';
+import {
+    BuildPlanInput,
+    BuildReviewInput,
+    CostAnalysisInput,
+    NextUpgradeInput,
+    RecommendCarInput,
+} from './ai.validation';
 
 const getCarWithModifications = async (carId: string, userId: string) => {
     const car = await findOwnedCarOrFail(carId, userId);
-    const modifications = await Modification.find({car: carId});
+    const modifications = await Modification.find({car: carId}).lean();
     return {car, modifications};
 };
 
@@ -78,9 +78,11 @@ export const getRecommendationsByCarService = async (
 ) => {
     await findOwnedCarOrFail(carId, userId);
 
-    return AIRecommendation.find({user: userId, car: carId}).sort({
-        createdAt: -1,
-    });
+    return AIRecommendation.find({user: userId, car: carId})
+        .sort({
+            createdAt: -1,
+        })
+        .lean();
 };
 
 export const buildPlanService = async (

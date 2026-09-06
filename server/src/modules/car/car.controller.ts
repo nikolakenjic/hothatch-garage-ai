@@ -10,6 +10,7 @@ import {
 } from './car.service';
 import {CREATED, OK} from '../../constants/http';
 import {getUserId} from '../../utils/getUser';
+import {GetMyCarsQuery} from './car.validation';
 
 export const createCar = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
@@ -25,7 +26,9 @@ export const createCar = catchAsync(async (req: Request, res: Response) => {
 export const getMyCars = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
 
-    const result = await getMyCarsService(userId, req.query);
+    const query = req.query as unknown as GetMyCarsQuery;
+
+    const result = await getMyCarsService(userId, query);
 
     res.status(OK).json({
         message: 'Cars fetched successfully',

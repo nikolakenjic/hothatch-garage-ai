@@ -1,18 +1,25 @@
+import {CarFront, Sparkles} from 'lucide-react';
+
+import GlassPanel from '@/components/shared/GlassPanel';
+
 export default function EmptyGarage() {
     return (
-        <div className="mt-10 rounded-[2rem] border border-dashed border-zinc-300 bg-white/60 p-10 text-center shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.03]">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-red-600/10 text-3xl">
-                🏁
+        <GlassPanel variant="solid" className="border-dashed py-14 text-center">
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <CarFront className="size-6" aria-hidden="true" />
             </div>
 
-            <h2 className="font-heading text-2xl font-black text-zinc-950 dark:text-white">
-                Your garage is empty
-            </h2>
+            <h2 className="section-title mt-5">Your garage is ready</h2>
 
-            <p className="mx-auto mt-2 max-w-md text-zinc-500 dark:text-zinc-400">
-                Add your first car and start tracking your build like a real
-                premium garage profile.
+            <p className="body-muted mx-auto mt-2 max-w-md">
+                Add your first vehicle to organize specifications,
+                modifications, ownership costs, and future build decisions.
             </p>
-        </div>
+
+            <div className="mx-auto mt-6 flex w-fit items-center gap-2 rounded-full border border-border-subtle bg-surface-muted px-3 py-1.5 text-sm text-muted-foreground">
+                <Sparkles className="size-4 text-primary" aria-hidden="true" />
+                AI recommendations become available after adding a vehicle
+            </div>
+        </GlassPanel>
     );
 }

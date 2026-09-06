@@ -1,5 +1,9 @@
+import Link from 'next/link';
+import {ArrowLeft, Check} from 'lucide-react';
 import {ReactNode} from 'react';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+
+import GlassPanel from '@/components/shared/GlassPanel';
+import {Button} from '@/components/ui/button';
 import {APP_NAME} from '@/lib/constants';
 
 type Feature = {
@@ -27,66 +31,104 @@ type AuthLayoutProps = {
 };
 
 export default function AuthLayout({children, hero, card}: AuthLayoutProps) {
-    const {eyebrow, title, description} = card;
-
     return (
-        <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-50 px-4 text-zinc-950 dark:bg-zinc-950 dark:text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.18),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.12),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(220,38,38,0.25),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.18),_transparent_35%)]" />
+        <main className="relative min-h-screen overflow-hidden bg-background text-foreground">
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_32%),radial-gradient(circle_at_85%_85%,color-mix(in_oklab,var(--primary)_8%,transparent),transparent_30%)]"
+            />
 
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[size:44px_44px] opacity-30 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] dark:opacity-20" />
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_oklab,var(--border)_35%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--border)_35%,transparent)_1px,transparent_1px)] bg-[size:48px_48px] opacity-40 mask-[linear-gradient(to_bottom,black,transparent_85%)]"
+            />
 
-            <section className="relative z-10 grid w-full max-w-6xl items-center gap-10 lg:grid-cols-2">
-                <div className="hidden space-y-6 lg:block">
-                    <p className="text-sm font-semibold uppercase tracking-[0.35em] text-red-600 dark:text-red-500">
-                        {APP_NAME}
-                    </p>
-
-                    <h1 className="font-heading max-w-xl text-4xl font-black leading-tight tracking-tight lg:text-5xl">
-                        {hero.title}
-                        <span className="block text-red-600 dark:text-red-500">
-                            {hero.highlight}
+            <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
+                <header className="flex items-center justify-between">
+                    <Link
+                        href="/"
+                        className="inline-flex items-center gap-3 font-heading text-sm font-bold tracking-tight"
+                    >
+                        <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-sm font-black text-primary-foreground shadow-sm">
+                            HH
                         </span>
-                    </h1>
 
-                    <p className="max-w-lg text-lg text-zinc-600 dark:text-zinc-400">
-                        {hero.description}
-                    </p>
+                        <span>{APP_NAME}</span>
+                    </Link>
 
-                    <div className="grid max-w-md grid-cols-3 gap-3 pt-4">
-                        {hero.features.map((item) => (
-                            <div
-                                key={item.title}
-                                className="rounded-2xl border border-zinc-200 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5"
-                            >
-                                <p className="font-heading text-2xl font-bold">
-                                    {item.title}
-                                </p>
-                                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                    {item.description}
-                                </p>
-                            </div>
-                        ))}
+                    <Button asChild variant="ghost" size="sm">
+                        <Link href="/">
+                            <ArrowLeft className="size-4" aria-hidden="true" />
+                            Back to home
+                        </Link>
+                    </Button>
+                </header>
+
+                <section className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.8fr)] lg:gap-20">
+                    <div className="hidden lg:block">
+                        <p className="eyebrow mb-5">
+                            Built for performance enthusiasts
+                        </p>
+
+                        <h1 className="hero-title max-w-2xl">
+                            {hero.title}{' '}
+                            <span className="text-primary">
+                                {hero.highlight}
+                            </span>
+                        </h1>
+
+                        <p className="body-large mt-6 max-w-xl">
+                            {hero.description}
+                        </p>
+
+                        <div className="mt-10 grid max-w-xl gap-3">
+                            {hero.features.map((feature) => (
+                                <div
+                                    key={feature.title}
+                                    className="flex items-start gap-3 rounded-xl border border-border-subtle bg-surface/70 p-4 backdrop-blur-sm"
+                                >
+                                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                        <Check
+                                            className="size-3.5"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
+
+                                    <div>
+                                        <p className="text-sm font-semibold text-foreground">
+                                            {feature.title}
+                                        </p>
+
+                                        <p className="mt-0.5 text-sm text-muted-foreground">
+                                            {feature.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                <Card className="w-full border-zinc-200 bg-white/85 shadow-xl backdrop-blur-xl lg:shadow-2xl dark:border-white/10 dark:bg-zinc-950/80 dark:shadow-red-950/30">
-                    <CardHeader className="space-y-2 text-center">
-                        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-600 dark:text-red-500">
-                            {eyebrow}
-                        </p>
+                    <GlassPanel
+                        variant="elevated"
+                        padding="lg"
+                        className="mx-auto w-full max-w-lg"
+                    >
+                        <div className="mb-8 text-center sm:text-left">
+                            <p className="eyebrow">{card.eyebrow}</p>
 
-                        <CardTitle className="font-heading text-3xl font-black text-zinc-950 dark:text-white">
-                            {title}
-                        </CardTitle>
+                            <h2 className="page-title mt-3">{card.title}</h2>
 
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                            {description}
-                        </p>
-                    </CardHeader>
+                            <p className="body-text mt-3">{card.description}</p>
+                        </div>
 
-                    <CardContent className="pt-3">{children}</CardContent>
-                </Card>
-            </section>
+                        {children}
+                    </GlassPanel>
+                </section>
+
+                <footer className="py-3 text-center text-xs text-muted-foreground">
+                    Your garage data stays private and belongs to you.
+                </footer>
+            </div>
         </main>
     );
 }

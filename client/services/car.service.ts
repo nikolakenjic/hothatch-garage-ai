@@ -1,7 +1,7 @@
 import type {AxiosRequestConfig} from 'axios';
 
 import BaseService from '@/lib/api/base.service';
-import {Car, CreateCarInput} from '@/types/car';
+import {Car, CreateCarInput, UpdateCarInput} from '@/types/car';
 
 type CarsResponse = {
     message: string;
@@ -12,7 +12,9 @@ type CarsResponse = {
 
 type CarDetailsResponse = {
     message: string;
-    data: Car;
+    data: {
+        car: Car;
+    };
 };
 
 type CreateCarResponse = {
@@ -48,7 +50,7 @@ export default class CarService {
             config,
         );
 
-        return response.data;
+        return response.data.car;
     }
 
     static async createCar(
@@ -66,7 +68,7 @@ export default class CarService {
 
     static async updateCar(
         carId: string,
-        body: Partial<CreateCarInput>,
+        body: UpdateCarInput,
         config?: AxiosRequestConfig,
     ): Promise<Car> {
         const response = await BaseService.update<UpdateCarResponse>(

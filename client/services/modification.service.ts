@@ -1,5 +1,9 @@
 import BaseService from '@/lib/api/base.service';
-import {Modification, CreateModificationInput} from '@/types/modification';
+import {
+    Modification,
+    CreateModificationInput,
+    UpdateModificationInput,
+} from '@/types/modification';
 import {AxiosRequestConfig} from 'axios';
 
 type ModificationsResponse = {
@@ -48,7 +52,7 @@ export default class ModificationService {
 
     static async updateModification(
         modId: string,
-        body: Partial<CreateModificationInput>,
+        body: UpdateModificationInput,
         config?: AxiosRequestConfig,
     ): Promise<Modification> {
         const response = await BaseService.update<ModificationResponse>(

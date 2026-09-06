@@ -3,23 +3,24 @@ import type {NextRequest} from 'next/server';
 
 export function proxy(request: NextRequest) {
     const accessToken = request.cookies.get('accessToken')?.value;
+    const refreshToken = request.cookies.get('refreshToken')?.value;
 
-    const isPublicPage =
-        request.nextUrl.pathname === '/' ||
-        request.nextUrl.pathname.startsWith('/login') ||
-        request.nextUrl.pathname.startsWith('/register');
+    const hasAuthSession = Boolean(accessToken || refreshToken);
 
-    if (!accessToken && !isPublicPage) {
+    if (!hasAuthSession) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (accessToken && isPublicPage && request.nextUrl.pathname !== '/') {
-        return NextResponse.redirect(new URL('/garage', request.url));
-    }
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-current-path', request.nextUrl.pathname);
 
-    return NextResponse.next();
+    return NextResponse.next({
+        request: {
+            headers: requestHeaders,
+        },
+    });
 }
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+    matcher: ['/garage/:path*', '/ai/:path*', '/settings/:path*'],
 };

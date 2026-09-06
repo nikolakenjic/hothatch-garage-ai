@@ -45,6 +45,17 @@ const aiRecommendationSchema = new Schema<IAIRecommendation>(
     },
 );
 
+aiRecommendationSchema.index({
+    user: 1,
+    createdAt: -1,
+});
+
+aiRecommendationSchema.index({
+    user: 1,
+    car: 1,
+    createdAt: -1,
+});
+
 export const AIRecommendation = mongoose.model<IAIRecommendation>(
     'AIRecommendation',
     aiRecommendationSchema,

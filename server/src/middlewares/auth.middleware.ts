@@ -1,32 +1,21 @@
 import {NextFunction, Request, Response} from 'express';
-import jwt from 'jsonwebtoken';
-import {env} from '../config/env';
 import mongoose from 'mongoose';
+import {AppError} from '../utils/AppError';
+import {UNAUTHORIZED} from '../constants/http';
+import {verifyAccessToken} from '../utils/token';
 
-type DecodedToken = {
-    userId: string;
-};
-
-export const protect = (req: Request, res: Response, next: NextFunction) => {
+export const protect = (req: Request, _res: Response, next: NextFunction) => {
     const token = req.cookies?.accessToken;
 
     if (!token) {
-        return res.status(401).json({
-            message: 'Not authorized, no token',
-        });
+        throw new AppError('Not authorized, no token', UNAUTHORIZED);
     }
 
-    try {
-        const decoded = jwt.verify(token, env.JWT_SECRET) as DecodedToken;
+    const {userId} = verifyAccessToken(token);
 
-        req.user = {
-            userId: new mongoose.Types.ObjectId(decoded.userId),
-        };
+    req.user = {
+        userId: new mongoose.Types.ObjectId(userId),
+    };
 
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            message: 'Not authorized, invalid token',
-        });
-    }
+    next();
 };

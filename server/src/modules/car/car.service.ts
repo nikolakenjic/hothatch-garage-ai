@@ -1,28 +1,12 @@
+import {NOT_FOUND} from '../../constants/http';
 import {AppError} from '../../utils/AppError';
+import {Modification} from '../modification/modification.model';
 import {Car} from './car.model';
+import {CreateCarInput, GetMyCarsQuery, UpdateCarInput} from './car.validation';
+import {AIRecommendation} from '../ai/ai.model';
 
-type CreateCarInput = {
-    brand: string;
-    model: string;
-    year: number;
-    nickname?: string;
-    fuelType?: 'petrol' | 'diesel' | 'hybrid' | 'electric';
-    horsepower?: number;
-    torque?: number;
-    transmission?: 'manual' | 'automatic' | 'dsg';
-    drivetrain?: 'fwd' | 'rwd' | 'awd';
-};
-
-type UpdateCarInput = Partial<CreateCarInput>;
-
-type GetMyCarsQuery = {
-    search?: string;
-    fuelType?: string;
-    transmission?: string;
-    drivetrain?: string;
-    page?: string;
-    limit?: string;
-};
+const escapeRegex = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const createCarService = async (
     userId: string,
@@ -38,8 +22,7 @@ export const getMyCarsService = async (
     userId: string,
     query: GetMyCarsQuery,
 ) => {
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
+    const {page, limit} = query;
     const skip = (page - 1) * limit;
 
     const filter: Record<string, unknown> = {
@@ -47,10 +30,12 @@ export const getMyCarsService = async (
     };
 
     if (query.search) {
+        const search = escapeRegex(query.search);
+
         filter.$or = [
-            {brand: {$regex: query.search, $options: 'i'}},
-            {model: {$regex: query.search, $options: 'i'}},
-            {nickname: {$regex: query.search, $options: 'i'}},
+            {brand: {$regex: search, $options: 'i'}},
+            {model: {$regex: search, $options: 'i'}},
+            {nickname: {$regex: search, $options: 'i'}},
         ];
     }
 
@@ -75,14 +60,13 @@ export const getMyCarsService = async (
 };
 
 export const findOwnedCarOrFail = async (carId: string, userId: string) => {
-    const car = await Car.findById(carId);
+    const car = await Car.findOne({
+        _id: carId,
+        user: userId,
+    });
 
     if (!car) {
-        throw new AppError('Car not found', 404);
-    }
-
-    if (car.user.toString() !== userId) {
-        throw new AppError('Not authorized', 403);
+        throw new AppError('Car not found', NOT_FOUND);
     }
 
     return car;
@@ -112,6 +96,11 @@ export const getCarDetailsService = async (carId: string, userId: string) => {
 
 export const deleteCarService = async (carId: string, userId: string) => {
     const car = await findOwnedCarOrFail(carId, userId);
+
+    await Promise.all([
+        Modification.deleteMany({car: car._id}),
+        AIRecommendation.deleteMany({car: car._id}),
+    ]);
 
     await car.deleteOne();
 };

@@ -7,17 +7,6 @@ export enum AIRecommendationType {
     BUILD_PLAN = 'build-plan',
 }
 
-export type RecommendCarInput = {
-    budget: string;
-    fuel: string;
-    use: string;
-};
-
-export type BuildPlanInput = {
-    budget: string;
-    goal: string;
-};
-
 export type CarPromptInput = {
     brand: string;
     model: string;
@@ -30,20 +19,6 @@ export type ModificationPromptInput = {
     status: string;
     cost?: number;
     brand?: string;
-};
-
-export type NextUpgradeInput = {
-    budget: string;
-    goal: string;
-};
-
-export type BuildReviewInput = {
-    goal: string;
-};
-
-export type CostAnalysisInput = {
-    budget: string;
-    goal: string;
 };
 
 export type PreviousRecommendationPromptInput = {

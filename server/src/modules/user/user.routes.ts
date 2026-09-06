@@ -6,11 +6,13 @@ import {
     getPublicProfile,
     getUserStats,
     updateProfile,
+    updateSettings,
 } from './user.controller';
 import {
     changePasswordSchema,
     publicProfileSchema,
     updateProfileSchema,
+    updateSettingsSchema,
 } from './user.validation';
 import {validate} from '../../middlewares/validate';
 
@@ -30,10 +32,21 @@ router.patch(
     changePassword,
 );
 
+router.patch(
+    '/me/settings',
+    protect,
+    validate(updateSettingsSchema),
+    updateSettings,
+);
+
 router.delete('/me', protect, deleteAccount);
 
 router.get('/me/stats', protect, getUserStats);
 
-router.get('/:username', validate(publicProfileSchema), getPublicProfile);
+router.get(
+    '/:username',
+    validate(publicProfileSchema, 'params'),
+    getPublicProfile,
+);
 
 export default router;
