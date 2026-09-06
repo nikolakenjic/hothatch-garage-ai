@@ -80,7 +80,7 @@ export default class AuthService {
             `${this.ENDPOINT}/reset-password`,
             {
                 token,
-                password: data.password,
+                newPassword: data.password,
             },
         );
     }

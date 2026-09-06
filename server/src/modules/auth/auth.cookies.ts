@@ -9,6 +9,9 @@ const baseCookieOptions: CookieOptions = {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
     sameSite: 'lax',
+    ...(env.COOKIE_DOMAIN && {
+        domain: env.COOKIE_DOMAIN,
+    }),
 };
 
 export const accessTokenCookieOptions: CookieOptions = {
@@ -22,7 +25,5 @@ export const refreshTokenCookieOptions: CookieOptions = {
 };
 
 export const authCookieClearOptions: CookieOptions = {
-    httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    ...baseCookieOptions,
 };

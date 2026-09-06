@@ -7,12 +7,7 @@ export function proxy(request: NextRequest) {
 
     const hasAuthSession = Boolean(accessToken || refreshToken);
 
-    const isPublicPage =
-        request.nextUrl.pathname === '/' ||
-        request.nextUrl.pathname.startsWith('/login') ||
-        request.nextUrl.pathname.startsWith('/register');
-
-    if (!hasAuthSession && !isPublicPage) {
+    if (!hasAuthSession) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
@@ -27,5 +22,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+    matcher: ['/garage/:path*', '/ai/:path*', '/settings/:path*'],
 };
