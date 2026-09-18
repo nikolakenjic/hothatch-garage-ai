@@ -11,7 +11,7 @@ const api = axios.create({
     withCredentials: true,
 });
 
-const refreshApi = axios.create({
+export const sameOriginApi = axios.create({
     withCredentials: true,
 });
 
@@ -22,7 +22,7 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
 let refreshPromise: Promise<void> | null = null;
 
 const refreshAccessToken = async (): Promise<void> => {
-    await refreshApi.post('/api/auth/refresh');
+    await sameOriginApi.post('/api/auth/refresh');
 };
 
 api.interceptors.response.use(
