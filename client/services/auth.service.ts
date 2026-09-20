@@ -14,6 +14,7 @@ import {
     RegisterResponse,
     VerifyEmailResponse,
 } from '@/types/auth';
+import {sameOriginApi} from '@/lib/axios';
 
 type AuthMessageResponse = {
     message: string;
@@ -22,11 +23,19 @@ type AuthMessageResponse = {
 export default class AuthService {
     static readonly ENDPOINT = '/auth';
 
+    // static async login(data: LoginInput): Promise<LoginResponse> {
+    //     return BaseService.create<LoginResponse>(
+    //         `${this.ENDPOINT}/login`,
+    //         data,
+    //     );
+    // }
     static async login(data: LoginInput): Promise<LoginResponse> {
-        return BaseService.create<LoginResponse>(
-            `${this.ENDPOINT}/login`,
+        const response = await sameOriginApi.post<LoginResponse>(
+            '/api/auth/login',
             data,
         );
+
+        return response.data;
     }
 
     static async register(data: RegisterInput): Promise<RegisterResponse> {
@@ -40,11 +49,23 @@ export default class AuthService {
         return BaseService.get<MeResponse>(`${this.ENDPOINT}/me`, config);
     }
 
+    static async getClientMe(): Promise<MeResponse> {
+        const response = await sameOriginApi.get<MeResponse>('/api/auth/me');
+
+        return response.data;
+    }
+
+    // static async logout(): Promise<LogoutResponse> {
+    //     return BaseService.create<LogoutResponse>(
+    //         `${this.ENDPOINT}/logout`,
+    //         {},
+    //     );
+    // }
     static async logout(): Promise<LogoutResponse> {
-        return BaseService.create<LogoutResponse>(
-            `${this.ENDPOINT}/logout`,
-            {},
-        );
+        const response =
+            await sameOriginApi.post<LogoutResponse>('/api/auth/logout');
+
+        return response.data;
     }
 
     static async verifyEmail(token: string): Promise<VerifyEmailResponse> {

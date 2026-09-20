@@ -29,7 +29,7 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     useEffect(() => {
         const restoreUser = async () => {
             try {
-                const response = await AuthService.getMe();
+                const response = await AuthService.getClientMe();
                 setUser(response.user);
             } catch (error) {
                 if (isUnauthorizedError(error)) {

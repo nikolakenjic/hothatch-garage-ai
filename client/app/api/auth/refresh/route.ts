@@ -22,10 +22,10 @@ async function refreshSession(request: NextRequest) {
         status: backendResponse.status,
     });
 
-    const setCookie = backendResponse.headers.get('set-cookie');
+    const setCookies = backendResponse.headers.getSetCookie();
 
-    if (setCookie) {
-        response.headers.set('set-cookie', setCookie);
+    for (const cookie of setCookies) {
+        response.headers.append('Set-Cookie', cookie);
     }
 
     return response;
@@ -58,10 +58,10 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.redirect(new URL(safeReturnTo, request.url));
 
-    const setCookie = backendResponse.headers.get('set-cookie');
+    const setCookies = backendResponse.headers.getSetCookie();
 
-    if (setCookie) {
-        response.headers.set('set-cookie', setCookie);
+    for (const cookie of setCookies) {
+        response.headers.append('Set-Cookie', cookie);
     }
 
     return response;
