@@ -1,13 +1,15 @@
 import axios, {AxiosError, InternalAxiosRequestConfig} from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
+const backendBaseURL = process.env.NEXT_PUBLIC_API_URL;
 
-if (!baseURL) {
+if (!backendBaseURL) {
     throw new Error('NEXT_PUBLIC_API_URL is not configured');
 }
 
+const isBrowser = typeof window !== 'undefined';
+
 const api = axios.create({
-    baseURL,
+    baseURL: isBrowser ? '/api/backend' : backendBaseURL,
     withCredentials: true,
 });
 
