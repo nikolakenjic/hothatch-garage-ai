@@ -124,21 +124,27 @@ export const getCurrentUserService = async (userId: string) => {
 export const refreshAccessTokenService = async (refreshToken: string) => {
     const decoded = verifyRefreshToken(refreshToken);
 
-    const refreshTokenHash = hashToken(refreshToken);
+    const currentRefreshTokenHash = hashToken(refreshToken);
 
-    const session = await Session.findOne({
-        refreshTokenHash,
-        user: decoded.userId,
-    });
+    const newRefreshToken = signRefreshToken(decoded.userId);
+    const newRefreshTokenHash = hashToken(newRefreshToken);
+
+    const session = await Session.findOneAndUpdate(
+        {
+            refreshTokenHash: currentRefreshTokenHash,
+            user: decoded.userId,
+            expiresAt: {$gt: new Date()},
+        },
+        {
+            refreshTokenHash: newRefreshTokenHash,
+        },
+        {
+            new: true,
+        },
+    );
 
     if (!session) {
         throw new AppError('Invalid session', UNAUTHORIZED);
-    }
-
-    if (session.expiresAt <= new Date()) {
-        await Session.deleteOne({_id: session._id});
-
-        throw new AppError('Session expired', UNAUTHORIZED);
     }
 
     const user = await User.findById(decoded.userId);
@@ -149,7 +155,12 @@ export const refreshAccessTokenService = async (refreshToken: string) => {
         throw new AppError('Invalid session', UNAUTHORIZED);
     }
 
-    return signAccessToken(user._id.toString());
+    const accessToken = signAccessToken(user._id.toString());
+
+    return {
+        accessToken,
+        refreshToken: newRefreshToken,
+    };
 };
 
 export const logoutService = async (refreshToken?: string) => {
