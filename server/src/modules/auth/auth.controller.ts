@@ -98,9 +98,11 @@ export const refresh = catchAsync(async (req: Request, res: Response) => {
         throw new AppError('No refresh token', UNAUTHORIZED);
     }
 
-    const accessToken = await refreshAccessTokenService(refreshToken);
+    const {accessToken, refreshToken: newRefreshToken} =
+        await refreshAccessTokenService(refreshToken);
 
     res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', newRefreshToken, refreshTokenCookieOptions);
 
     res.status(OK).json({
         message: 'Access token refreshed',
