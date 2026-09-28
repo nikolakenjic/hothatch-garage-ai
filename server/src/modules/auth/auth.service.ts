@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-
+import mongoose, {HydratedDocument} from 'mongoose';
 import {AppError} from '../../utils/AppError';
 import {IUser, User} from './user.model';
 import {Session} from './session.model';
@@ -29,7 +29,6 @@ import {
     PASSWORD_RESET_TOKEN_TTL_MS,
     REFRESH_TOKEN_TTL_SECONDS,
 } from '../../constants/auth.constants';
-import {HydratedDocument} from 'mongoose';
 
 type RegisterServiceResult = {
     user: HydratedDocument<IUser>;
@@ -256,11 +255,22 @@ export const resetPasswordService = async (
         throw new AppError('Invalid or expired reset token', BAD_REQUEST);
     }
 
-    user.passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
-    user.passwordResetTokenHash = undefined;
-    user.passwordResetExpires = undefined;
+    const session = await mongoose.startSession();
 
-    await user.save();
+    try {
+        await session.withTransaction(async () => {
+            user.passwordHash = await bcrypt.hash(
+                newPassword,
+                BCRYPT_SALT_ROUNDS,
+            );
+            user.passwordResetTokenHash = undefined;
+            user.passwordResetExpires = undefined;
 
-    await Session.deleteMany({user: user._id});
+            await user.save({session});
+
+            await Session.deleteMany({user: user._id}, {session});
+        });
+    } finally {
+        await session.endSession();
+    }
 };
