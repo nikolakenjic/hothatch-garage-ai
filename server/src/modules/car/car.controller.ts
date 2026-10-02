@@ -26,7 +26,7 @@ export const createCar = catchAsync(async (req: Request, res: Response) => {
 export const getMyCars = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
 
-    const query = req.query as unknown as GetMyCarsQuery;
+    const query = req.validated?.query as GetMyCarsQuery;
 
     const result = await getMyCarsService(userId, query);
 
