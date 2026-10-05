@@ -34,9 +34,16 @@ export const costAnalysisSchema = z.object({
     goal: requiredString('Goal is required'),
 });
 
-export const recommendationsQuerySchema = z.object({
+const paginationSchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export const recommendationsQuerySchema = paginationSchema.extend({
     type: z.nativeEnum(AIRecommendationType).optional(),
 });
+
+export const recommendationsByCarQuerySchema = paginationSchema;
 
 export type RecommendCarInput = z.infer<typeof recommendCarSchema>;
 export type BuildPlanInput = z.infer<typeof buildPlanSchema>;
@@ -45,3 +52,6 @@ export type BuildReviewInput = z.infer<typeof buildReviewSchema>;
 export type CostAnalysisInput = z.infer<typeof costAnalysisSchema>;
 
 export type RecommendationsQuery = z.infer<typeof recommendationsQuerySchema>;
+export type RecommendationsByCarQuery = z.infer<
+    typeof recommendationsByCarQuerySchema
+>;

@@ -12,7 +12,10 @@ import {
 } from './ai.service';
 import {OK} from '../../constants/http';
 import {getUserId} from '../../utils/getUser';
-import type {RecommendationsQuery} from './ai.validation';
+import type {
+    RecommendationsByCarQuery,
+    RecommendationsQuery,
+} from './ai.validation';
 
 export const recommendCar = catchAsync(async (req: Request, res: Response) => {
     const userId = getUserId(req);
@@ -44,17 +47,18 @@ export const recommendUpgrade = catchAsync(
 export const getRecommendations = catchAsync(
     async (req: Request, res: Response) => {
         const userId = getUserId(req);
-        const query = req.query as unknown as RecommendationsQuery;
+        const query = req.validated!.query as RecommendationsQuery;
 
-        const recommendations = await getRecommendationsService(
+        const {recommendations, pagination} = await getRecommendationsService(
             userId,
-            query.type,
+            query,
         );
 
         res.status(OK).json({
             message: 'Recommendations fetched successfully',
             count: recommendations.length,
             recommendations,
+            pagination,
         });
     },
 );
@@ -64,15 +68,16 @@ export const getRecommendationsByCar = catchAsync(
         const carId = req.params.carId as string;
         const userId = getUserId(req);
 
-        const recommendations = await getRecommendationsByCarService(
-            carId,
-            userId,
-        );
+        const query = req.validated!.query as RecommendationsByCarQuery;
+
+        const {recommendations, pagination} =
+            await getRecommendationsByCarService(carId, userId, query);
 
         res.status(OK).json({
             message: 'Car recommendations fetched successfully',
             count: recommendations.length,
             recommendations,
+            pagination,
         });
     },
 );
