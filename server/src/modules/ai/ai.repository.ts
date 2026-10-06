@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 import {AIRecommendation} from './ai.model';
-import {AIRecommendationType} from './ai.types';
+import {AIRecommendationType, type AIPrompt} from './ai.types';
 import {generateAIContent} from './ai.client';
 
 type CreateRecommendationArgs = {
     userId: string;
     carId?: string;
     type: AIRecommendationType;
-    prompt: string;
+    prompt: AIPrompt;
     model: string;
     input?: Record<string, unknown>;
 };
@@ -26,7 +26,7 @@ export const createAIRecommendation = async ({
         user: new mongoose.Types.ObjectId(userId),
         car: carId ? new mongoose.Types.ObjectId(carId) : undefined,
         type,
-        prompt,
+        prompt: prompt.user,
         input,
         content,
     });
