@@ -2,19 +2,32 @@ import Groq from 'groq-sdk';
 import {env} from '../../config/env';
 import {AppError} from '../../utils/AppError';
 import {BAD_GATEWAY, SERVICE_UNAVAILABLE} from '../../constants/http';
+import type {AIPrompt} from './ai.types';
 
 const groq = new Groq({
     apiKey: env.GROQ_API_KEY,
+    timeout: 30_000,
+    maxRetries: 1,
 });
 
 export const generateAIContent = async (
-    prompt: string,
+    prompt: AIPrompt,
     model: string,
 ): Promise<string> => {
     try {
         const response = await groq.chat.completions.create({
             model,
-            messages: [{role: 'user', content: prompt}],
+            messages: [
+                {
+                    role: 'system',
+                    content: prompt.system,
+                },
+                {
+                    role: 'user',
+                    content: prompt.user,
+                },
+            ],
+            max_completion_tokens: 2048,
         });
 
         const content = response.choices[0]?.message?.content?.trim();

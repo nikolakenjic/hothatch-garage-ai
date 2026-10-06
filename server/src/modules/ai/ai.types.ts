@@ -24,3 +24,8 @@ export type ModificationPromptInput = {
 export type PreviousRecommendationPromptInput = {
     content: string;
 };
+
+export type AIPrompt = {
+    system: string;
+    user: string;
+};
