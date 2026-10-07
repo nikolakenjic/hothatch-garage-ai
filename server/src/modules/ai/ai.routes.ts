@@ -1,4 +1,5 @@
 import {Router} from 'express';
+import rateLimit from 'express-rate-limit';
 import {
     buildPlan,
     buildReview,
@@ -21,13 +22,27 @@ import {
     recommendationsQuerySchema,
     recommendCarSchema,
 } from './ai.validation';
+import {AI_GENERATION_RATE_LIMIT} from './ai.constants';
+import {getUserId} from '../../utils/getUser';
+
+const aiGenerationLimiter = rateLimit({
+    ...AI_GENERATION_RATE_LIMIT,
+    keyGenerator: (req) => getUserId(req),
+});
 
 const router = Router();
 
-router.post('/recommend', protect, validate(recommendCarSchema), recommendCar);
+router.post(
+    '/recommend',
+    protect,
+    aiGenerationLimiter,
+    validate(recommendCarSchema),
+    recommendCar,
+);
 router.post(
     '/upgrade/:carId',
     protect,
+    aiGenerationLimiter,
     validate(aiCarParamsSchema, 'params'),
     recommendUpgrade,
 );
@@ -47,6 +62,7 @@ router.get(
 router.post(
     '/build-plan/:carId',
     protect,
+    aiGenerationLimiter,
     validate(aiCarParamsSchema, 'params'),
     validate(buildPlanSchema),
     buildPlan,
@@ -55,6 +71,7 @@ router.post(
 router.post(
     '/next-upgrade/:carId',
     protect,
+    aiGenerationLimiter,
     validate(aiCarParamsSchema, 'params'),
     validate(nextUpgradeSchema),
     nextUpgrade,
@@ -63,6 +80,7 @@ router.post(
 router.post(
     '/build-review/:carId',
     protect,
+    aiGenerationLimiter,
     validate(aiCarParamsSchema, 'params'),
     validate(buildReviewSchema),
     buildReview,
@@ -71,6 +89,7 @@ router.post(
 router.post(
     '/cost-analysis/:carId',
     protect,
+    aiGenerationLimiter,
     validate(aiCarParamsSchema, 'params'),
     validate(costAnalysisSchema),
     costAnalysis,
