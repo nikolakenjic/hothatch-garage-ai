@@ -8,7 +8,6 @@ import {
     getRecommendationsByCarService,
     getRecommendationsService,
     nextUpgradeService,
-    recommendUpgradeService,
 } from './ai.service';
 import {OK} from '../../constants/http';
 import {getUserId} from '../../utils/getUser';
@@ -29,20 +28,6 @@ export const recommendCar = catchAsync(async (req: Request, res: Response) => {
         recommendation,
     });
 });
-
-export const recommendUpgrade = catchAsync(
-    async (req: Request, res: Response) => {
-        const carId = req.params.carId as string;
-        const userId = getUserId(req);
-
-        const recommendation = await recommendUpgradeService(carId, userId);
-
-        res.status(OK).json({
-            message: 'Upgrade recommendation generated',
-            recommendation,
-        });
-    },
-);
 
 export const getRecommendations = catchAsync(
     async (req: Request, res: Response) => {

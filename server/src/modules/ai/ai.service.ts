@@ -6,7 +6,6 @@ import {
     buildBuildReviewPrompt,
     buildCarRecommendationPrompt,
     buildNextUpgradePrompt,
-    buildUpgradeRecommendationPrompt,
     buildCostAnalysisPrompt,
 } from './ai.prompts';
 import {AIRecommendationType} from './ai.types';
@@ -43,23 +42,6 @@ export const generateCarRecommendationService = async (
         prompt,
         model: AI_MODELS.RECOMMENDATION,
         input: data,
-    });
-};
-
-export const recommendUpgradeService = async (
-    carId: string,
-    userId: string,
-) => {
-    const {car, modifications} = await getCarWithModifications(carId, userId);
-    const prompt = buildUpgradeRecommendationPrompt(car, modifications);
-
-    return createAIRecommendation({
-        userId,
-        carId,
-        type: AIRecommendationType.NEXT_UPGRADE,
-        prompt,
-        model: AI_MODELS.FAST,
-        input: {carId},
     });
 };
 

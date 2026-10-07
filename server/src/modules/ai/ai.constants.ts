@@ -8,7 +8,6 @@ type RateLimitConfig = Partial<Options> & {
 
 export const AI_MODELS = {
     RECOMMENDATION: 'openai/gpt-oss-120b',
-    FAST: 'openai/gpt-oss-20b',
 } as const;
 
 export const AI_GENERATION_RATE_LIMIT: RateLimitConfig = {
