@@ -90,38 +90,6 @@ ${use}
 `.trim(),
 });
 
-export const buildUpgradeRecommendationPrompt = (
-    car: CarPromptInput,
-    modifications: ModificationPromptInput[],
-): AIPrompt => ({
-    system: `
-${AI_SAFETY_INSTRUCTIONS}
-
-You are a car tuning expert.
-
-Suggest ONE sensible next upgrade for the supplied car.
-
-Consider the car and its existing modifications.
-Avoid recommending something that is already installed.
-Prefer practical upgrades suitable for a daily-driven car.
-
-Respond exactly in this format:
-
-Upgrade: <name>
-Why: <short explanation>
-`.trim(),
-
-    user: `
-Car:
-- Brand: ${car.brand}
-- Model: ${car.model}
-- Year: ${car.year}
-
-Current modifications:
-${formatModsList(modifications)}
-`.trim(),
-});
-
 export const buildBuildPlanPrompt = (
     car: CarPromptInput,
     modifications: ModificationPromptInput[],

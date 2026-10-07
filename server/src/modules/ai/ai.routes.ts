@@ -8,7 +8,6 @@ import {
     getRecommendationsByCar,
     nextUpgrade,
     recommendCar,
-    recommendUpgrade,
 } from './ai.controller';
 import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
@@ -39,19 +38,14 @@ router.post(
     validate(recommendCarSchema),
     recommendCar,
 );
-router.post(
-    '/upgrade/:carId',
-    protect,
-    aiGenerationLimiter,
-    validate(aiCarParamsSchema, 'params'),
-    recommendUpgrade,
-);
+
 router.get(
     '/recommendations',
     protect,
     validate(recommendationsQuerySchema, 'query'),
     getRecommendations,
 );
+
 router.get(
     '/recommendations/car/:carId',
     protect,
@@ -59,6 +53,7 @@ router.get(
     validate(recommendationsByCarQuerySchema, 'query'),
     getRecommendationsByCar,
 );
+
 router.post(
     '/build-plan/:carId',
     protect,
