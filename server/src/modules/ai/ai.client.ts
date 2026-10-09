@@ -33,6 +33,10 @@ export const generateAIContent = async (
         const content = response.choices[0]?.message?.content?.trim();
 
         if (!content) {
+            console.error('AI provider returned an empty response', {
+                model,
+            });
+
             throw new AppError(
                 'AI provider returned an empty response',
                 BAD_GATEWAY,
@@ -44,6 +48,8 @@ export const generateAIContent = async (
         if (error instanceof AppError) {
             throw error;
         }
+
+        console.error('AI provider request failed', error);
 
         throw new AppError(
             'AI service is currently unavailable. Please try again later.',
