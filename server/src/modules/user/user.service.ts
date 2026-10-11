@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import {AppError} from '../../utils/AppError';
 import {User} from '../auth/user.model';
 import bcrypt from 'bcryptjs';
@@ -67,44 +68,81 @@ export const changePasswordService = async (
     userId: string,
     input: ChangePasswordInput,
 ) => {
-    const user = await User.findById(userId).select('+passwordHash');
+    const session = await mongoose.startSession();
 
-    if (!user) {
-        throw new AppError('User not found', NOT_FOUND);
+    try {
+        await session.withTransaction(async () => {
+            const user = await User.findById(userId)
+                .select('+passwordHash')
+                .session(session);
+
+            if (!user) {
+                throw new AppError('User not found', NOT_FOUND);
+            }
+
+            const isPasswordCorrect = await bcrypt.compare(
+                input.currentPassword,
+                user.passwordHash,
+            );
+
+            if (!isPasswordCorrect) {
+                throw new AppError(
+                    'Current password is incorrect',
+                    UNAUTHORIZED,
+                );
+            }
+
+            user.passwordHash = await bcrypt.hash(
+                input.newPassword,
+                BCRYPT_SALT_ROUNDS,
+            );
+
+            await user.save({session});
+
+            await Session.deleteMany({user: userId}, {session});
+        });
+    } finally {
+        await session.endSession();
     }
-
-    const isPasswordCorrect = await bcrypt.compare(
-        input.currentPassword,
-        user.passwordHash,
-    );
-
-    if (!isPasswordCorrect) {
-        throw new AppError('Current password is incorrect', UNAUTHORIZED);
-    }
-
-    user.passwordHash = await bcrypt.hash(
-        input.newPassword,
-        BCRYPT_SALT_ROUNDS,
-    );
-
-    await user.save();
-
-    await Session.deleteMany({user: userId});
 };
 
 export const deleteAccountService = async (userId: string) => {
-    const cars = await Car.find({user: userId}).select('_id');
+    const session = await mongoose.startSession();
 
-    const carIds = cars.map((car) => car._id);
+    try {
+        await session.withTransaction(async () => {
+            const user = await User.findById(userId)
+                .select('_id')
+                .session(session);
 
-    await Promise.all([
-        Modification.deleteMany({car: {$in: carIds}}),
-        AIRecommendation.deleteMany({user: userId}),
-        Session.deleteMany({user: userId}),
-        Car.deleteMany({user: userId}),
-    ]);
+            if (!user) {
+                throw new AppError('User not found', NOT_FOUND);
+            }
 
-    await User.findByIdAndDelete(userId);
+            const cars = await Car.find({user: userId})
+                .select('_id')
+                .session(session);
+
+            const carIds = cars.map((car) => car._id);
+
+            await Modification.deleteMany(
+                {
+                    car: {$in: carIds},
+                },
+                {session},
+            );
+
+            await AIRecommendation.deleteMany({user: userId}, {session});
+
+            await Session.deleteMany({user: userId}, {session});
+
+            await Car.deleteMany({user: userId}, {session});
+
+            await User.deleteOne({_id: userId}, {session});
+        });
+    } finally {
+        await session.endSession();
+    }
 };
 
 export const getUserStatsService = async (userId: string) => {
