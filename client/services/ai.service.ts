@@ -11,28 +11,45 @@ import {
     GeneratedRecommendation,
     NextUpgradeInput,
     NextUpgradeResponse,
-    RecommendationHistoryItem,
     RecommendationsResponse,
     RecommendationType,
     RecommendCarInput,
     RecommendCarResponse,
 } from '@/types/ai';
 
+type GetRecommendationsOptions = {
+    type?: RecommendationType;
+    page?: number;
+    limit?: number;
+};
+
 export default class AiService {
     static readonly ENDPOINT = '/ai';
 
     static async getRecommendations(
-        type?: RecommendationType,
+        options: GetRecommendationsOptions = {},
         config?: AxiosRequestConfig,
-    ): Promise<RecommendationHistoryItem[]> {
-        const query = type ? `?type=${encodeURIComponent(type)}` : '';
+    ): Promise<RecommendationsResponse> {
+        const params = new URLSearchParams();
 
-        const response = await BaseService.get<RecommendationsResponse>(
-            `${this.ENDPOINT}/recommendations${query}`,
+        if (options.type) {
+            params.set('type', options.type);
+        }
+
+        if (options.page !== undefined) {
+            params.set('page', String(options.page));
+        }
+
+        if (options.limit !== undefined) {
+            params.set('limit', String(options.limit));
+        }
+
+        const query = params.toString();
+
+        return BaseService.get<RecommendationsResponse>(
+            `${this.ENDPOINT}/recommendations${query ? `?${query}` : ''}`,
             config,
         );
-
-        return response.recommendations;
     }
 
     static async recommendCar(
