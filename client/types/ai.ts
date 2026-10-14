@@ -13,14 +13,26 @@ export type GeneratedRecommendation = {
 
 export type RecommendationHistoryItem = {
     _id: string;
-    user: string;
     car?: string;
     type: RecommendationType;
-    prompt: string;
     input?: Record<string, unknown>;
     content: string;
     createdAt: string;
     updatedAt: string;
+};
+
+export type RecommendationsPagination = {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type RecommendationsResponse = {
+    message: string;
+    count: number;
+    recommendations: RecommendationHistoryItem[];
+    pagination: RecommendationsPagination;
 };
 
 export type Recommendation = {
@@ -30,12 +42,6 @@ export type Recommendation = {
     createdAt: string;
     car?: string;
     input?: Record<string, unknown>;
-};
-
-export type RecommendationsResponse = {
-    message: string;
-    count: number;
-    recommendations: RecommendationHistoryItem[];
 };
 
 export type RecommendCarInput = {
