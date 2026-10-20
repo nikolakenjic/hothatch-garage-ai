@@ -218,9 +218,9 @@ export const resendVerificationService = async (email: string) => {
 };
 
 export const forgotPasswordService = async (email: string) => {
-    const user = await User.findOne({email});
+    const user = await User.findOne({email}).select('+passwordHash');
 
-    if (!user) {
+    if (!user?.passwordHash) {
         return;
     }
 
@@ -249,6 +249,7 @@ export const resetPasswordService = async (
     const user = await User.findOne({
         passwordResetTokenHash: hashedToken,
         passwordResetExpires: {$gt: new Date()},
+        passwordHash: {$exists: true},
     });
 
     if (!user) {

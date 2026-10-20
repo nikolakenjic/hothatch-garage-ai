@@ -80,6 +80,13 @@ export const changePasswordService = async (
                 throw new AppError('User not found', NOT_FOUND);
             }
 
+            if (!user.passwordHash) {
+                throw new AppError(
+                    'Password change is unavailable for this account',
+                    CONFLICT,
+                );
+            }
+
             const isPasswordCorrect = await bcrypt.compare(
                 input.currentPassword,
                 user.passwordHash,
