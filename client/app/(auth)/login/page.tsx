@@ -9,6 +9,7 @@ import AuthForm, {Field} from '@/components/auth/AuthForm';
 import AuthLayout from '@/components/auth/AuthLayout';
 import {getErrorMessage} from '@/lib/errors';
 import Link from 'next/link';
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
 const loginFields: Field<LoginInput>[] = [
     {
@@ -77,23 +78,35 @@ export default function LoginPage() {
                 submitLoadingText="Opening garage..."
                 fields={loginFields}
                 secondaryAction={
-                    <div className="space-y-3 text-center text-sm">
-                        <Link
-                            href="/forgot-password"
-                            className="font-semibold text-primary transition-colors hover:text-primary/80"
-                        >
-                            Forgot password?
-                        </Link>
+                    <div className="space-y-5">
+                        <div className="flex items-center gap-3">
+                            <div className="h-px flex-1 bg-border" />
+                            <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                                Or continue with
+                            </span>
+                            <div className="h-px flex-1 bg-border" />
+                        </div>
 
-                        <p className="text-muted-foreground">
-                            Don&apos;t have an account?{' '}
+                        <GoogleAuthButton />
+
+                        <div className="space-y-3 text-center text-sm">
                             <Link
-                                href="/register"
+                                href="/forgot-password"
                                 className="font-semibold text-primary transition-colors hover:text-primary/80"
                             >
-                                Create account
+                                Forgot password?
                             </Link>
-                        </p>
+
+                            <p className="text-muted-foreground">
+                                Don&apos;t have an account?{' '}
+                                <Link
+                                    href="/register"
+                                    className="font-semibold text-primary transition-colors hover:text-primary/80"
+                                >
+                                    Create account
+                                </Link>
+                            </p>
+                        </div>
                     </div>
                 }
             />
