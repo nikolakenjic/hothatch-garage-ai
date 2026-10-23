@@ -2,6 +2,7 @@ import {Router} from 'express';
 import {
     forgotPassword,
     getMe,
+    googleLogin,
     login,
     logout,
     refresh,
@@ -14,6 +15,7 @@ import {protect} from '../../middlewares/auth.middleware';
 import {validate} from '../../middlewares/validate';
 import {
     forgotPasswordSchema,
+    googleLoginSchema,
     loginSchema,
     registerSchema,
     resendVerificationSchema,
@@ -79,5 +81,8 @@ router.post(
     validate(resetPasswordSchema),
     resetPassword,
 );
+
+//Google OAuth
+router.post('/google', loginLimiter, validate(googleLoginSchema), googleLogin);
 
 export default router;

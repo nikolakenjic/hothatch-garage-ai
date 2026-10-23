@@ -9,6 +9,7 @@ import AuthForm, {Field} from '@/components/auth/AuthForm';
 import AuthLayout from '@/components/auth/AuthLayout';
 import {getErrorMessage} from '@/lib/errors';
 import Link from 'next/link';
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
 const registerFields: Field<RegisterInput>[] = [
     {
@@ -79,15 +80,27 @@ export default function RegisterPage() {
                 submitLoadingText="Starting garage..."
                 fields={registerFields}
                 secondaryAction={
-                    <p className="text-center text-sm text-muted-foreground">
-                        Already have an account?{' '}
-                        <Link
-                            href="/login"
-                            className="font-semibold text-primary transition-colors hover:text-primary/80"
-                        >
-                            Login
-                        </Link>
-                    </p>
+                    <div className="space-y-5">
+                        <div className="flex items-center gap-3">
+                            <div className="h-px flex-1 bg-border" />
+                            <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                                Or continue with
+                            </span>
+                            <div className="h-px flex-1 bg-border" />
+                        </div>
+
+                        <GoogleAuthButton />
+
+                        <p className="text-center text-sm text-muted-foreground">
+                            Already have an account?{' '}
+                            <Link
+                                href="/login"
+                                className="font-semibold text-primary transition-colors hover:text-primary/80"
+                            >
+                                Login
+                            </Link>
+                        </p>
+                    </div>
                 }
             />
         </AuthLayout>

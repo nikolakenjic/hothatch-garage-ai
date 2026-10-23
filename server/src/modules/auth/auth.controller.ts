@@ -28,6 +28,7 @@ import {
     refreshTokenCookieOptions,
 } from './auth.cookies';
 import {AppError} from '../../utils/AppError';
+import {googleLoginService} from './google-auth.service';
 
 export const register = catchAsync(
     async (req: Request<{}, {}, RegisterInput>, res: Response) => {
@@ -156,6 +157,25 @@ export const resetPassword = catchAsync(
 
         res.status(OK).json({
             message: 'Password reset successfully',
+        });
+    },
+);
+
+// Google Oauth
+export const googleLogin = catchAsync(
+    async (req: Request<{}, {}, {idToken: string}>, res: Response) => {
+        const {idToken} = req.body;
+
+        const {user, accessToken, refreshToken} =
+            await googleLoginService(idToken);
+
+        res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+
+        res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
+
+        res.status(OK).json({
+            message: 'Google login successful',
+            user: toUserResponse(user),
         });
     },
 );

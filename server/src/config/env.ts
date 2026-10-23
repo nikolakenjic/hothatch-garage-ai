@@ -22,6 +22,8 @@ const envSchema = z.object({
     CLIENT_URL: z.string().url('CLIENT_URL must be a valid URL'),
     EMAIL_FROM: z.string().email('EMAIL_FROM must be a valid email address'),
     COOKIE_DOMAIN: z.string().optional(),
+
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
