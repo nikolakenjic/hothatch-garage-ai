@@ -14,7 +14,8 @@ export interface IUserPrivacy {
 
 export interface IUser {
     email: string;
-    passwordHash: string;
+    passwordHash?: string;
+    googleSub?: string;
     isEmailVerified: boolean;
     emailVerificationTokenHash?: string;
     emailVerificationExpires?: Date;
@@ -41,7 +42,10 @@ const userSchema = new Schema<IUser>(
         },
         passwordHash: {
             type: String,
-            required: true,
+            select: false,
+        },
+        googleSub: {
+            type: String,
             select: false,
         },
         isEmailVerified: {
@@ -113,5 +117,24 @@ const userSchema = new Schema<IUser>(
         timestamps: true,
     },
 );
+
+userSchema.index(
+    {googleSub: 1},
+    {
+        unique: true,
+        partialFilterExpression: {
+            googleSub: {$type: 'string'},
+        },
+    },
+);
+
+userSchema.pre('validate', function () {
+    if (!this.passwordHash && !this.googleSub) {
+        this.invalidate(
+            'passwordHash',
+            'At least one authentication method is required',
+        );
+    }
+});
 
 export const User = mongoose.model<IUser>('User', userSchema);

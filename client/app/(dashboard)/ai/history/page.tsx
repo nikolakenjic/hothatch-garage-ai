@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import {redirect} from 'next/navigation';
 import {getServerCookieHeader} from '@/lib/auth/server-auth';
-import {ArrowLeft, History} from 'lucide-react';
+import {ArrowLeft, ChevronLeft, ChevronRight, History} from 'lucide-react';
 
 import {PageContainer} from '@/components/layout';
 import GlassPanel from '@/components/shared/GlassPanel';
@@ -9,17 +10,49 @@ import AiService from '@/services/ai.service';
 
 import RecommendationHistoryList from './_components/RecommendationHistoryList';
 
-export default async function AIHistoryPage() {
+type AIHistoryPageProps = {
+    searchParams?: Promise<{
+        page?: string;
+    }>;
+};
+
+const HISTORY_PAGE_SIZE = 10;
+
+export default async function AIHistoryPage({
+    searchParams,
+}: AIHistoryPageProps) {
+    const resolvedSearchParams = await searchParams;
+
+    const requestedPage = Number(resolvedSearchParams?.page);
+
+    const currentPage =
+        Number.isInteger(requestedPage) && requestedPage > 0
+            ? requestedPage
+            : 1;
+
     const cookieHeader = await getServerCookieHeader();
 
-    const recommendations = await AiService.getRecommendations(
-        'car-recommendation',
+    const response = await AiService.getRecommendations(
+        {
+            type: 'car-recommendation',
+            page: currentPage,
+            limit: HISTORY_PAGE_SIZE,
+        },
         {
             headers: {
                 Cookie: cookieHeader,
             },
         },
     );
+
+    const {recommendations, pagination} = response;
+
+    if (pagination.totalPages > 0 && currentPage > pagination.totalPages) {
+        redirect(`/ai/history?page=${pagination.totalPages}`);
+    }
+
+    const hasPreviousPage = pagination.page > 1;
+    const hasNextPage = pagination.page < pagination.totalPages;
 
     return (
         <main className="page-shell">
@@ -58,6 +91,61 @@ export default async function AIHistoryPage() {
                 </GlassPanel>
 
                 <RecommendationHistoryList recommendations={recommendations} />
+
+                {pagination.totalPages > 1 ? (
+                    <nav
+                        aria-label="Recommendation history pagination"
+                        className="flex items-center justify-between gap-4"
+                    >
+                        {hasPreviousPage ? (
+                            <Button asChild variant="outline">
+                                <Link
+                                    href={`/ai/history?page=${pagination.page - 1}`}
+                                >
+                                    <ChevronLeft
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                    Previous
+                                </Link>
+                            </Button>
+                        ) : (
+                            <Button variant="outline" disabled>
+                                <ChevronLeft
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                                Previous
+                            </Button>
+                        )}
+
+                        <p className="text-sm text-muted-foreground">
+                            Page {pagination.page} of {pagination.totalPages}
+                        </p>
+
+                        {hasNextPage ? (
+                            <Button asChild variant="outline">
+                                <Link
+                                    href={`/ai/history?page=${pagination.page + 1}`}
+                                >
+                                    Next
+                                    <ChevronRight
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                </Link>
+                            </Button>
+                        ) : (
+                            <Button variant="outline" disabled>
+                                Next
+                                <ChevronRight
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                            </Button>
+                        )}
+                    </nav>
+                ) : null}
             </PageContainer>
         </main>
     );

@@ -28,6 +28,7 @@ import {
     refreshTokenCookieOptions,
 } from './auth.cookies';
 import {AppError} from '../../utils/AppError';
+import {googleLoginService} from './google-auth.service';
 
 export const register = catchAsync(
     async (req: Request<{}, {}, RegisterInput>, res: Response) => {
@@ -98,9 +99,11 @@ export const refresh = catchAsync(async (req: Request, res: Response) => {
         throw new AppError('No refresh token', UNAUTHORIZED);
     }
 
-    const accessToken = await refreshAccessTokenService(refreshToken);
+    const {accessToken, refreshToken: newRefreshToken} =
+        await refreshAccessTokenService(refreshToken);
 
     res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', newRefreshToken, refreshTokenCookieOptions);
 
     res.status(OK).json({
         message: 'Access token refreshed',
@@ -154,6 +157,25 @@ export const resetPassword = catchAsync(
 
         res.status(OK).json({
             message: 'Password reset successfully',
+        });
+    },
+);
+
+// Google Oauth
+export const googleLogin = catchAsync(
+    async (req: Request<{}, {}, {idToken: string}>, res: Response) => {
+        const {idToken} = req.body;
+
+        const {user, accessToken, refreshToken} =
+            await googleLoginService(idToken);
+
+        res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+
+        res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
+
+        res.status(OK).json({
+            message: 'Google login successful',
+            user: toUserResponse(user),
         });
     },
 );

@@ -38,8 +38,12 @@ const aiFeatures = [
 export default async function AIPage() {
     const cookieHeader = await getServerCookieHeader();
 
-    const recommendations = await AiService.getRecommendations(
-        'car-recommendation',
+    const response = await AiService.getRecommendations(
+        {
+            type: 'car-recommendation',
+            page: 1,
+            limit: 1,
+        },
         {
             headers: {
                 Cookie: cookieHeader,
@@ -47,7 +51,7 @@ export default async function AIPage() {
         },
     );
 
-    const latestRecommendation = recommendations[0];
+    const latestRecommendation = response.recommendations[0];
 
     return (
         <main className="page-shell">

@@ -1,5 +1,8 @@
 import {Router} from 'express';
 import {protect} from '../../middlewares/auth.middleware';
+import rateLimit from 'express-rate-limit';
+import {CHANGE_PASSWORD_RATE_LIMIT} from './user.constants';
+import {getUserId} from '../../utils/getUser';
 import {
     changePassword,
     deleteAccount,
@@ -18,6 +21,11 @@ import {validate} from '../../middlewares/validate';
 
 const router = Router();
 
+const changePasswordLimiter = rateLimit({
+    ...CHANGE_PASSWORD_RATE_LIMIT,
+    keyGenerator: (req) => getUserId(req),
+});
+
 router.patch(
     '/me/profile',
     protect,
@@ -28,6 +36,7 @@ router.patch(
 router.patch(
     '/me/password',
     protect,
+    changePasswordLimiter,
     validate(changePasswordSchema),
     changePassword,
 );

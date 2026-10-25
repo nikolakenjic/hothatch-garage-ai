@@ -6,7 +6,6 @@ import {
     buildBuildReviewPrompt,
     buildCarRecommendationPrompt,
     buildNextUpgradePrompt,
-    buildUpgradeRecommendationPrompt,
     buildCostAnalysisPrompt,
 } from './ai.prompts';
 import {AIRecommendationType} from './ai.types';
@@ -21,6 +20,8 @@ import {
     CostAnalysisInput,
     NextUpgradeInput,
     RecommendCarInput,
+    RecommendationsByCarQuery,
+    RecommendationsQuery,
 } from './ai.validation';
 
 const getCarWithModifications = async (carId: string, userId: string) => {
@@ -44,45 +45,74 @@ export const generateCarRecommendationService = async (
     });
 };
 
-export const recommendUpgradeService = async (
-    carId: string,
-    userId: string,
-) => {
-    const {car, modifications} = await getCarWithModifications(carId, userId);
-    const prompt = buildUpgradeRecommendationPrompt(car, modifications);
-
-    return createAIRecommendation({
-        userId,
-        carId,
-        type: AIRecommendationType.NEXT_UPGRADE,
-        prompt,
-        model: AI_MODELS.FAST,
-        input: {carId},
-    });
-};
-
 export const getRecommendationsService = async (
     userId: string,
-    type?: string,
+    {type, page, limit}: RecommendationsQuery,
 ) => {
-    const filter: Record<string, unknown> = {user: userId};
+    const filter: Record<string, unknown> = {
+        user: userId,
+    };
 
-    if (type) filter.type = type;
+    if (type) {
+        filter.type = type;
+    }
 
-    return AIRecommendation.find(filter).sort({createdAt: -1});
+    const skip = (page - 1) * limit;
+
+    const [recommendations, total] = await Promise.all([
+        AIRecommendation.find(filter)
+            .select('car type input content createdAt updatedAt')
+            .sort({createdAt: -1})
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        AIRecommendation.countDocuments(filter),
+    ]);
+
+    return {
+        recommendations,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        },
+    };
 };
 
 export const getRecommendationsByCarService = async (
     carId: string,
     userId: string,
+    {page, limit}: RecommendationsByCarQuery,
 ) => {
     await findOwnedCarOrFail(carId, userId);
 
-    return AIRecommendation.find({user: userId, car: carId})
-        .sort({
-            createdAt: -1,
-        })
-        .lean();
+    const filter = {
+        user: userId,
+        car: carId,
+    };
+
+    const skip = (page - 1) * limit;
+
+    const [recommendations, total] = await Promise.all([
+        AIRecommendation.find(filter)
+            .select('car type input content createdAt updatedAt')
+            .sort({createdAt: -1})
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        AIRecommendation.countDocuments(filter),
+    ]);
+
+    return {
+        recommendations,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        },
+    };
 };
 
 export const buildPlanService = async (

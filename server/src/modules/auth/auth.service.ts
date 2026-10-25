@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-
+import mongoose, {HydratedDocument} from 'mongoose';
 import {AppError} from '../../utils/AppError';
 import {IUser, User} from './user.model';
 import {Session} from './session.model';
@@ -29,7 +29,6 @@ import {
     PASSWORD_RESET_TOKEN_TTL_MS,
     REFRESH_TOKEN_TTL_SECONDS,
 } from '../../constants/auth.constants';
-import {HydratedDocument} from 'mongoose';
 
 type RegisterServiceResult = {
     user: HydratedDocument<IUser>;
@@ -124,21 +123,27 @@ export const getCurrentUserService = async (userId: string) => {
 export const refreshAccessTokenService = async (refreshToken: string) => {
     const decoded = verifyRefreshToken(refreshToken);
 
-    const refreshTokenHash = hashToken(refreshToken);
+    const currentRefreshTokenHash = hashToken(refreshToken);
 
-    const session = await Session.findOne({
-        refreshTokenHash,
-        user: decoded.userId,
-    });
+    const newRefreshToken = signRefreshToken(decoded.userId);
+    const newRefreshTokenHash = hashToken(newRefreshToken);
+
+    const session = await Session.findOneAndUpdate(
+        {
+            refreshTokenHash: currentRefreshTokenHash,
+            user: decoded.userId,
+            expiresAt: {$gt: new Date()},
+        },
+        {
+            refreshTokenHash: newRefreshTokenHash,
+        },
+        {
+            new: true,
+        },
+    );
 
     if (!session) {
         throw new AppError('Invalid session', UNAUTHORIZED);
-    }
-
-    if (session.expiresAt <= new Date()) {
-        await Session.deleteOne({_id: session._id});
-
-        throw new AppError('Session expired', UNAUTHORIZED);
     }
 
     const user = await User.findById(decoded.userId);
@@ -149,7 +154,12 @@ export const refreshAccessTokenService = async (refreshToken: string) => {
         throw new AppError('Invalid session', UNAUTHORIZED);
     }
 
-    return signAccessToken(user._id.toString());
+    const accessToken = signAccessToken(user._id.toString());
+
+    return {
+        accessToken,
+        refreshToken: newRefreshToken,
+    };
 };
 
 export const logoutService = async (refreshToken?: string) => {
@@ -208,9 +218,9 @@ export const resendVerificationService = async (email: string) => {
 };
 
 export const forgotPasswordService = async (email: string) => {
-    const user = await User.findOne({email});
+    const user = await User.findOne({email}).select('+passwordHash');
 
-    if (!user) {
+    if (!user?.passwordHash) {
         return;
     }
 
@@ -239,17 +249,29 @@ export const resetPasswordService = async (
     const user = await User.findOne({
         passwordResetTokenHash: hashedToken,
         passwordResetExpires: {$gt: new Date()},
+        passwordHash: {$exists: true},
     });
 
     if (!user) {
         throw new AppError('Invalid or expired reset token', BAD_REQUEST);
     }
 
-    user.passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
-    user.passwordResetTokenHash = undefined;
-    user.passwordResetExpires = undefined;
+    const session = await mongoose.startSession();
 
-    await user.save();
+    try {
+        await session.withTransaction(async () => {
+            user.passwordHash = await bcrypt.hash(
+                newPassword,
+                BCRYPT_SALT_ROUNDS,
+            );
+            user.passwordResetTokenHash = undefined;
+            user.passwordResetExpires = undefined;
 
-    await Session.deleteMany({user: user._id});
+            await user.save({session});
+
+            await Session.deleteMany({user: user._id}, {session});
+        });
+    } finally {
+        await session.endSession();
+    }
 };

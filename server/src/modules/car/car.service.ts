@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import {NOT_FOUND} from '../../constants/http';
 import {AppError} from '../../utils/AppError';
 import {Modification} from '../modification/modification.model';
@@ -95,14 +96,28 @@ export const getCarDetailsService = async (carId: string, userId: string) => {
 };
 
 export const deleteCarService = async (carId: string, userId: string) => {
-    const car = await findOwnedCarOrFail(carId, userId);
+    const session = await mongoose.startSession();
 
-    await Promise.all([
-        Modification.deleteMany({car: car._id}),
-        AIRecommendation.deleteMany({car: car._id}),
-    ]);
+    try {
+        await session.withTransaction(async () => {
+            const car = await Car.findOne({
+                _id: carId,
+                user: userId,
+            }).session(session);
 
-    await car.deleteOne();
+            if (!car) {
+                throw new AppError('Car not found', NOT_FOUND);
+            }
+
+            await Modification.deleteMany({car: car._id}, {session});
+
+            await AIRecommendation.deleteMany({car: car._id}, {session});
+
+            await car.deleteOne({session});
+        });
+    } finally {
+        await session.endSession();
+    }
 };
 
 export const getGarageSummaryService = async (userId: string) => {
