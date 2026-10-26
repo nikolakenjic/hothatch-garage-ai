@@ -1,215 +1,395 @@
-# 🚗 HotHatch Garage AI
+# HotHatch Garage AI
 
-A full-stack web application for hot hatch enthusiasts who want to manage their cars, track modifications, and get AI-powered upgrade recommendations — all in one place.
+**A full-stack garage management platform with AI-powered automotive recommendations.**
 
----
+HotHatch Garage AI helps car enthusiasts manage their vehicles, track modifications and costs, and plan future upgrades with AI assistance.
 
-## ✨ Features
+Built with Next.js, React, TypeScript, Node.js, Express, MongoDB, and Groq.
 
-- 🔐 JWT authentication with secure cookie storage
-- 🚗 Full car management (add, edit, delete)
-- 🔧 Modification tracking with cost overview
-- 🤖 AI build planner powered by Groq (LLaMA 3)
-- 🌙 Dark mode support
-- 📱 Fully responsive design
+**Live Application:** https://hothatch-garage-ai.vercel.app/
 
 ---
 
-## 🛠 Tech Stack
+## Features
 
-### Frontend
+### Authentication & Account Management
 
-- **Next.js 15** (App Router, Server Components)
-- **TypeScript**
-- **Tailwind CSS**
-- **shadcn/ui**
-- **React Hook Form + Zod**
+- Email/password registration and login
+- Google OAuth authentication
+- JWT access and refresh token authentication
+- HttpOnly authentication cookies
+- Persistent sessions and refresh token rotation
+- Email verification
+- Password recovery and reset
+- Profile and account settings
+- Multi-device session support
 
-### Backend
+### Garage Management
 
-- **Node.js + Express**
-- **TypeScript**
-- **MongoDB + Mongoose**
-- **JWT Authentication**
-- **Groq API (LLaMA 3)**
+- Add, view, update, and delete vehicles
+- Manage personal vehicle collections
+- Search, filter, and paginate vehicles
+- View detailed vehicle information
+- User-based resource ownership protection
+
+### Modifications
+
+- Create and manage vehicle modifications
+- Track modification details and costs
+- View modification summaries
+- Associate modifications with owned vehicles
+
+### AI Garage Advisor
+
+- AI-powered vehicle recommendations
+- Vehicle-specific upgrade recommendations
+- Personalized build plans
+- Next-upgrade suggestions
+- Build reviews
+- Modification cost analysis
+- AI recommendation history
+
+AI recommendations are generated through the Groq API and are intended as informational guidance.
+
+### User Profile & Settings
+
+- Edit profile information
+- Update password for password-based accounts
+- Manage preferences and privacy settings
+- View account statistics
+- Access public profiles where permitted
 
 ---
 
-## ⚙️ Getting Started
+## Tech Stack
+
+| Layer          | Technologies                                     |
+| -------------- | ------------------------------------------------ |
+| Frontend       | Next.js 16, React 19, TypeScript, Tailwind CSS 4 |
+| UI             | shadcn/ui, Radix UI, Lucide React                |
+| Forms          | React Hook Form, Zod                             |
+| Backend        | Node.js 22+, Express 5, TypeScript               |
+| Database       | MongoDB Atlas, Mongoose                          |
+| Authentication | JWT, bcryptjs, Google OAuth / OpenID Connect     |
+| AI             | Groq SDK                                         |
+| Email          | Resend                                           |
+| Deployment     | Vercel, Render                                   |
+| Validation     | Zod                                              |
+
+Supported Node.js versions follow the project engine constraint: `>=22 <25`.
+
+---
+
+## Project Architecture
+
+The repository contains two main applications:
+
+```text
+hothatch-garage-ai/
+├── client/                 # Next.js frontend
+│   ├── app/                # App Router pages and API routes
+│   ├── components/         # Shared UI components
+│   ├── context/            # React context providers
+│   ├── lib/                # Utilities and authentication helpers
+│   ├── services/           # API service layer
+│   └── types/              # TypeScript definitions
+│
+├── server/                 # Express backend
+│   └── src/
+│       ├── config/         # Environment configuration
+│       ├── constants/      # Shared constants
+│       ├── middlewares/    # Validation, auth and error handling
+│       ├── modules/        # Feature-based backend modules
+│       └── utils/          # Shared utilities
+│
+└── README.md
+```
+
+### Backend Design
+
+The Express backend follows a feature-based architecture with separate routes, controllers, services, models, and validation schemas.
+
+Typical request flow:
+
+```text
+HTTP Request
+    ↓
+Route / Middleware
+    ↓
+Zod Validation
+    ↓
+Controller
+    ↓
+Service / Business Logic
+    ↓
+Mongoose / MongoDB
+```
+
+Key architectural decisions include centralized error handling, reusable ownership checks, TypeScript types, and separation of HTTP handling from business logic.
+
+### Frontend Design
+
+The frontend uses Next.js App Router, combining Server Components for server-side data access with Client Components for interactive functionality.
+
+Shared API communication is organized through a service layer. Authentication also uses Next.js API routes to support cookie forwarding between the frontend and backend.
+
+### Google OAuth Flow
+
+```text
+Browser
+   ↓
+Next.js OAuth Start Route
+   ↓
+Google Authorization
+   ↓
+Next.js OAuth Callback
+   ↓
+Express ID Token Verification
+   ↓
+MongoDB User + Session
+   ↓
+HttpOnly Authentication Cookies
+   ↓
+Authenticated Dashboard
+```
+
+The OAuth flow uses state, nonce, PKCE, and an encrypted short-lived transaction cookie. Existing email/password accounts are not automatically linked to Google identities.
+
+---
+
+## Security
+
+The application includes the following security measures:
+
+- HttpOnly authentication cookies
+- Short-lived access tokens and refresh token rotation
+- Hashed refresh tokens stored in database sessions
+- Password hashing using bcrypt
+- Input validation using Zod
+- API rate limiting
+- Resource ownership checks
+- Centralized error handling
+- Helmet security middleware
+- Environment-based CORS configuration
+- Google ID token verification
+- OAuth state, nonce, and PKCE protection
+
+Security controls reduce risk but do not replace independent security auditing.
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22, 23, or 24
+- npm
 - MongoDB database
 - Groq API key
+- Resend API key and configured sender address
+- Google OAuth credentials for Google sign-in
 
-### Backend Setup
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/nikolakenjic/hothatch-garage-ai.git
+cd hothatch-garage-ai
+```
+
+### 2. Configure the Backend
 
 ```bash
 cd server
 npm install
 ```
 
-Create `.env` file in `/server`:
+Copy `server/.env.example` to `server/.env` and replace the placeholders with your own configuration.
 
-```env
-PORT=3010
-MONGO_URI=your_mongo_uri
-GROQ_API_KEY=your_api_key
-JWT_SECRET=your_secret
-```
+Important variables include:
+
+| Variable             | Purpose                               |
+| -------------------- | ------------------------------------- |
+| `NODE_ENV`           | Application environment               |
+| `PORT`               | Express server port                   |
+| `MONGO_URI`          | MongoDB connection string             |
+| `JWT_SECRET`         | Access token signing secret           |
+| `JWT_REFRESH_SECRET` | Refresh token signing secret          |
+| `GROQ_API_KEY`       | Groq API credentials                  |
+| `RESEND_API_KEY`     | Email provider credentials            |
+| `EMAIL_FROM`         | Verified sender address               |
+| `CLIENT_URL`         | Allowed frontend origin               |
+| `COOKIE_DOMAIN`      | Optional authentication cookie domain |
+| `GOOGLE_CLIENT_ID`   | Google OAuth audience verification    |
+
+Start the backend:
 
 ```bash
 npm run dev
 ```
 
-### Frontend Setup
+### 3. Configure the Frontend
+
+From the repository root:
 
 ```bash
 cd client
 npm install
 ```
 
-Create `.env.local` file in `/client`:
+Copy `client/.env.example` to `client/.env.local`.
+
+Configure:
+
+| Variable                     | Purpose                              |
+| ---------------------------- | ------------------------------------ |
+| `NEXT_PUBLIC_API_URL`        | Express API base URL                 |
+| `GOOGLE_CLIENT_ID`           | Google OAuth Client ID               |
+| `GOOGLE_CLIENT_SECRET`       | Google OAuth Client Secret           |
+| `GOOGLE_REDIRECT_URI`        | OAuth callback URL                   |
+| `GOOGLE_OAUTH_COOKIE_SECRET` | 32-byte encryption key in hex format |
+
+Generate the OAuth transaction encryption key:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+For local development with the backend running on port `3010`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3010/api/v1
+GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
 ```
+
+Start the frontend:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open http://localhost:3000.
+
+Configure the corresponding local redirect URI in Google Cloud Console before using Google sign-in.
+
+**Never commit real `.env` files, API keys, JWT secrets, or OAuth credentials.**
 
 ---
 
-## 📡 API Endpoints
+## API Overview
 
-### 🔐 Auth
-
-| Method | Endpoint                | Description       |
-| ------ | ----------------------- | ----------------- |
-| POST   | `/api/v1/auth/register` | Register new user |
-| POST   | `/api/v1/auth/login`    | Login             |
-
-### 🚗 Cars
-
-| Method | Endpoint           | Description       |
-| ------ | ------------------ | ----------------- |
-| GET    | `/api/v1/cars`     | Get all user cars |
-| POST   | `/api/v1/cars`     | Add new car       |
-| GET    | `/api/v1/cars/:id` | Get car by ID     |
-| PATCH  | `/api/v1/cars/:id` | Update car        |
-| DELETE | `/api/v1/cars/:id` | Delete car        |
-
-### 🔧 Modifications
-
-| Method | Endpoint                       | Description           |
-| ------ | ------------------------------ | --------------------- |
-| GET    | `/api/v1/modifications/:carId` | Get car modifications |
-| POST   | `/api/v1/modifications/:carId` | Add modification      |
-| PATCH  | `/api/v1/modifications/:id`    | Update modification   |
-| DELETE | `/api/v1/modifications/:id`    | Delete modification   |
-
-### 🤖 AI
-
-| Method | Endpoint                       | Description            |
-| ------ | ------------------------------ | ---------------------- |
-| POST   | `/api/v1/ai/build-plan/:carId` | Generate AI build plan |
-
----
-
-## 🏗 Architecture Decisions
-
-**Server Components for data fetching**
-Pages that need data use Next.js Server Components — data is fetched on the server before the page is sent to the browser. No loading spinners, no useEffect, faster page loads.
-
-**Service layer pattern**
-All API calls go through a `BaseService` class with shared HTTP methods. Each feature has its own service (`CarService`, `ModificationService`) that builds on top of it. One place to change if the API ever changes.
-
-**Feature-based component structure**
-Components that are only used on one page live next to that page in a `_components` folder. Shared components live in the global `components` folder. This makes the codebase easy to navigate as it grows.
-
----
-
-## 🔐 Security Notes
-
-- Passwords are hashed with bcrypt on the server
-- JWT tokens are stored in cookies with `SameSite=Strict`
-- Token expiry checked on the client before making requests
-- Note: tokens are stored in accessible cookies — `httpOnly` cookies would be more secure and is a planned improvement
-
----
-
-## 🚀 Future Improvements
-
-- Real-time AI chat for build advice
-- Image upload for cars
-- Modification cost charts and analytics
-- Community features to connect with other enthusiasts
-
----
-
-## 📸 Screenshots
-
-_Coming soon_
-
----
-
-## 🏗 Backend Architecture
-
-The backend follows a feature-based architecture.
-
-Each module contains its own:
-
-- Controller
-- Service
-- Model
-- Validation schemas
-- Routes
-
-Example:
+Express API base path:
 
 ```text
-modules/
-├── auth
-├── car
-├── modification
-└── ai
+/api/v1
 ```
 
-### Request Flow
+### Authentication
+
+| Method | Endpoint                    | Description                        |
+| ------ | --------------------------- | ---------------------------------- |
+| POST   | `/auth/register`            | Register an account                |
+| POST   | `/auth/login`               | Email/password login               |
+| POST   | `/auth/google`              | Verify Google ID token and sign in |
+| POST   | `/auth/logout`              | Log out                            |
+| GET    | `/auth/me`                  | Get authenticated user             |
+| POST   | `/auth/refresh`             | Refresh authentication             |
+| POST   | `/auth/verify-email`        | Verify email address               |
+| POST   | `/auth/resend-verification` | Resend verification                |
+| POST   | `/auth/forgot-password`     | Request password reset             |
+| POST   | `/auth/reset-password`      | Reset password                     |
+
+Google browser authentication begins through the Next.js route `/api/auth/google/start`.
+
+### Garage & Modifications
+
+The backend provides authenticated CRUD APIs for vehicles and their modifications under `/cars` and `/modifications`.
+
+Resources are associated with their owners, and protected operations enforce ownership checks.
+
+### AI Garage Advisor
+
+| Method | Endpoint                         | Description                    |
+| ------ | -------------------------------- | ------------------------------ |
+| POST   | `/ai/recommend`                  | Recommend a vehicle            |
+| GET    | `/ai/recommendations`            | List AI recommendation history |
+| GET    | `/ai/recommendations/car/:carId` | View recommendations for a car |
+| POST   | `/ai/build-plan/:carId`          | Generate a build plan          |
+| POST   | `/ai/next-upgrade/:carId`        | Suggest the next upgrade       |
+| POST   | `/ai/build-review/:carId`        | Review a vehicle build         |
+| POST   | `/ai/cost-analysis/:carId`       | Analyze modification costs     |
+
+AI endpoints require authentication and generation endpoints are rate-limited.
+
+---
+
+## Development Commands
+
+### Frontend
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
+
+### Backend
+
+```bash
+npm run dev
+npm run build
+npm run start
+```
+
+The backend also includes Vitest tooling. Automated test coverage is planned for further development.
+
+---
+
+## Deployment
+
+The application is deployed using:
+
+- **Vercel:** Next.js frontend
+- **Render:** Express API
+- **MongoDB Atlas:** Hosted database
+
+Development follows a branch-based Git workflow:
 
 ```text
-Route
-↓
-Validation Middleware
-↓
-Controller
-↓
-Service
-↓
-Database
+feature/fix branch
+       ↓
+Pull Request
+       ↓
+develop
+       ↓
+Release Pull Request
+       ↓
+main
+       ↓
+Production Deployment
 ```
 
-### Error Handling
+The `main` branch is used for production releases.
 
-The application uses:
+---
 
-- Custom `AppError` class
-- `catchAsync` wrapper for async controllers
-- Global error handler middleware
+## Current Limitations & Roadmap
 
-This ensures consistent API responses and centralized error management.
+V1 focuses on the core production application.
 
-### Ownership Protection
+Known limitations and future improvements:
 
-Users can only access resources they own.
+- Google OAuth is initially configured in Testing mode with authorized test users.
+- Broader automated integration and end-to-end test coverage is planned.
+- Further observability, reliability improvements, and usability refinements are planned.
+- Additional functionality will be considered after the V1 feature freeze.
 
-Ownership checks are implemented through reusable service helpers such as:
+---
 
-- `findOwnedCarOrFail`
-- `findOwnedModificationOrFail`
+## Project Status
 
-This prevents unauthorized access to cars and modifications belonging to other users.
+**V1 — Deployed**
+
+The core application, including Google authentication, garage management, modifications, user settings, and AI recommendations, is available in production.
+
+**Live Demo:** https://hothatch-garage-ai.vercel.app/
