@@ -53,7 +53,11 @@ export const signAccessToken = (userId: string) => {
 };
 
 export const signRefreshToken = (userId: string) => {
-    return jwt.sign({userId}, env.JWT_REFRESH_SECRET, refreshTokenOptions);
+    return jwt.sign(
+        {userId, jti: crypto.randomUUID()},
+        env.JWT_REFRESH_SECRET,
+        refreshTokenOptions,
+    );
 };
 
 export const verifyAccessToken = (token: string): TokenPayload => {
