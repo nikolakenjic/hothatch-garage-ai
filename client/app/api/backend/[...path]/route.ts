@@ -8,6 +8,14 @@ if (!API_URL) {
 
 const ALLOWED_PREFIXES = new Set(['cars', 'modifications', 'users', 'ai']);
 
+const ALLOWED_AUTH_PATHS = new Set([
+    'auth/register',
+    'auth/verify-email',
+    'auth/resend-verification',
+    'auth/forgot-password',
+    'auth/reset-password',
+]);
+
 type RouteContext = {
     params: Promise<{
         path: string[];
@@ -18,12 +26,16 @@ async function proxyRequest(request: NextRequest, context: RouteContext) {
     const {path} = await context.params;
 
     const [root] = path;
+    const backendPath = path.join('/');
 
-    if (!root || !ALLOWED_PREFIXES.has(root)) {
+    const isAllowedModule = ALLOWED_PREFIXES.has(root ?? '');
+
+    const isAllowedAuthRequest =
+        request.method === 'POST' && ALLOWED_AUTH_PATHS.has(backendPath);
+
+    if (!isAllowedModule && !isAllowedAuthRequest) {
         return NextResponse.json({message: 'Route not allowed'}, {status: 404});
     }
-
-    const backendPath = path.join('/');
 
     const targetUrl = new URL(`${API_URL}/${backendPath}`);
 
