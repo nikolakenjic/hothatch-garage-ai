@@ -6,6 +6,32 @@ if (!API_URL) {
     throw new Error('NEXT_PUBLIC_API_URL is not configured');
 }
 
+function getSafeReturnTo(request: NextRequest): string {
+    const returnTo = request.nextUrl.searchParams.get('returnTo');
+
+    if (
+        !returnTo ||
+        !returnTo.startsWith('/') ||
+        returnTo.startsWith('//') ||
+        returnTo.includes('\\') ||
+        /[\u0000-\u001F\u007F]/.test(returnTo)
+    ) {
+        return '/garage';
+    }
+
+    try {
+        const target = new URL(returnTo, request.url);
+
+        if (target.origin !== request.nextUrl.origin) {
+            return '/garage';
+        }
+
+        return `${target.pathname}${target.search}${target.hash}`;
+    } catch {
+        return '/garage';
+    }
+}
+
 async function refreshSession(request: NextRequest) {
     const cookieHeader = request.headers.get('cookie') ?? '';
 
@@ -14,6 +40,7 @@ async function refreshSession(request: NextRequest) {
         headers: {
             Cookie: cookieHeader,
         },
+        cache: 'no-store',
     });
 
     const data = await backendResponse.json();
@@ -22,9 +49,7 @@ async function refreshSession(request: NextRequest) {
         status: backendResponse.status,
     });
 
-    const setCookies = backendResponse.headers.getSetCookie();
-
-    for (const cookie of setCookies) {
+    for (const cookie of backendResponse.headers.getSetCookie()) {
         response.headers.append('Set-Cookie', cookie);
     }
 
@@ -36,12 +61,16 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-    const returnTo = request.nextUrl.searchParams.get('returnTo');
+    const fetchSite = request.headers.get('sec-fetch-site');
 
-    const safeReturnTo =
-        returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')
-            ? returnTo
-            : '/garage';
+    if (fetchSite === 'cross-site') {
+        return NextResponse.json(
+            {message: 'Cross-site refresh is not allowed'},
+            {status: 403},
+        );
+    }
+
+    const safeReturnTo = getSafeReturnTo(request);
 
     const cookieHeader = request.headers.get('cookie') ?? '';
 
@@ -50,17 +79,23 @@ export async function GET(request: NextRequest) {
         headers: {
             Cookie: cookieHeader,
         },
+        cache: 'no-store',
     });
 
-    if (!backendResponse.ok) {
+    if (backendResponse.status === 401) {
         return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    if (!backendResponse.ok) {
+        return NextResponse.json(
+            {message: 'Unable to refresh session'},
+            {status: 502},
+        );
     }
 
     const response = NextResponse.redirect(new URL(safeReturnTo, request.url));
 
-    const setCookies = backendResponse.headers.getSetCookie();
-
-    for (const cookie of setCookies) {
+    for (const cookie of backendResponse.headers.getSetCookie()) {
         response.headers.append('Set-Cookie', cookie);
     }
 
