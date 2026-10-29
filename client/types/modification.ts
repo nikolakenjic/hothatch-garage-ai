@@ -44,4 +44,8 @@ export type CreateModificationInput = {
     notes?: string;
 };
 
-export type UpdateModificationInput = Partial<CreateModificationInput>;
+export type UpdateModificationInput = Partial<
+    Omit<CreateModificationInput, 'cost'>
+> & {
+    cost?: number | null;
+};
