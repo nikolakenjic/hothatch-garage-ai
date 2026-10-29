@@ -1,6 +1,6 @@
 'use client';
 
-import {createContext, useContext, useEffect, useState} from 'react';
+import {createContext, useContext, useEffect, useRef, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
 import {isUnauthorizedError} from '@/lib/errors';
@@ -25,26 +25,42 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
 
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const authVersion = useRef(0);
 
     useEffect(() => {
+        const version = authVersion.current;
+        let active = true;
+
         const restoreUser = async () => {
             try {
                 const response = await AuthService.getClientMe();
-                setUser(response.user);
-            } catch (error) {
-                if (isUnauthorizedError(error)) {
-                    setUser(null);
-                    return;
-                }
 
-                console.error('Failed to restore authenticated user:', error);
-                setUser(null);
+                if (active && version === authVersion.current) {
+                    setUser(response.user);
+                }
+            } catch (error) {
+                if (active && version === authVersion.current) {
+                    if (!isUnauthorizedError(error)) {
+                        console.error(
+                            'Failed to restore authenticated user:',
+                            error,
+                        );
+                    }
+
+                    setUser(null);
+                }
             } finally {
-                setIsLoading(false);
+                if (active && version === authVersion.current) {
+                    setIsLoading(false);
+                }
             }
         };
 
         void restoreUser();
+
+        return () => {
+            active = false;
+        };
     }, []);
 
     const register = async (data: RegisterInput) => {
@@ -66,12 +82,16 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     const login = async (data: LoginInput) => {
         const response = await AuthService.login(data);
 
+        authVersion.current += 1;
         setUser(response.user);
+        setIsLoading(false);
+
         toast.success('Welcome back!');
         router.replace('/garage');
     };
 
     const updateUser = (updatedUser: AuthUser) => {
+        authVersion.current += 1;
         setUser(updatedUser);
     };
 
@@ -79,7 +99,9 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         try {
             await AuthService.logout();
         } finally {
+            authVersion.current += 1;
             setUser(null);
+            setIsLoading(false);
             router.replace('/login');
         }
     };
