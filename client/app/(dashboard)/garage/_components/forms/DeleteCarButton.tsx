@@ -32,7 +32,7 @@ export default function DeleteCarButton({carId}: DeleteCarButtonProps) {
             await CarService.deleteCar(carId);
 
             toast.success('Vehicle deleted');
-            router.replace('/garage');
+            router.refresh();
         } catch (error) {
             toast.error(getErrorMessage(error));
         } finally {
