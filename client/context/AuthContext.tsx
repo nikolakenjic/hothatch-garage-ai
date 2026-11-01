@@ -16,6 +16,7 @@ type AuthContextType = {
     register: (data: RegisterInput) => Promise<void>;
     logout: () => Promise<void>;
     updateUser: (user: AuthUser) => void;
+    clearUser: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -106,9 +107,23 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
         }
     };
 
+    const clearUser = () => {
+        authVersion.current += 1;
+        setUser(null);
+        setIsLoading(false);
+    };
+
     return (
         <AuthContext.Provider
-            value={{user, isLoading, login, register, updateUser, logout}}
+            value={{
+                user,
+                isLoading,
+                login,
+                register,
+                updateUser,
+                logout,
+                clearUser,
+            }}
         >
             {children}
         </AuthContext.Provider>

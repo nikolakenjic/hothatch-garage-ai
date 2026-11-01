@@ -14,21 +14,15 @@ export const updateProfileSchema = z
             )
             .optional(),
 
-        displayName: z
-            .string()
-            .trim()
-            .min(2, 'Display name must be at least 2 characters')
-            .max(50, 'Display name must be at most 50 characters')
-            .optional(),
+        displayName: z.string().trim().min(2).max(50).nullable().optional(),
 
-        bio: z
-            .string()
-            .trim()
-            .min(1, 'Bio is required')
-            .max(300, 'Bio must be at most 300 characters')
-            .optional(),
+        bio: z.string().trim().min(1).max(300).nullable().optional(),
 
-        avatarUrl: z.string().url('Avatar must be a valid URL').optional(),
+        avatarUrl: z
+            .string()
+            .url('Avatar must be a valid URL')
+            .nullable()
+            .optional(),
     })
     .refine(
         (data) =>
