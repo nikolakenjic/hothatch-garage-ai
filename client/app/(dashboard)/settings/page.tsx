@@ -9,6 +9,7 @@ import PreferencesSettingsForm from './_components/PreferencesSettingsForm';
 import PrivacySettingsForm from './_components/PrivacySettingsForm';
 import ChangePasswordForm from './_components/ChangePasswordForm';
 import DangerZone from './_components/DangerZone';
+import {Button} from '@/components/ui/button';
 
 export default function SettingsPage() {
     const {user, isLoading} = useAuth();
@@ -24,7 +25,29 @@ export default function SettingsPage() {
     }
 
     if (!user) {
-        return null;
+        return (
+            <main className="page-shell">
+                <PageContainer className="py-8 md:py-10">
+                    <div className="space-y-4 text-center">
+                        <h1 className="section-title">
+                            Unable to load account settings
+                        </h1>
+
+                        <p className="body-text">
+                            We couldn&rsquo;t load your account information.
+                            Please try refreshing the page.
+                        </p>
+
+                        <Button
+                            type="button"
+                            onClick={() => window.location.reload()}
+                        >
+                            Try again
+                        </Button>
+                    </div>
+                </PageContainer>
+            </main>
+        );
     }
 
     return (
