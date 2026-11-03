@@ -27,11 +27,11 @@ const editModificationSchema = z.object({
     category: z.enum(modificationCategories),
     cost: z.preprocess((value) => {
         if (value === '' || value === null || value === undefined) {
-            return undefined;
+            return null;
         }
 
         return Number(value);
-    }, z.number().min(0, 'Cost cannot be negative').optional()),
+    }, z.number().min(0, 'Cost cannot be negative').nullable()),
 });
 
 type EditModificationFormInput = z.input<typeof editModificationSchema>;

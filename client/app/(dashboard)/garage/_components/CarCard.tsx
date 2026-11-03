@@ -74,7 +74,7 @@ export default function CarCard({car}: CarCardProps) {
                         icon={<Gauge className="size-4" aria-hidden="true" />}
                         label="Power"
                         value={
-                            car.horsepower
+                            car.horsepower != null
                                 ? `${car.horsepower} hp`
                                 : 'Not added'
                         }

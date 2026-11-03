@@ -26,9 +26,9 @@ export type User = {
 
 export type UpdateProfileInput = {
     username?: string;
-    displayName?: string;
-    bio?: string;
-    avatarUrl?: string;
+    displayName?: string | null;
+    bio?: string | null;
+    avatarUrl?: string | null;
 };
 
 export type UpdateSettingsInput = {

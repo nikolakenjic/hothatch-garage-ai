@@ -54,6 +54,7 @@ export default function ProfileSettingsForm({user}: ProfileSettingsFormProps) {
     const {
         register,
         handleSubmit,
+        reset,
         formState: {errors, isSubmitting, isDirty},
     } = useForm<ProfileSettingsInput>({
         resolver: zodResolver(profileSettingsSchema),
@@ -69,12 +70,20 @@ export default function ProfileSettingsForm({user}: ProfileSettingsFormProps) {
         try {
             const updatedUser = await UserService.updateProfile({
                 username: data.username || undefined,
-                displayName: data.displayName || undefined,
-                bio: data.bio || undefined,
-                avatarUrl: data.avatarUrl || undefined,
+                displayName: data.displayName || null,
+                bio: data.bio || null,
+                avatarUrl: data.avatarUrl || null,
             });
 
             updateUser(updatedUser);
+
+            reset({
+                username: updatedUser.username ?? '',
+                displayName: updatedUser.displayName ?? '',
+                bio: updatedUser.bio ?? '',
+                avatarUrl: updatedUser.avatarUrl ?? '',
+            });
+
             toast.success('Profile updated successfully');
         } catch (error) {
             toast.error(getErrorMessage(error));

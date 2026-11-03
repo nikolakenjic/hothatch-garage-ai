@@ -19,22 +19,21 @@ export const updateProfileService = async (
     userId: string,
     input: UpdateProfileInput,
 ) => {
-    const update: Partial<UpdateProfileInput> = {};
+    const update: Record<string, string> = {};
+    const unset: Record<string, 1> = {};
 
     if (input.username !== undefined) {
         update.username = input.username.toLowerCase();
     }
 
-    if (input.displayName !== undefined) {
-        update.displayName = input.displayName;
-    }
+    for (const field of ['displayName', 'bio', 'avatarUrl'] as const) {
+        const value = input[field];
 
-    if (input.bio !== undefined) {
-        update.bio = input.bio;
-    }
-
-    if (input.avatarUrl !== undefined) {
-        update.avatarUrl = input.avatarUrl;
+        if (value === null) {
+            unset[field] = 1;
+        } else if (value !== undefined) {
+            update[field] = value;
+        }
     }
 
     if (input.username) {
@@ -48,14 +47,20 @@ export const updateProfileService = async (
         }
     }
 
-    const user = await User.findByIdAndUpdate(
-        userId,
-        {$set: update},
-        {
-            new: true,
-            runValidators: true,
-        },
-    ).select('-__v');
+    const operations: Record<string, unknown> = {};
+
+    if (Object.keys(update).length > 0) {
+        operations.$set = update;
+    }
+
+    if (Object.keys(unset).length > 0) {
+        operations.$unset = unset;
+    }
+
+    const user = await User.findByIdAndUpdate(userId, operations, {
+        new: true,
+        runValidators: true,
+    }).select('-__v');
 
     if (!user) {
         throw new AppError('User not found', NOT_FOUND);

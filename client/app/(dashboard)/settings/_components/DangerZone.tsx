@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
 import {AlertTriangle, LoaderCircle, Trash2} from 'lucide-react';
+import {useAuth} from '@/context/AuthContext';
 
 import GlassPanel from '@/components/shared/GlassPanel';
 import {Button} from '@/components/ui/button';
@@ -13,6 +14,7 @@ import UserService from '@/services/user.service';
 export default function DangerZone() {
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
+    const {clearUser} = useAuth();
 
     const handleDeleteAccount = async () => {
         const confirmed = window.confirm(
@@ -28,9 +30,11 @@ export default function DangerZone() {
 
             await UserService.deleteAccount();
 
+            clearUser();
             toast.success('Account deleted successfully');
+
             router.replace('/register');
-            router.replace('/register');
+            router.refresh();
         } catch (error) {
             toast.error(getErrorMessage(error));
         } finally {

@@ -61,7 +61,16 @@ export const updateModificationService = async (
         userId,
     );
 
-    modification.set(data);
+    const {cost, ...rest} = data;
+
+    modification.set(rest);
+
+    if (cost === null) {
+        modification.set('cost', undefined);
+    } else if (cost !== undefined) {
+        modification.set('cost', cost);
+    }
+
     await modification.save();
 
     return modification;

@@ -13,16 +13,13 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {getErrorMessage} from '@/lib/errors';
 import UserService from '@/services/user.service';
+import {passwordPolicySchema} from '@/lib/validations/auth';
 
 const changePasswordSchema = z
     .object({
-        currentPassword: z
-            .string()
-            .min(6, 'Current password must contain at least 6 characters'),
+        currentPassword: z.string().min(1, 'Current password is required'),
 
-        newPassword: z
-            .string()
-            .min(6, 'New password must contain at least 6 characters'),
+        newPassword: passwordPolicySchema,
 
         confirmPassword: z.string().min(1, 'Please confirm your new password'),
     })

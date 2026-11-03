@@ -105,7 +105,7 @@ export default function PrivacySettingsForm({user}: PrivacySettingsFormProps) {
 
                 <PrivacyOption
                     title="Public garage"
-                    description="Allow your saved vehicles to appear on your public profile."
+                    description="Allow visitors to see your vehicles, modification count, and total modification spending on your public profile."
                     enabled={publicGarage}
                     disabled={!publicProfile}
                     onToggle={() =>

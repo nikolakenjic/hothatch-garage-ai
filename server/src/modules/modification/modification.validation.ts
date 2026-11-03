@@ -34,6 +34,13 @@ export const createModificationSchema = z.object({
 
 export const updateModificationSchema = createModificationSchema
     .partial()
+    .extend({
+        cost: z
+            .number()
+            .min(0, 'Cost cannot be negative')
+            .nullable()
+            .optional(),
+    })
     .refine(
         (data) => Object.values(data).some((value) => value !== undefined),
         {

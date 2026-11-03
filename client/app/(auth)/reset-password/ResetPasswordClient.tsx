@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import {useRouter} from 'next/navigation';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {toast} from 'sonner';
@@ -25,6 +26,7 @@ type ResetPasswordClientProps = {
 };
 
 export default function ResetPasswordClient({token}: ResetPasswordClientProps) {
+    const router = useRouter();
     const form = useForm<ResetPasswordInput>({
         resolver: zodResolver(resetPasswordSchema),
     });
@@ -39,7 +41,7 @@ export default function ResetPasswordClient({token}: ResetPasswordClientProps) {
             const response = await AuthService.resetPassword(token, data);
 
             toast.success(response.message);
-            form.reset();
+            router.replace('/login');
         } catch (error) {
             toast.error(getErrorMessage(error));
         }
