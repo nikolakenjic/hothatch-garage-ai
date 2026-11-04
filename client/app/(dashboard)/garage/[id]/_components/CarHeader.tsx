@@ -26,7 +26,8 @@ type CarHeaderProps = {
 const currencyFormatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'EUR',
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
 });
 
 export default function CarHeader({
