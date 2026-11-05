@@ -129,6 +129,15 @@ userSchema.index(
 );
 
 userSchema.pre('validate', function () {
+    // Normal queries omit authentication fields; validate them only on creation or change.
+    if (
+        !this.isNew &&
+        !this.isModified('passwordHash') &&
+        !this.isModified('googleSub')
+    ) {
+        return;
+    }
+
     if (!this.passwordHash && !this.googleSub) {
         this.invalidate(
             'passwordHash',
