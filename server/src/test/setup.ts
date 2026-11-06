@@ -1,12 +1,12 @@
-// Global integration test setup will live here.
+// A replica set supports the transactions used by authentication services.
 import mongoose from 'mongoose';
-import {MongoMemoryServer} from 'mongodb-memory-server';
+import {MongoMemoryReplSet} from 'mongodb-memory-server';
 import {afterAll, afterEach, beforeAll} from 'vitest';
 
-let mongoServer: MongoMemoryServer;
+let mongoServer: MongoMemoryReplSet;
 
 beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    mongoServer = await MongoMemoryReplSet.create({replSet: {count: 1}});
 
     const mongoUri = mongoServer.getUri();
 

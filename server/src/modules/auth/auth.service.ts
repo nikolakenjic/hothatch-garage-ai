@@ -246,28 +246,31 @@ export const resetPasswordService = async (
     newPassword: string,
 ) => {
     const hashedToken = hashToken(token);
-    const user = await User.findOne({
-        passwordResetTokenHash: hashedToken,
-        passwordResetExpires: {$gt: new Date()},
-        passwordHash: {$exists: true},
-    });
-
-    if (!user) {
-        throw new AppError('Invalid or expired reset token', BAD_REQUEST);
-    }
-
+    const passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
     const session = await mongoose.startSession();
 
     try {
         await session.withTransaction(async () => {
-            user.passwordHash = await bcrypt.hash(
-                newPassword,
-                BCRYPT_SALT_ROUNDS,
-            );
-            user.passwordResetTokenHash = undefined;
-            user.passwordResetExpires = undefined;
+            // Claim the token and change the password in the same conditional write.
+            const user = await User.findOneAndUpdate(
+                {
+                    passwordResetTokenHash: hashedToken,
+                    passwordResetExpires: {$gt: new Date()},
+                    passwordHash: {$exists: true},
+                },
+                {
+                    $set: {passwordHash},
+                    $unset: {
+                        passwordResetTokenHash: 1,
+                        passwordResetExpires: 1,
+                    },
+                },
+                {returnDocument: 'after', runValidators: true, session},
+            ).select('_id');
 
-            await user.save({session});
+            if (!user) {
+                throw new AppError('Invalid or expired reset token', BAD_REQUEST);
+            }
 
             await Session.deleteMany({user: user._id}, {session});
         });
