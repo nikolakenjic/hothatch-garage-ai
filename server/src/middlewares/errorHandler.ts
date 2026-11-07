@@ -1,7 +1,12 @@
 import {ErrorRequestHandler} from 'express';
 import {MongoServerError} from 'mongodb';
 import {AppError} from '../utils/AppError';
-import {CONFLICT, INTERNAL_SERVER_ERROR} from '../constants/http';
+import {
+    BAD_REQUEST,
+    CONFLICT,
+    INTERNAL_SERVER_ERROR,
+    PAYLOAD_TOO_LARGE,
+} from '../constants/http';
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     if (err instanceof AppError) {
@@ -26,6 +31,24 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
         });
 
         return;
+    }
+
+    if (err instanceof Error && 'type' in err && 'status' in err) {
+        if (err.type === 'entity.parse.failed' && err.status === BAD_REQUEST) {
+            res.status(BAD_REQUEST).json({
+                status: 'fail',
+                message: 'Invalid JSON body',
+            });
+            return;
+        }
+
+        if (err.type === 'entity.too.large' && err.status === PAYLOAD_TOO_LARGE) {
+            res.status(PAYLOAD_TOO_LARGE).json({
+                status: 'fail',
+                message: 'Request body is too large',
+            });
+            return;
+        }
     }
 
     console.error(err);
