@@ -341,7 +341,30 @@ npm run build
 npm run start
 ```
 
-The backend also includes Vitest tooling. Automated test coverage is planned for further development.
+### Backend Tests
+
+Run the existing backend test suite from the repository root:
+
+```bash
+npm --prefix server test
+```
+
+For watch mode during development:
+
+```bash
+npm --prefix server run test:watch
+```
+
+The suite uses Vitest and Supertest. Current coverage includes:
+
+- Registration and duplicate-email rejection.
+- Email verification, resending links, invalid/expired tokens, and authentication-method validation.
+- Password reset, single-use tokens under concurrent requests, session revocation, and transaction rollback.
+- Invalid JSON, oversized request bodies, validation errors, and generic server-error responses.
+
+Follow the backend environment setup above before running tests: importing the application still validates its environment variables. The test setup creates a temporary local MongoDB replica set through `mongodb-memory-server` to support transactions; it does not connect to the database configured by `MONGO_URI`. Email delivery is mocked in the current test suites.
+
+Broader integration coverage and frontend end-to-end tests remain planned.
 
 ---
 
