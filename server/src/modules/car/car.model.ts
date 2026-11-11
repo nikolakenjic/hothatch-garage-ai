@@ -1,7 +1,7 @@
 import mongoose, {Schema} from 'mongoose';
 
 export type FuelType = 'petrol' | 'diesel' | 'hybrid' | 'electric';
-export type Transmission = 'manual' | 'automatic' | 'dsg';
+export type Transmission = 'manual' | 'automatic';
 export type Drivetrain = 'fwd' | 'rwd' | 'awd';
 
 export interface ICar {
