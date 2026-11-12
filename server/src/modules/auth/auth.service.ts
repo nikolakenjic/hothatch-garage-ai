@@ -138,7 +138,7 @@ export const refreshAccessTokenService = async (refreshToken: string) => {
             refreshTokenHash: newRefreshTokenHash,
         },
         {
-            new: true,
+            returnDocument: 'after',
         },
     );
 

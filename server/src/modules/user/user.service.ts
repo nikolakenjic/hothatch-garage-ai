@@ -58,7 +58,7 @@ export const updateProfileService = async (
     }
 
     const user = await User.findByIdAndUpdate(userId, operations, {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
     }).select('-__v');
 
@@ -288,7 +288,7 @@ export const updateSettingsService = async (
         userId,
         {$set: update},
         {
-            new: true,
+            returnDocument: 'after',
             runValidators: true,
         },
     ).select(' -__v');
