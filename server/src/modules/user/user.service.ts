@@ -109,6 +109,9 @@ export const changePasswordService = async (
                 BCRYPT_SALT_ROUNDS,
             );
 
+            user.passwordResetTokenHash = undefined;
+            user.passwordResetExpires = undefined;
+
             await user.save({session});
 
             await Session.deleteMany({user: userId}, {session});
