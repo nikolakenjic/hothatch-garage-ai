@@ -66,7 +66,11 @@ export const updateSettingsSchema = z
             .optional(),
     })
     .refine(
-        (data) => data.preferences !== undefined || data.privacy !== undefined,
+        (data) =>
+            data.preferences?.theme !== undefined ||
+            data.preferences?.emailNotifications !== undefined ||
+            data.privacy?.publicProfile !== undefined ||
+            data.privacy?.publicGarage !== undefined,
         {
             message: 'At least one settings field is required',
         },
