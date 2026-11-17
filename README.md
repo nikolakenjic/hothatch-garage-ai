@@ -184,7 +184,7 @@ Security controls reduce risk but do not replace independent security auditing.
 
 - Node.js 22, 23, or 24
 - npm
-- MongoDB database
+- MongoDB deployment with transaction support (MongoDB Atlas or a local replica set)
 - Groq API key
 - Resend API key and configured sender address
 - Google OAuth credentials for Google sign-in
@@ -220,6 +220,8 @@ Important variables include:
 | `CLIENT_URL`         | Allowed frontend origin               |
 | `COOKIE_DOMAIN`      | Optional authentication cookie domain |
 | `GOOGLE_CLIENT_ID`   | Google OAuth audience verification    |
+
+Password changes, password resets, account deletion, and vehicle deletion use MongoDB transactions. Configure `MONGO_URI` with a MongoDB Atlas cluster or a local replica set. A standalone MongoDB instance does not support these transactions; see the [MongoDB transaction deployment requirements](https://www.mongodb.com/docs/manual/core/transactions-production-consideration/#availability).
 
 Start the backend:
 
