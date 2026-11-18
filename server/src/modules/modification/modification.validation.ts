@@ -24,7 +24,7 @@ export const createModificationSchema = z.object({
     description: z.string().trim().max(1000).optional(),
     category: modificationCategorySchema,
     status: modificationStatusSchema.optional(),
-    cost: z.number().min(0, 'Cost must be positive').optional(),
+    cost: z.number().min(0, 'Cost cannot be negative').optional(),
     installedAt: z.coerce.date().optional(),
     brand: z.string().trim().max(80).optional(),
     partNumber: z.string().trim().max(80).optional(),
