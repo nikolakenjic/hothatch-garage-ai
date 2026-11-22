@@ -154,7 +154,7 @@ export default function HomePage() {
                         >
                             <div className="flex items-center justify-between border-b border-border-subtle pb-5">
                                 <div>
-                                    <p className="caption">Current build</p>
+                                    <p className="caption">Example build</p>
                                     <h2 className="card-title mt-1">
                                         Golf GTI Clubsport
                                     </h2>
@@ -203,14 +203,6 @@ export default function HomePage() {
                                     most from improved thermal capacity and
                                     pedal consistency.
                                 </p>
-
-                                <Button variant="ai" size="sm" className="mt-5">
-                                    View recommendation
-                                    <ArrowRight
-                                        className="size-4"
-                                        aria-hidden="true"
-                                    />
-                                </Button>
                             </div>
                         </GlassPanel>
                     </div>
