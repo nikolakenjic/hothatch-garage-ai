@@ -7,7 +7,12 @@ const envSchema = z.object({
     NODE_ENV: z
         .enum(['development', 'production', 'test'])
         .default('development'),
-    PORT: z.coerce.number().int().positive().default(5001),
+    PORT: z.coerce
+        .number()
+        .int()
+        .positive()
+        .max(65535, 'PORT must not exceed 65535')
+        .default(5001),
 
     MONGO_URI: z.string().min(1, 'MONGO_URI is required'),
 
