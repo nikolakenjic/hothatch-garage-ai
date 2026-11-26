@@ -362,9 +362,12 @@ The suite uses Vitest and Supertest. Current coverage includes:
 - Registration and duplicate-email rejection.
 - Email verification, resending links, invalid/expired tokens, and authentication-method validation.
 - Password reset, single-use tokens under concurrent requests, session revocation, and transaction rollback.
+- Authenticated password changes, outstanding reset-link invalidation, and rollback if session revocation fails.
 - Invalid JSON, oversized request bodies, validation errors, and generic server-error responses.
 
 Follow the backend environment setup above before running tests: importing the application still validates its environment variables. The test setup creates a temporary local MongoDB replica set through `mongodb-memory-server` to support transactions; it does not connect to the database configured by `MONGO_URI`. Email delivery is mocked in the current test suites.
+
+Test hooks have a 60-second timeout to allow for replica-set startup and cleanup. Individual tests have a 15-second timeout to accommodate password hashing on slower machines. These limits are configured in `server/vitest.config.ts` and apply to both the regular test command and watch mode.
 
 Broader integration coverage and frontend end-to-end tests remain planned.
 
